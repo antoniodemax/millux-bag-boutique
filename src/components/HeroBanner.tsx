@@ -43,7 +43,7 @@ const HeroBanner = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden">
+    <section className="relative min-h-screen bg-gradient-to-br from-brand-secondary via-brand-light to-brand-secondary overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
@@ -54,16 +54,16 @@ const HeroBanner = () => {
           {/* Left Content */}
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-6">
-              <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-5xl lg:text-7xl font-bold text-brand-dark leading-tight">
                 Premium
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-gray-700 to-gray-900">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-dark">
                   Bags
                 </span>
-                <span className="block text-3xl lg:text-4xl font-light text-gray-600">
+                <span className="block text-3xl lg:text-4xl font-light text-brand-primary/80">
                   for Every Occasion
                 </span>
               </h1>
-              <p className="text-xl lg:text-2xl text-gray-600 max-w-2xl leading-relaxed">
+              <p className="text-xl lg:text-2xl text-brand-primary/70 max-w-2xl leading-relaxed">
                 Discover our curated collection of stylish handbags, travel bags, and accessories 
                 that combine elegance with functionality.
               </p>
@@ -73,7 +73,7 @@ const HeroBanner = () => {
               <Link to="/shop">
                 <Button 
                   size="lg" 
-                  className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="w-full sm:w-auto bg-brand-primary hover:bg-brand-dark text-brand-light px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   Shop Collection
                 </Button>
@@ -82,7 +82,7 @@ const HeroBanner = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="w-full sm:w-auto border-2 border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105"
+                  className="w-full sm:w-auto border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-light px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105"
                 >
                   Our Story
                 </Button>
@@ -92,16 +92,16 @@ const HeroBanner = () => {
             {/* Trust Indicators */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 pt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">500+</div>
-                <div className="text-sm text-gray-600">Happy Customers</div>
+                <div className="text-2xl font-bold text-brand-dark">500+</div>
+                <div className="text-sm text-brand-primary/70">Happy Customers</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">50+</div>
-                <div className="text-sm text-gray-600">Unique Designs</div>
+                <div className="text-2xl font-bold text-brand-dark">50+</div>
+                <div className="text-sm text-brand-primary/70">Unique Designs</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">24/7</div>
-                <div className="text-sm text-gray-600">Customer Support</div>
+                <div className="text-2xl font-bold text-brand-dark">24/7</div>
+                <div className="text-sm text-brand-primary/70">Customer Support</div>
               </div>
             </div>
           </div>
@@ -130,15 +130,15 @@ const HeroBanner = () => {
               {/* Navigation Arrows */}
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-brand-light/90 hover:bg-brand-light p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
               >
-                <ChevronLeft className="w-6 h-6 text-gray-800" />
+                <ChevronLeft className="w-6 h-6 text-brand-dark" />
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-brand-light/90 hover:bg-brand-light p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
               >
-                <ChevronRight className="w-6 h-6 text-gray-800" />
+                <ChevronRight className="w-6 h-6 text-brand-dark" />
               </button>
 
               {/* Dots Indicator */}
@@ -149,8 +149,8 @@ const HeroBanner = () => {
                     onClick={() => setCurrentImage(index)}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       index === currentImage 
-                        ? 'bg-white scale-125' 
-                        : 'bg-white/50 hover:bg-white/70'
+                        ? 'bg-brand-accent scale-125' 
+                        : 'bg-brand-light/50 hover:bg-brand-light/70'
                     }`}
                   />
                 ))}
@@ -158,16 +158,16 @@ const HeroBanner = () => {
             </div>
 
             {/* Floating Elements */}
-            <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full opacity-60 animate-pulse"></div>
-            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full opacity-40 animate-pulse delay-1000"></div>
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-brand-accent/30 to-brand-primary/30 rounded-full opacity-60 animate-pulse"></div>
+            <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-br from-brand-secondary/50 to-brand-accent/30 rounded-full opacity-40 animate-pulse delay-1000"></div>
           </div>
         </div>
       </div>
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-gray-400 rounded-full mt-2 animate-pulse"></div>
+        <div className="w-6 h-10 border-2 border-brand-primary rounded-full flex justify-center">
+          <div className="w-1 h-3 bg-brand-primary rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
     </section>
