@@ -43,10 +43,26 @@ const HeroBanner = () => {
   };
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-brand-secondary via-brand-light to-brand-secondary overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0">
+        <img 
+          src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          alt="Luxury handbag collection background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-dark/70 via-brand-primary/60 to-brand-secondary/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/50 to-transparent"></div>
+      </div>
+
       {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}></div>
+      <div className="absolute inset-0 opacity-10">
+        <div 
+          className="absolute inset-0" 
+          style={{ 
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+          }}
+        ></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -54,16 +70,16 @@ const HeroBanner = () => {
           {/* Left Content */}
           <div className="text-center lg:text-left space-y-8">
             <div className="space-y-6">
-              <h1 className="text-5xl lg:text-7xl font-bold text-brand-dark leading-tight">
+              <h1 className="text-5xl lg:text-7xl font-bold text-brand-light leading-tight">
                 Premium
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-dark">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-brand-light">
                   Bags
                 </span>
-                <span className="block text-3xl lg:text-4xl font-light text-brand-primary/80">
+                <span className="block text-3xl lg:text-4xl font-light text-brand-accent">
                   for Every Occasion
                 </span>
               </h1>
-              <p className="text-xl lg:text-2xl text-brand-primary/70 max-w-2xl leading-relaxed">
+              <p className="text-xl lg:text-2xl text-brand-light/90 max-w-2xl leading-relaxed">
                 Discover our curated collection of stylish handbags, travel bags, and accessories 
                 that combine elegance with functionality.
               </p>
@@ -73,7 +89,7 @@ const HeroBanner = () => {
               <Link to="/shop">
                 <Button 
                   size="lg" 
-                  className="w-full sm:w-auto bg-brand-primary hover:bg-brand-dark text-brand-light px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="w-full sm:w-auto bg-brand-accent hover:bg-brand-accent/90 text-brand-dark px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   Shop Collection
                 </Button>
@@ -82,7 +98,7 @@ const HeroBanner = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="w-full sm:w-auto border-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-brand-light px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105"
+                  className="w-full sm:w-auto border-2 border-brand-accent text-brand-accent hover:bg-brand-accent hover:text-brand-dark px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105"
                 >
                   Our Story
                 </Button>
@@ -92,16 +108,16 @@ const HeroBanner = () => {
             {/* Trust Indicators */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 pt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold text-brand-dark">500+</div>
-                <div className="text-sm text-brand-primary/70">Happy Customers</div>
+                <div className="text-2xl font-bold text-brand-light">500+</div>
+                <div className="text-sm text-brand-accent">Happy Customers</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-brand-dark">50+</div>
-                <div className="text-sm text-brand-primary/70">Unique Designs</div>
+                <div className="text-2xl font-bold text-brand-light">50+</div>
+                <div className="text-sm text-brand-accent">Unique Designs</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-brand-dark">24/7</div>
-                <div className="text-sm text-brand-primary/70">Customer Support</div>
+                <div className="text-2xl font-bold text-brand-light">24/7</div>
+                <div className="text-sm text-brand-accent">Customer Support</div>
               </div>
             </div>
           </div>
@@ -166,8 +182,8 @@ const HeroBanner = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-brand-primary rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-brand-primary rounded-full mt-2 animate-pulse"></div>
+        <div className="w-6 h-10 border-2 border-brand-accent rounded-full flex justify-center">
+          <div className="w-1 h-3 bg-brand-accent rounded-full mt-2 animate-pulse"></div>
         </div>
       </div>
     </section>
