@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,97 +6,97 @@
 
 @layer base {
   :root {
-    --background: 45 44% 94%;
-    --foreground: 24 45% 20%;
+    --background: 210 40% 98%;
+    --foreground: 210 40% 15%;
 
-    --card: 45 44% 97%;
-    --card-foreground: 24 45% 20%;
+    --card: 210 40% 100%;
+    --card-foreground: 210 40% 15%;
 
-    --popover: 45 44% 97%;
-    --popover-foreground: 24 45% 20%;
+    --popover: 210 40% 100%;
+    --popover-foreground: 210 40% 15%;
 
-    --primary: 24 45% 35%;
-    --primary-foreground: 45 44% 94%;
+    --primary: 210 100% 45%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 45 44% 90%;
-    --secondary-foreground: 24 45% 25%;
+    --secondary: 210 30% 90%;
+    --secondary-foreground: 210 40% 20%;
 
-    --muted: 45 44% 88%;
-    --muted-foreground: 24 25% 45%;
+    --muted: 210 30% 92%;
+    --muted-foreground: 210 20% 50%;
 
-    --accent: 35 75% 85%;
-    --accent-foreground: 24 45% 20%;
+    --accent: 200 100% 80%;
+    --accent-foreground: 210 40% 15%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 45 44% 94%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 45 35% 85%;
-    --input: 45 35% 85%;
-    --ring: 24 45% 35%;
+    --border: 210 30% 88%;
+    --input: 210 30% 88%;
+    --ring: 210 100% 45%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 45 44% 96%;
-    --sidebar-foreground: 24 35% 30%;
-    --sidebar-primary: 24 45% 35%;
-    --sidebar-primary-foreground: 45 44% 94%;
-    --sidebar-accent: 45 44% 92%;
-    --sidebar-accent-foreground: 24 45% 25%;
-    --sidebar-border: 45 35% 88%;
-    --sidebar-ring: 35 75% 70%;
+    --sidebar-background: 210 40% 97%;
+    --sidebar-foreground: 210 40% 25%;
+    --sidebar-primary: 210 100% 45%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 30% 93%;
+    --sidebar-accent-foreground: 210 40% 20%;
+    --sidebar-border: 210 30% 90%;
+    --sidebar-ring: 200 100% 75%;
 
-    /* Custom brand colors */
-    --brand-primary: 24 45% 35%; /* #8F4F2A rich brown */
-    --brand-secondary: 45 44% 89%; /* #FFE6B4 cream */
-    --brand-accent: 35 75% 70%; /* warm gold */
-    --brand-dark: 24 55% 25%; /* darker brown */
-    --brand-light: 45 55% 95%; /* lighter cream */
+    /* Custom brand colors - Blue, White, Unisex theme */
+    --brand-primary: 210 100% 45%; /* Classic blue */
+    --brand-secondary: 210 40% 98%; /* Clean white */
+    --brand-accent: 200 100% 75%; /* Light blue accent */
+    --brand-dark: 210 40% 15%; /* Navy blue */
+    --brand-light: 210 40% 100%; /* Pure white */
   }
 
   .dark {
-    --background: 24 45% 8%;
-    --foreground: 45 44% 94%;
+    --background: 210 40% 8%;
+    --foreground: 210 40% 95%;
 
-    --card: 24 45% 10%;
-    --card-foreground: 45 44% 94%;
+    --card: 210 40% 10%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 24 45% 10%;
-    --popover-foreground: 45 44% 94%;
+    --popover: 210 40% 10%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 45 44% 89%;
-    --primary-foreground: 24 45% 15%;
+    --primary: 200 100% 75%;
+    --primary-foreground: 210 40% 10%;
 
-    --secondary: 24 35% 15%;
-    --secondary-foreground: 45 44% 94%;
+    --secondary: 210 30% 15%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 24 35% 15%;
-    --muted-foreground: 45 25% 65%;
+    --muted: 210 30% 15%;
+    --muted-foreground: 210 20% 65%;
 
-    --accent: 24 35% 18%;
-    --accent-foreground: 45 44% 94%;
+    --accent: 210 30% 18%;
+    --accent-foreground: 210 40% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 45 44% 94%;
+    --destructive-foreground: 210 40% 95%;
 
-    --border: 24 35% 18%;
-    --input: 24 35% 18%;
-    --ring: 45 44% 83%;
+    --border: 210 30% 18%;
+    --input: 210 30% 18%;
+    --ring: 200 100% 75%;
     
-    --sidebar-background: 24 45% 8%;
-    --sidebar-foreground: 45 44% 90%;
-    --sidebar-primary: 35 75% 60%;
-    --sidebar-primary-foreground: 24 45% 8%;
-    --sidebar-accent: 24 35% 12%;
-    --sidebar-accent-foreground: 45 44% 90%;
-    --sidebar-border: 24 35% 15%;
-    --sidebar-ring: 35 75% 70%;
+    --sidebar-background: 210 40% 8%;
+    --sidebar-foreground: 210 40% 90%;
+    --sidebar-primary: 200 100% 70%;
+    --sidebar-primary-foreground: 210 40% 8%;
+    --sidebar-accent: 210 30% 12%;
+    --sidebar-accent-foreground: 210 40% 90%;
+    --sidebar-border: 210 30% 15%;
+    --sidebar-ring: 200 100% 75%;
 
-    /* Custom brand colors for dark mode */
-    --brand-primary: 35 75% 60%;
-    --brand-secondary: 24 35% 18%;
-    --brand-accent: 45 65% 75%;
-    --brand-dark: 24 45% 8%;
-    --brand-light: 24 35% 20%;
+    /* Custom brand colors for dark mode - Blue, White, Unisex theme */
+    --brand-primary: 200 100% 70%;
+    --brand-secondary: 210 30% 18%;
+    --brand-accent: 200 100% 80%;
+    --brand-dark: 210 40% 8%;
+    --brand-light: 210 30% 20%;
   }
 }
 
