@@ -49,19 +49,40 @@ const Index = () => {
       </section>
 
       {/* Featured Category */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+            alt="Luxury handbag collection background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-dark/80 via-brand-primary/70 to-brand-secondary/90"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/60 to-transparent"></div>
+        </div>
+
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div 
+            className="absolute inset-0" 
+            style={{ 
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+            }}
+          ></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-brand-light mb-6">
               Featured Collection
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-brand-light/90 max-w-3xl mx-auto leading-relaxed">
               Explore our signature handbags for women - crafted with premium materials 
               and designed for the modern woman who values both style and functionality.
             </p>
           </div>
           
-          <Card className="max-w-6xl mx-auto overflow-hidden shadow-2xl rounded-3xl">
+          <Card className="max-w-6xl mx-auto overflow-hidden shadow-2xl rounded-3xl bg-brand-light/95 backdrop-blur-sm">
             <CardContent className="p-0">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <div className="relative h-80 lg:h-[500px] overflow-hidden">
@@ -70,19 +91,19 @@ const Index = () => {
                     alt="Handbags for Women"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/30 to-transparent"></div>
                 </div>
-                <div className="p-12 lg:p-16 flex flex-col justify-center bg-gradient-to-br from-white to-gray-50">
-                  <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+                <div className="p-12 lg:p-16 flex flex-col justify-center">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-brand-dark mb-6">
                     Handbags for Women
                   </h3>
-                  <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                  <p className="text-lg text-brand-primary mb-8 leading-relaxed">
                     Elevate your style with our exquisite collection of handbags. 
                     From everyday essentials to statement pieces, find the perfect 
                     bag to complement your unique style and lifestyle needs.
                   </p>
                   <Link to="/shop?category=handbags-women">
-                    <Button className="w-full sm:w-auto bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
+                    <Button className="w-full sm:w-auto bg-brand-primary hover:bg-brand-dark text-brand-light px-8 py-4 text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-lg">
                       Shop Handbags
                     </Button>
                   </Link>
