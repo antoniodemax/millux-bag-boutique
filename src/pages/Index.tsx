@@ -1,14 +1,17 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryGrid from "@/components/CategoryGrid";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import HeroBanner from "@/components/HeroBanner";
 import { Sparkles, Shield, Truck, Star, Award, Heart } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen overflow-hidden">
+      {/* Hero Section with Enhanced Animation */}
+      <HeroBanner />
+
       {/* Enhanced Features Section with Floating Animation */}
       <section className="py-20 bg-gradient-to-br from-brand-light via-white to-brand-secondary/30 relative overflow-hidden">
         {/* Animated Background Elements */}
