@@ -58,14 +58,14 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-12">
-            <ShoppingBag className="h-24 w-24 text-gray-300 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
-            <p className="text-gray-600 mb-6">Add some beautiful bags to get started!</p>
+      <div className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-8 sm:py-12">
+            <ShoppingBag className="h-16 w-16 sm:h-24 sm:w-24 text-gray-300 mx-auto mb-4" />
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">Add some beautiful bags to get started!</p>
             <Link to="/shop">
-              <Button>Continue Shopping</Button>
+              <Button className="w-full sm:w-auto">Continue Shopping</Button>
             </Link>
           </div>
         </div>
@@ -74,92 +74,140 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+    <div className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Shopping Cart</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item) => (
               <Card key={item.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     {/* Product Image */}
-                    <div className="bg-gray-200 h-20 w-20 rounded-lg flex items-center justify-center">
-                      <div className="w-10 h-10 bg-gray-300 rounded"></div>
+                    <div className="bg-gray-200 h-16 w-16 sm:h-20 sm:w-20 rounded-lg flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded"></div>
                     </div>
 
-                    {/* Product Details */}
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                      <p className="text-gray-600">KSh {item.price.toLocaleString()}</p>
+                    {/* Product Details - Mobile Layout */}
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{item.name}</h3>
+                      <p className="text-gray-600 text-sm sm:text-base">KSh {item.price.toLocaleString()}</p>
                     </div>
 
-                    {/* Quantity Controls */}
-                    <div className="flex items-center space-x-2">
+                    {/* Mobile Controls Section */}
+                    <div className="flex flex-col space-y-3 sm:hidden">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center justify-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                          className="w-16 text-center h-8 text-sm"
+                          min="0"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+
+                      {/* Total and Remove */}
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold text-gray-900 text-sm">
+                          KSh {(item.price * item.quantity).toLocaleString()}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeItem(item.id)}
+                          className="text-red-600 hover:text-red-700 h-8"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Desktop Controls - Hidden on Mobile */}
+                    <div className="hidden sm:flex sm:items-center sm:space-x-4">
+                      {/* Quantity Controls */}
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                          className="w-16 text-center"
+                          min="0"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      {/* Item Total */}
+                      <div className="text-right min-w-[100px]">
+                        <p className="font-semibold text-gray-900">
+                          KSh {(item.price * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
+
+                      {/* Remove Button */}
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => removeItem(item.id)}
+                        className="text-red-600 hover:text-red-700"
                       >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <Input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
-                        className="w-16 text-center"
-                        min="0"
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      >
-                        <Plus className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-
-                    {/* Item Total */}
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">
-                        KSh {(item.price * item.quantity).toLocaleString()}
-                      </p>
-                    </div>
-
-                    {/* Remove Button */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeItem(item.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Order Summary */}
-          <div>
+          {/* Order Summary - Sticky on Desktop */}
+          <div className="lg:self-start lg:sticky lg:top-8">
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
                 
                 <div className="space-y-2 mb-4">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="text-gray-900">KSh {subtotal.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm sm:text-base">
                     <span className="text-gray-600">Shipping</span>
                     <span className="text-gray-900">KSh {shipping.toLocaleString()}</span>
                   </div>
                   <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between font-semibold">
+                    <div className="flex justify-between font-semibold text-sm sm:text-base">
                       <span className="text-gray-900">Total</span>
                       <span className="text-gray-900">KSh {total.toLocaleString()}</span>
                     </div>
@@ -167,11 +215,11 @@ const Cart = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <Button className="w-full" onClick={handleWhatsAppCheckout}>
+                  <Button className="w-full text-sm sm:text-base" onClick={handleWhatsAppCheckout}>
                     Checkout via WhatsApp
                   </Button>
                   <Link to="/shop">
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full text-sm sm:text-base">
                       Continue Shopping
                     </Button>
                   </Link>
