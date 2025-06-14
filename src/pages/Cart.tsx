@@ -1,53 +1,32 @@
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthGuard from "@/components/AuthGuard";
 
-// Mock cart data
-const mockCartItems = [
-  {
-    id: 1,
-    name: "Classic Leather Handbag",
-    price: 8500,
-    quantity: 1,
-    image: ""
-  },
-  {
-    id: 2,
-    name: "Designer Tote Bag",
-    price: 12000,
-    quantity: 2,
-    image: ""
-  }
-];
+const CartContent = () => {
+  const { cartItems, updateQuantity, removeFromCart, isLoading } = useCart();
+  const { user } = useAuth();
 
-const Cart = () => {
-  const [cartItems, setCartItems] = useState(mockCartItems);
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      removeItem(id);
-      return;
-    }
-    setCartItems(cartItems.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    ));
+  const updateItemQuantity = (itemId: string, newQuantity: number) => {
+    updateQuantity({ itemId, quantity: newQuantity });
   };
 
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+  const removeItem = (itemId: string) => {
+    removeFromCart(itemId);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.products.price * item.quantity), 0);
   const shipping = 500; // Fixed shipping cost
   const total = subtotal + shipping;
 
   const handleWhatsAppCheckout = () => {
     const itemsText = cartItems.map(item => 
-      `${item.name} x${item.quantity} - KSh ${(item.price * item.quantity).toLocaleString()}`
+      `${item.products.name} x${item.quantity} - KSh ${(item.products.price * item.quantity).toLocaleString()}`
     ).join('\n');
     
     const message = `Hi! I'd like to place an order:\n\n${itemsText}\n\nSubtotal: KSh ${subtotal.toLocaleString()}\nShipping: KSh ${shipping.toLocaleString()}\nTotal: KSh ${total.toLocaleString()}`;
@@ -55,6 +34,19 @@ const Cart = () => {
     const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-4 px-4 sm:py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-8 sm:py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your cart...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -87,13 +79,21 @@ const Cart = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     {/* Product Image */}
                     <div className="bg-gray-200 h-16 w-16 sm:h-20 sm:w-20 rounded-lg flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded"></div>
+                      {item.products.image_url ? (
+                        <img 
+                          src={item.products.image_url} 
+                          alt={item.products.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded"></div>
+                      )}
                     </div>
 
                     {/* Product Details - Mobile Layout */}
                     <div className="flex-1 text-center sm:text-left">
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{item.name}</h3>
-                      <p className="text-gray-600 text-sm sm:text-base">KSh {item.price.toLocaleString()}</p>
+                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{item.products.name}</h3>
+                      <p className="text-gray-600 text-sm sm:text-base">KSh {item.products.price.toLocaleString()}</p>
                     </div>
 
                     {/* Mobile Controls Section */}
@@ -103,7 +103,7 @@ const Cart = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
                           className="h-8 w-8 p-0"
                         >
                           <Minus className="h-3 w-3" />
@@ -111,14 +111,14 @@ const Cart = () => {
                         <Input
                           type="number"
                           value={item.quantity}
-                          onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                          onChange={(e) => updateItemQuantity(item.id, parseInt(e.target.value) || 0)}
                           className="w-16 text-center h-8 text-sm"
                           min="0"
                         />
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
                           className="h-8 w-8 p-0"
                         >
                           <Plus className="h-3 w-3" />
@@ -128,7 +128,7 @@ const Cart = () => {
                       {/* Total and Remove */}
                       <div className="flex items-center justify-between">
                         <p className="font-semibold text-gray-900 text-sm">
-                          KSh {(item.price * item.quantity).toLocaleString()}
+                          KSh {(item.products.price * item.quantity).toLocaleString()}
                         </p>
                         <Button
                           variant="outline"
@@ -148,21 +148,21 @@ const Cart = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
                         <Input
                           type="number"
                           value={item.quantity}
-                          onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 0)}
+                          onChange={(e) => updateItemQuantity(item.id, parseInt(e.target.value) || 0)}
                           className="w-16 text-center"
                           min="0"
                         />
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -171,7 +171,7 @@ const Cart = () => {
                       {/* Item Total */}
                       <div className="text-right min-w-[100px]">
                         <p className="font-semibold text-gray-900">
-                          KSh {(item.price * item.quantity).toLocaleString()}
+                          KSh {(item.products.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
 
@@ -234,6 +234,14 @@ const Cart = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const Cart = () => {
+  return (
+    <AuthGuard>
+      <CartContent />
+    </AuthGuard>
   );
 };
 
