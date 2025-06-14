@@ -1,10 +1,11 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryGrid from "@/components/CategoryGrid";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import HeroBanner from "@/components/HeroBanner";
-import { Sparkles, Shield, Truck, Star, Award, Heart } from "lucide-react";
+import { Sparkles, Shield, Truck } from "lucide-react";
 
 const Index = () => {
   return (
@@ -25,9 +26,6 @@ const Index = () => {
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl lg:text-5xl font-bold text-brand-dark mb-6 relative">
               Why Choose Our Bags?
-              <div className="absolute -top-4 -right-4 animate-spin-slow">
-                <Star className="w-8 h-8 text-brand-accent" />
-              </div>
             </h2>
             <p className="text-xl text-brand-primary max-w-3xl mx-auto">
               Experience the perfect blend of style, quality, and innovation
@@ -44,11 +42,6 @@ const Index = () => {
               <p className="text-brand-primary leading-relaxed">
                 Crafted with the finest materials and attention to detail for lasting elegance and durability.
               </p>
-              <div className="mt-4 flex justify-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 text-brand-accent fill-current" />
-                ))}
-              </div>
             </div>
 
             <div className="group text-center p-8 rounded-3xl bg-gradient-to-br from-white to-brand-light/50 hover:from-brand-accent/10 hover:to-brand-secondary/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-lg hover:shadow-2xl border border-brand-secondary/30 md:translate-y-4">
@@ -60,9 +53,6 @@ const Index = () => {
               <p className="text-brand-primary leading-relaxed">
                 Every bag comes with our comprehensive satisfaction guarantee and premium quality assurance.
               </p>
-              <div className="mt-4 flex justify-center">
-                <Award className="w-6 h-6 text-brand-accent opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:animate-bounce" />
-              </div>
             </div>
 
             <div className="group text-center p-8 rounded-3xl bg-gradient-to-br from-white to-brand-light/50 hover:from-brand-accent/10 hover:to-brand-secondary/20 transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 shadow-lg hover:shadow-2xl border border-brand-secondary/30">
@@ -74,9 +64,6 @@ const Index = () => {
               <p className="text-brand-primary leading-relaxed">
                 Lightning-fast and secure delivery to bring your perfect bag right to your doorstep.
               </p>
-              <div className="mt-4 flex justify-center">
-                <Heart className="w-6 h-6 text-brand-accent opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:animate-ping" />
-              </div>
             </div>
           </div>
         </div>
@@ -159,11 +146,11 @@ const Index = () => {
                         <span className="font-medium">Premium Leather</span>
                       </div>
                       <div className="flex items-center text-brand-primary">
-                        <Star className="w-5 h-5 mr-2 text-brand-accent" />
+                        <Sparkles className="w-5 h-5 mr-2 text-brand-accent" />
                         <span className="font-medium">Handcrafted</span>
                       </div>
                       <div className="flex items-center text-brand-primary">
-                        <Heart className="w-5 h-5 mr-2 text-brand-accent" />
+                        <Shield className="w-5 h-5 mr-2 text-brand-accent" />
                         <span className="font-medium">Lifetime Warranty</span>
                       </div>
                     </div>
