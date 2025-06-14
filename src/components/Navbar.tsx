@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag, MessageCircle } from "lucide-react";
+import { Menu, X, ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -19,6 +19,12 @@ const Navbar = () => {
 
   const handleWhatsAppContact = () => {
     const message = "Hi! I'm interested in your products at MilluxCollections.";
+    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleCartClick = () => {
+    const message = "Hi! I've found some bags I'm interested in purchasing from MilluxCollections. Can you help me with the order?";
     const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -50,6 +56,14 @@ const Navbar = () => {
               </Link>
             ))}
             
+            <button
+              onClick={handleCartClick}
+              className="relative p-2 text-brand-primary hover:text-brand-dark transition-colors duration-200"
+              aria-label="Contact us to order"
+            >
+              <ShoppingCart className="h-6 w-6" />
+            </button>
+            
             <Button 
               onClick={handleWhatsAppContact}
               className="ml-4 bg-green-600 hover:bg-green-700"
@@ -60,7 +74,14 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={handleCartClick}
+              className="p-2 text-brand-primary hover:text-brand-dark transition-colors duration-200"
+              aria-label="Contact us to order"
+            >
+              <ShoppingCart className="h-6 w-6" />
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-brand-primary hover:text-brand-dark hover:bg-brand-accent/20"
