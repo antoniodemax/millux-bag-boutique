@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 export interface CartItem {
   id: string;
@@ -21,9 +21,10 @@ export interface CartItem {
 
 export const useCart = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const cartQuery = useQuery({
+  const { data: cartItems = [], isLoading } = useQuery({
     queryKey: ['cart', user?.id],
     queryFn: async (): Promise<CartItem[]> => {
       if (!user) return [];
@@ -47,76 +48,52 @@ export const useCart = () => {
     enabled: !!user,
   });
 
-  const addToCartMutation = useMutation({
+  const addToCart = useMutation({
     mutationFn: async ({ productId, quantity }: { productId: string; quantity: number }) => {
-      if (!user) throw new Error('User not authenticated');
+      if (!user) throw new Error('User must be logged in');
 
-      // Check if item already exists in cart
-      const { data: existingItem } = await supabase
+      const { data, error } = await supabase
         .from('cart_items')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('product_id', productId)
-        .single();
+        .upsert({
+          user_id: user.id,
+          product_id: productId,
+          quantity: quantity,
+        }, {
+          onConflict: 'user_id,product_id'
+        });
 
-      if (existingItem) {
-        // Update existing item
-        const { error } = await supabase
-          .from('cart_items')
-          .update({ 
-            quantity: existingItem.quantity + quantity,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingItem.id);
-
-        if (error) throw error;
-      } else {
-        // Insert new item
-        const { error } = await supabase
-          .from('cart_items')
-          .insert({
-            user_id: user.id,
-            product_id: productId,
-            quantity
-          });
-
-        if (error) throw error;
-      }
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart', user?.id] });
       toast({
         title: "Added to cart",
-        description: "Item has been added to your cart successfully.",
+        description: "Item has been added to your cart.",
       });
     },
-    onError: () => {
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to add item to cart. Please try again.",
+        description: "Failed to add item to cart.",
         variant: "destructive",
       });
     },
   });
 
-  const updateQuantityMutation = useMutation({
+  const updateQuantity = useMutation({
     mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
       if (quantity <= 0) {
         const { error } = await supabase
           .from('cart_items')
           .delete()
           .eq('id', itemId);
-
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('cart_items')
-          .update({ 
-            quantity,
-            updated_at: new Date().toISOString()
-          })
+          .update({ quantity })
           .eq('id', itemId);
-
         if (error) throw error;
       }
     },
@@ -125,13 +102,12 @@ export const useCart = () => {
     },
   });
 
-  const removeFromCartMutation = useMutation({
+  const removeFromCart = useMutation({
     mutationFn: async (itemId: string) => {
       const { error } = await supabase
         .from('cart_items')
         .delete()
         .eq('id', itemId);
-
       if (error) throw error;
     },
     onSuccess: () => {
@@ -144,10 +120,10 @@ export const useCart = () => {
   });
 
   return {
-    cartItems: cartQuery.data || [],
-    isLoading: cartQuery.isLoading,
-    addToCart: addToCartMutation.mutate,
-    updateQuantity: updateQuantityMutation.mutate,
-    removeFromCart: removeFromCartMutation.mutate,
+    cartItems,
+    isLoading,
+    addToCart: addToCart.mutate,
+    updateQuantity: updateQuantity.mutate,
+    removeFromCart: removeFromCart.mutate,
   };
 };

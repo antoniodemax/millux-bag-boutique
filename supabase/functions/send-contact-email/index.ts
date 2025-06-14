@@ -17,7 +17,6 @@ interface ContactEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,46 +24,27 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { name, email, message }: ContactEmailRequest = await req.json();
 
-    // Send confirmation email to customer
-    const customerEmailResponse = await resend.emails.send({
+    const emailResponse = await resend.emails.send({
       from: "MilluxCollections <onboarding@resend.dev>",
       to: [email],
-      subject: "We received your message!",
+      subject: "Thank you for contacting us!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #333;">Thank you for contacting us, ${name}!</h1>
           <p>We have received your message and will get back to you as soon as possible.</p>
-          <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <p><strong>Your message:</strong></p>
-            <p style="font-style: italic;">"${message}"</p>
+          
+          <h2 style="color: #333;">Your Message:</h2>
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="margin: 0;">${message}</p>
           </div>
+          
+          <p>We typically respond within 24 hours during business days.</p>
           <p>Best regards,<br>The MilluxCollections Team</p>
         </div>
       `,
     });
 
-    // Send notification email to admin
-    const adminEmailResponse = await resend.emails.send({
-      from: "MilluxCollections <onboarding@resend.dev>",
-      to: ["admin@milluxcollections.com"], // Replace with actual admin email
-      subject: `New Contact Form Submission from ${name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #333;">New Contact Form Submission</h1>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Message:</strong></p>
-          <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <p>${message}</p>
-          </div>
-          <p>Please respond to this inquiry as soon as possible.</p>
-        </div>
-      `,
-    });
-
-    console.log("Contact emails sent successfully:", { customerEmailResponse, adminEmailResponse });
-
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify(emailResponse), {
       status: 200,
       headers: {
         "Content-Type": "application/json",

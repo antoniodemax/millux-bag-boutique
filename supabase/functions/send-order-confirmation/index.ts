@@ -11,60 +11,67 @@ const corsHeaders = {
 };
 
 interface OrderConfirmationRequest {
-  customerEmail: string;
-  customerName: string;
+  email: string;
+  name: string;
   orderId: string;
-  orderItems: Array<{
+  items: Array<{
     name: string;
     quantity: number;
     price: number;
   }>;
-  totalAmount: number;
+  total: number;
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { customerEmail, customerName, orderId, orderItems, totalAmount }: OrderConfirmationRequest = await req.json();
+    const { email, name, orderId, items, total }: OrderConfirmationRequest = await req.json();
 
-    const itemsList = orderItems.map(item => 
-      `<li>${item.name} x${item.quantity} - KSh ${(item.price * item.quantity).toLocaleString()}</li>`
+    const itemsHtml = items.map(item => 
+      `<tr>
+        <td style="padding: 8px; border-bottom: 1px solid #eee;">${item.name}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${item.quantity}</td>
+        <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">KSh ${item.price.toLocaleString()}</td>
+      </tr>`
     ).join('');
 
     const emailResponse = await resend.emails.send({
       from: "MilluxCollections <onboarding@resend.dev>",
-      to: [customerEmail],
+      to: [email],
       subject: `Order Confirmation - ${orderId}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #333;">Thank you for your order, ${customerName}!</h1>
+          <h1 style="color: #333;">Thank you for your order, ${name}!</h1>
+          <p>We've received your order and will process it shortly.</p>
           
-          <p>We've received your order and are preparing it for delivery.</p>
+          <h2 style="color: #333;">Order Details</h2>
+          <p><strong>Order ID:</strong> ${orderId}</p>
           
-          <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px;">
-            <h2 style="color: #333; margin-top: 0;">Order Details</h2>
-            <p><strong>Order ID:</strong> ${orderId}</p>
-            <p><strong>Items:</strong></p>
-            <ul>
-              ${itemsList}
-            </ul>
-            <p><strong>Total:</strong> KSh ${totalAmount.toLocaleString()}</p>
-          </div>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+              <tr style="background-color: #f5f5f5;">
+                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Item</th>
+                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Quantity</th>
+                <th style="padding: 12px; text-align: right; border-bottom: 2px solid #ddd;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsHtml}
+              <tr style="font-weight: bold; background-color: #f9f9f9;">
+                <td style="padding: 12px; border-top: 2px solid #ddd;" colspan="2">Total</td>
+                <td style="padding: 12px; border-top: 2px solid #ddd; text-align: right;">KSh ${total.toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
           
-          <p>We'll send you another email with tracking information once your order ships.</p>
-          
-          <p>If you have any questions about your order, please contact us via WhatsApp at +254700000000.</p>
-          
-          <p>Best regards,<br>The MilluxCollections Team</p>
+          <p>We'll send you another email when your order ships.</p>
+          <p>Thank you for shopping with MilluxCollections!</p>
         </div>
       `,
     });
-
-    console.log("Order confirmation email sent successfully:", emailResponse);
 
     return new Response(JSON.stringify(emailResponse), {
       status: 200,
