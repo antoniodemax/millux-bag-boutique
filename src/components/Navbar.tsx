@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
@@ -56,13 +55,23 @@ const Navbar = () => {
               </Link>
             ))}
             
-            <button
-              onClick={handleCartClick}
-              className="relative p-2 text-brand-primary hover:text-brand-dark transition-colors duration-200"
-              aria-label="Contact us to order"
-            >
-              <ShoppingCart className="h-6 w-6" />
-            </button>
+            <div className="relative group">
+              <button
+                onClick={handleCartClick}
+                className="relative bg-gradient-to-r from-brand-primary to-blue-600 hover:from-blue-600 hover:to-brand-primary text-white p-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 group"
+                aria-label="Contact us to order"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
+                  !
+                </span>
+              </button>
+              
+              <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                Order via WhatsApp
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+              </div>
+            </div>
             
             <Button 
               onClick={handleWhatsAppContact}
@@ -75,13 +84,19 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-2">
-            <button
-              onClick={handleCartClick}
-              className="p-2 text-brand-primary hover:text-brand-dark transition-colors duration-200"
-              aria-label="Contact us to order"
-            >
-              <ShoppingCart className="h-6 w-6" />
-            </button>
+            <div className="relative">
+              <button
+                onClick={handleCartClick}
+                className="relative bg-gradient-to-r from-brand-primary to-blue-600 text-white p-2.5 rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                aria-label="Contact us to order"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold animate-pulse">
+                  !
+                </span>
+              </button>
+            </div>
+            
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-brand-primary hover:text-brand-dark hover:bg-brand-accent/20"
