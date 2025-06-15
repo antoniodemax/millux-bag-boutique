@@ -1,12 +1,17 @@
 
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag, MessageCircle } from "lucide-react";
+import { Menu, X, ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { cartItems } = useCart();
+  const { user } = useAuth();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -22,6 +27,8 @@ const Navbar = () => {
     const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
+
+  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <nav className="bg-brand-light shadow-lg sticky top-0 z-50 border-b border-brand-accent/20">
@@ -49,6 +56,20 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {user && (
+              <Link to="/cart" className="relative p-2">
+                <ShoppingCart className="h-6 w-6 text-brand-dark/70 hover:text-brand-primary" />
+                {cartItemCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {cartItemCount}
+                  </Badge>
+                )}
+              </Link>
+            )}
             
             <Button 
               onClick={handleWhatsAppContact}
@@ -88,6 +109,18 @@ const Navbar = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {user && (
+                <Link 
+                  to="/cart" 
+                  className="flex items-center px-3 py-2 text-base font-medium text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                </Link>
+              )}
+              
               <button
                 onClick={() => {
                   handleWhatsAppContact();

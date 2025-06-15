@@ -147,7 +147,7 @@ const ProductDetail = () => {
                 disabled={!product.stock_quantity || product.stock_quantity <= 0}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
-                {user ? 'Add to Cart' : 'Sign In to Add to Cart'}
+                Purchase
               </Button>
               
               <Button 
