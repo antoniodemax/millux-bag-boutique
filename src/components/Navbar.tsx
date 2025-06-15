@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
+import { Menu, X, MessageCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/useCart";
@@ -46,8 +46,11 @@ const Navbar = () => {
               onClick={handleLogoClick}
               className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             >
-              <ShoppingBag className="h-8 w-8 text-brand-primary mr-2" />
-              <span className="text-xl font-bold text-brand-dark">MilluxCollections</span>
+              <img 
+                src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
+                alt="Millux Collection Logo" 
+                className="h-10 w-auto"
+              />
             </div>
           </div>
 
