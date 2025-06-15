@@ -49,7 +49,7 @@ const Navbar = () => {
               <img 
                 src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
                 alt="Millux Collection Logo" 
-                className="h-10 w-auto"
+                className="h-12 w-auto"
               />
             </div>
           </div>
