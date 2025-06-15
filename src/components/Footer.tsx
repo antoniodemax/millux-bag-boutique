@@ -50,7 +50,7 @@ const Footer = () => {
 
         <div className="border-t border-brand-primary/30 mt-8 pt-8 text-center">
           <p className="text-brand-light/70">
-            © 2024 MilluxCollections. All rights reserved.
+            © 2025 MilluxCollections. All rights reserved.
           </p>
         </div>
       </div>
