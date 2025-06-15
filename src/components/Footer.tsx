@@ -40,10 +40,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-brand-accent">Categories</h3>
             <ul className="space-y-2">
-              <li><Link to="/shop?category=1" className="text-brand-light/80 hover:text-brand-accent transition-colors">Handbags for Women</Link></li>
-              <li><Link to="/shop?category=4" className="text-brand-light/80 hover:text-brand-accent transition-colors">Travel Bags</Link></li>
-              <li><Link to="/shop?category=7" className="text-brand-light/80 hover:text-brand-accent transition-colors">Laptop Bags</Link></li>
-              <li><Link to="/shop?category=11" className="text-brand-light/80 hover:text-brand-accent transition-colors">Men Bags</Link></li>
+              <li><Link to="/shop" className="text-brand-light/80 hover:text-brand-accent transition-colors">Handbags for Women</Link></li>
+              <li><Link to="/shop" className="text-brand-light/80 hover:text-brand-accent transition-colors">Travel Bags</Link></li>
+              <li><Link to="/shop" className="text-brand-light/80 hover:text-brand-accent transition-colors">Laptop Bags</Link></li>
+              <li><Link to="/shop" className="text-brand-light/80 hover:text-brand-accent transition-colors">Men Bags</Link></li>
             </ul>
           </div>
         </div>
