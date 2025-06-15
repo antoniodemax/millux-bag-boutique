@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingBag, MessageCircle, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems } = useCart();
   const { user } = useAuth();
 
@@ -21,6 +22,12 @@ const Navbar = () => {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Logo clicked, navigating to homepage");
+    navigate("/");
+  };
 
   const handleWhatsAppContact = () => {
     const message = "Hi! I'm interested in your products at MilluxCollections.";
@@ -35,10 +42,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
+            <div 
+              onClick={handleLogoClick}
+              className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+            >
               <ShoppingBag className="h-8 w-8 text-brand-primary mr-2" />
               <span className="text-xl font-bold text-brand-dark">MilluxCollections</span>
-            </Link>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
