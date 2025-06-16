@@ -31,7 +31,7 @@ const CartContent = () => {
     
     const message = `Hi! I'd like to place an order:\n\n${itemsText}\n\nSubtotal: KSh ${subtotal.toLocaleString()}\nShipping: KSh ${shipping.toLocaleString()}\nTotal: KSh ${total.toLocaleString()}`;
     
-    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
