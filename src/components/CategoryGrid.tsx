@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 
 const categories = [
-  { id: 1, name: "Handbags for Women", image: "", available: true },
+  { id: 1, name: "Handbags for Women", image: "/lovable-uploads/3504aa42-e749-4c7b-b736-c8700d635528.png", available: true },
   { id: 2, name: "Sling Bags", image: "", available: false },
   { id: 3, name: "Large Bags", image: "", available: false },
   { id: 4, name: "Travel Bags", image: "", available: false },
@@ -39,11 +39,19 @@ const CategoryGrid = () => {
                 category.available ? "hover:scale-105" : "opacity-75"
               }`}>
                 <CardContent className="p-0">
-                  <div className="bg-gray-200 h-48 flex items-center justify-center relative">
-                    <div className="text-center text-gray-500">
-                      <div className="w-16 h-16 bg-gray-300 rounded-lg mx-auto mb-2"></div>
-                      <p className="text-sm">{category.name}</p>
-                    </div>
+                  <div className="bg-gray-200 h-48 flex items-center justify-center relative overflow-hidden">
+                    {category.image ? (
+                      <img 
+                        src={category.image} 
+                        alt={`${category.name} - Premium bags from MilluxCollections`}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-center text-gray-500">
+                        <div className="w-16 h-16 bg-gray-300 rounded-lg mx-auto mb-2"></div>
+                        <p className="text-sm">{category.name}</p>
+                      </div>
+                    )}
                     {!category.available && (
                       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                         <span className="text-white font-semibold">Coming Soon</span>
