@@ -18,7 +18,7 @@ const Auth = () => {
 
   const handleWhatsAppContact = () => {
     const message = "Hi! I'm interested in your products at MilluxCollections and would like to place an order.";
-    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

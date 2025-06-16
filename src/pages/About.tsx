@@ -44,11 +44,12 @@ const About = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Meet Our Founder</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
               <div className="md:col-span-1">
-                <div className="bg-gray-200 h-64 w-full rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto mb-2"></div>
-                    <p className="text-sm">Founder Photo</p>
-                  </div>
+                <div className="h-64 w-full rounded-lg overflow-hidden">
+                  <img 
+                    src="/lovable-uploads/be8feb59-6ba3-45a2-a52e-5a7b4940d995.png" 
+                    alt="Milkah Adhiambo - Founder of MilluxCollections"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
               <div className="md:col-span-2">
@@ -60,7 +61,7 @@ const About = () => {
                 </p>
                 <p className="text-gray-600">
                   "I believe that the right bag can transform not just your outfit, but your entire day. 
-                  That's why we're committed to offering pieces that are both beautiful and functional." - Sarah
+                  That's why we're committed to offering pieces that are both beautiful and functional." - Milkah
                 </p>
               </div>
             </div>

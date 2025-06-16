@@ -9,7 +9,7 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 const Contact = () => {
   const handleWhatsAppContact = () => {
     const message = "Hi! I'd like to get in touch with MilluxCollections.";
-    const whatsappUrl = `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
@@ -113,7 +113,7 @@ const Contact = () => {
                     <Phone className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Phone</p>
-                      <p className="text-gray-900">+254 700 000 000</p>
+                      <p className="text-gray-900">+254 723 425 778</p>
                     </div>
                   </div>
                   

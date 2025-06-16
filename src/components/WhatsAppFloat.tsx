@@ -1,6 +1,6 @@
 
 const WhatsAppFloat = () => {
-  const whatsappNumber = "254723425778"; // Replace with actual number
+  const whatsappNumber = "254723425778";
   const message = "Hi! I'm interested in your bags from MilluxCollections";
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
