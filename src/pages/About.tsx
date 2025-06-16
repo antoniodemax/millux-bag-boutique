@@ -52,9 +52,9 @@ const About = () => {
                 </div>
               </div>
               <div className="md:col-span-2">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Sarah Millux</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Milkah Adhiambo</h3>
                 <p className="text-gray-600 mb-4">
-                  With over a decade of experience in fashion and retail, Sarah founded MilluxCollections 
+                  With over a decade of experience in fashion and retail, Milkah Adhiambo founded MilluxCollections 
                   with a mission to make premium bags accessible to everyone. Her eye for quality and 
                   passion for customer satisfaction drives every aspect of our business.
                 </p>
