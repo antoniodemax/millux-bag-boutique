@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import CategoryGrid from "@/components/CategoryGrid";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import HeroBanner from "@/components/HeroBanner";
+import AboutSection from "@/components/AboutSection";
 import { Sparkles, Shield, Truck } from "lucide-react";
 
 const Index = () => {
@@ -12,6 +13,9 @@ const Index = () => {
     <div className="min-h-screen overflow-hidden">
       {/* Hero Section with Enhanced Animation */}
       <HeroBanner />
+
+      {/* About Section */}
+      <AboutSection />
 
       {/* Enhanced Features Section with Floating Animation */}
       <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-brand-light via-white to-brand-secondary/30 relative overflow-hidden">
