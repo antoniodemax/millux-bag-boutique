@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="col-span-1 sm:col-span-2 lg:col-span-2">
             <div className="flex items-center mb-4">
               <ShoppingBag className="h-6 w-6 sm:h-8 sm:w-8 mr-2 text-brand-accent" />
-              <span className="text-lg sm:text-xl font-bold">MilluxCollections</span>
+              <span className="text-lg sm:text-xl font-bold">MilluxCollection</span>
             </div>
             <p className="text-brand-light/80 mb-4 max-w-md text-sm sm:text-base">
               Premium bags for every occasion. Discover our curated collection of handbags, 
@@ -20,7 +20,7 @@ const Footer = () => {
             <div className="flex space-x-4">
               <div className="flex items-center text-brand-light/80">
                 <Mail className="h-4 w-4 mr-2" />
-                <span className="text-xs sm:text-sm">info@milluxcollections.com</span>
+                <span className="text-xs sm:text-sm">info@milluxcollection.com</span>
               </div>
             </div>
           </div>
@@ -50,7 +50,7 @@ const Footer = () => {
 
         <div className="border-t border-brand-primary/30 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
           <p className="text-brand-light/70 text-xs sm:text-sm">
-            © 2025 MilluxCollections. All rights reserved.
+            © 2025 MilluxCollection. All rights reserved.
           </p>
         </div>
       </div>
