@@ -17,7 +17,7 @@ const Auth = () => {
   }, [user, navigate]);
 
   const handleWhatsAppContact = () => {
-    const message = "Hi! I'm interested in your products at MilluxCollections and would like to place an order.";
+    const message = "Hi! I'm interested in your products at MilluxCollection and would like to place an order.";
     const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -38,7 +38,7 @@ const Auth = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <ShoppingBag className="h-12 w-12 text-brand-primary mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-gray-900">Welcome to MilluxCollections</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Welcome to MilluxCollection</h2>
           <p className="mt-2 text-gray-600">Contact us directly to place your order</p>
         </div>
 
