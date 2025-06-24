@@ -16,7 +16,7 @@ const AboutSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-brand-dark mb-6">
-            About MilluxCollections
+            About MilluxCollection
           </h2>
           <p className="text-lg lg:text-xl text-brand-primary max-w-3xl mx-auto leading-relaxed">
             Crafting premium bags that combine style, functionality, and durability for the modern lifestyle.
@@ -27,7 +27,7 @@ const AboutSection = () => {
           <div className="space-y-6 animate-fade-in">
             <h3 className="text-2xl lg:text-3xl font-bold text-brand-dark">Our Story</h3>
             <p className="text-brand-primary leading-relaxed">
-              Founded with a passion for quality and design, MilluxCollections began as a vision to create 
+              Founded with a passion for quality and design, MilluxCollection began as a vision to create 
               bags that seamlessly blend elegance with everyday functionality. We believe that a great bag 
               is more than just an accessory – it's an extension of your personality.
             </p>
