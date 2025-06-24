@@ -11,9 +11,9 @@ import { Trash2, Edit, Plus } from "lucide-react";
 
 // Mock products data
 const mockProducts = [
-  { id: 1, name: "Classic Leather Handbag", price: 8500, category: "Handbags for Women", description: "Elegant leather handbag" },
-  { id: 2, name: "Designer Tote Bag", price: 12000, category: "Handbags for Women", description: "Spacious tote bag" },
-  { id: 3, name: "Evening Clutch", price: 5500, category: "Handbags for Women", description: "Sophisticated clutch" },
+  { id: 1, name: "Classic Leather Handbag", price: 2500, category: "Handbags for Women", description: "Elegant leather handbag" },
+  { id: 2, name: "Designer Tote Bag", price: 2700, category: "Handbags for Women", description: "Spacious tote bag" },
+  { id: 3, name: "Evening Clutch", price: 3500, category: "Handbags for Women", description: "Sophisticated clutch" },
 ];
 
 const Admin = () => {
@@ -94,7 +94,7 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your MilluxCollections inventory</p>
+          <p className="text-gray-600">Manage your MilluxCollection inventory</p>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
