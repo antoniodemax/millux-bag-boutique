@@ -8,7 +8,7 @@ import { Mail, Phone, MapPin, MessageCircle } from "lucide-react";
 
 const Contact = () => {
   const handleWhatsAppContact = () => {
-    const message = "Hi! I'd like to get in touch with MilluxCollections.";
+    const message = "Hi! I'd like to get in touch with MilluxCollection.";
     const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -105,7 +105,7 @@ const Contact = () => {
                     <Mail className="h-5 w-5 text-gray-400 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="text-gray-900">info@milluxcollections.com</p>
+                      <p className="text-gray-900">info@milluxcollection.com</p>
                     </div>
                   </div>
                   
