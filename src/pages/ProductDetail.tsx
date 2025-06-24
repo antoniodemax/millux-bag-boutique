@@ -16,12 +16,12 @@ const ProductDetail = () => {
   const { user } = useAuth();
   const [quantity, setQuantity] = useState(1);
   
-  const handleWhatsAppInquiry = () => {
-    if (!product) return;
-    const message = `Hi! I'm interested in the ${product.name} (KSh ${product.price.toLocaleString()}) from MilluxCollections. Can you provide more details?`;
-    const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
+ const handleWhatsAppInquiry = () => {
+  if (!product) return;
+  const message = `Hi! I'm interested in the ${product.name} (KSh ${product.price.toLocaleString()}) from MilluxCollections. Can you provide more details?`;
+  const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
+  window.open(whatsappUrl, '_blank');
+};
 
   const handleAddToCart = () => {
     if (!user) {
