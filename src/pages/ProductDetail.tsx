@@ -164,15 +164,7 @@ const ProductDetail = () => {
 
               {/* Action Buttons */}
               <div className="space-y-4">
-                <Button 
-                  className="w-full" 
-                  size="lg"
-                  onClick={handleAddToCart}
-                  disabled={!product.stock_quantity || product.stock_quantity <= 0}
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Purchase
-                </Button>
+                
                 
                 <Button 
                   variant="outline" 
