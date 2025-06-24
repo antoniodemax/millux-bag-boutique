@@ -59,8 +59,8 @@ const Shop = () => {
       ? "Shop Premium Bags & Handbags" 
       : `${categoryLabel} - Premium Quality`;
     const description = selectedCategory === "all"
-      ? "Browse our complete collection of premium bags, handbags, travel bags, and laptop bags. Quality guaranteed with free delivery in Nairobi & Mombasa."
-      : `Discover our ${categoryLabel.toLowerCase()} collection. Premium quality ${categoryLabel.toLowerCase()} with free delivery in Nairobi & Mombasa.`;
+      ? "Browse our complete collection of premium bags, handbags, travel bags, and laptop bags. Quality guaranteed with free delivery in Nairobi."
+      : `Discover our ${categoryLabel.toLowerCase()} collection. Premium quality ${categoryLabel.toLowerCase()} with free delivery in Nairobi .`;
     
     return { title, description, categoryLabel };
   };
@@ -72,7 +72,7 @@ const Shop = () => {
       <>
         <SEO 
           title="Loading Shop..."
-          description="Loading our premium bags collection from MilluxCollections"
+          description="Loading our premium bags collection from MilluxCollection"
         />
         <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -138,7 +138,7 @@ const Shop = () => {
                     {product.image_url ? (
                       <img 
                         src={product.image_url} 
-                        alt={`${product.name} - Premium ${product.category} from MilluxCollections`}
+                        alt={`${product.name} - Premium ${product.category} from MilluxCollection`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
