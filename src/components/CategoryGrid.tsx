@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const categories = [
   { id: 1, name: "Handbags for Women", image: "/lovable-uploads/3504aa42-e749-4c7b-b736-c8700d635528.png", available: true },
-  { id: 2, name: "Sling Bags", image: "", available: false },
+  { id: 2, name: "Sling Bags", image: "", available: true },
   { id: 3, name: "Large Bags", image: "", available: false },
-  { id: 4, name: "Travel Bags", image: "", available: false },
+  { id: 4, name: "Travel Bags", image: "", available: true },
   { id: 5, name: "Bridal Bags", image: "", available: false },
   { id: 6, name: "Gym Bags", image: "", available: false },
   { id: 7, name: "Laptop Bags", image: "", available: false },
