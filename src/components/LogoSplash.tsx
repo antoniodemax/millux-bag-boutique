@@ -23,7 +23,7 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
         <div className="text-center animate-scale-out">
           <img 
             src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
-            alt="Millux Collections" 
+            alt="Millux Collection" 
             className="h-32 w-auto mx-auto mb-4"
           />
           <div className="text-brand-light text-xl font-semibold">MilluxCollections</div>
@@ -37,7 +37,7 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
       <div className="text-center animate-fade-in">
         <img 
           src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
-          alt="Millux Collections" 
+          alt="Millux Collection" 
           className="h-32 w-auto mx-auto mb-4 animate-pulse"
         />
         <div className="text-brand-light text-xl font-semibold animate-fade-in delay-500">MilluxCollections</div>
