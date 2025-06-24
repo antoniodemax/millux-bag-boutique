@@ -16,8 +16,8 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = "MilluxCollections - Premium Bags & Handbags in Kenya",
-  description = "Discover premium quality bags and handbags at MilluxCollections. From stylish handbags to travel bags, laptop bags, and more. Free delivery in Nairobi & Mombasa.",
+  title = "MilluxCollection - Premium Bags & Handbags in Kenya",
+  description = "Discover premium quality bags and handbags at MilluxCollection. From stylish handbags to travel bags, laptop bags, and more. Free delivery in Nairobi & Mombasa.",
   keywords = "bags Kenya, handbags Kenya, travel bags, laptop bags, women bags, premium bags Nairobi, bags Mombasa",
   image = "/placeholder.svg",
   url = window.location.href,
@@ -25,7 +25,7 @@ const SEO = ({
   price,
   currency = "KES",
   availability,
-  brand = "MilluxCollections",
+  brand = "MilluxCollection",
   category
 }: SEOProps) => {
   const fullTitle = title.includes("MilluxCollections") ? title : `${title} | MilluxCollections`;
@@ -71,7 +71,7 @@ const SEO = ({
       <meta property="og:image" content={image} />
       <meta property="og:url" content={url} />
       <meta property="og:type" content={type === "product" ? "product" : "website"} />
-      <meta property="og:site_name" content="MilluxCollections" />
+      <meta property="og:site_name" content="MilluxCollection" />
 
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -99,10 +99,10 @@ const SEO = ({
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "MilluxCollections",
+            "name": "MilluxCollection",
             "description": "Premium bags and handbags store in Kenya",
-            "url": "https://milluxcollections.com",
-            "telephone": "+254700000000",
+            "url": "https://milluxcollection.com",
+            "telephone": "+254723425778",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "KE",
