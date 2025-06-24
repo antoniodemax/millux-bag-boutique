@@ -226,7 +226,7 @@ const CartContent = () => {
                 </div>
 
                 <div className="mt-4 text-xs text-gray-500">
-                  <p>Free delivery in Nairobi & Mombasa for orders over KSh 10,000</p>
+                  <p>Free delivery in Nairobi for orders over KSh 5,000</p>
                 </div>
               </CardContent>
             </Card>
