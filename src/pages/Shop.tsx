@@ -135,17 +135,23 @@ const Shop = () => {
                 <CardContent className="p-0">
                   {/* Product Image */}
                   <div className="relative bg-gray-100 h-48 sm:h-56 lg:h-64 overflow-hidden rounded-t-lg">
-                    {product.image_url ? (
-                      <img 
-                        src={product.image_url} 
-                        alt={`${product.name} - Premium ${product.category} from MilluxCollection`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg mb-2"></div>
-                        <p className="text-xs sm:text-sm text-center px-2">{product.name}</p>
-                      </div>
+                     {product.image_url ? (
+                       <img 
+                         src={product.image_url} 
+                         alt={`${product.name} - Premium ${product.category} from MilluxCollection`}
+                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         onLoad={() => console.log(`Image loaded successfully: ${product.image_url}`)}
+                         onError={(e) => {
+                           console.error(`Failed to load image: ${product.image_url}`);
+                           e.currentTarget.style.display = 'none';
+                           e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                         }}
+                       />
+                     ) : (
+                       <div className={`flex flex-col items-center justify-center h-full text-gray-400 ${product.image_url ? 'hidden' : ''}`}>
+                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg mb-2"></div>
+                         <p className="text-xs sm:text-sm text-center px-2">{product.name}</p>
+                       </div>
                     )}
                     
                     {/* Stock Badge */}
