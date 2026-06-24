@@ -46,9 +46,9 @@ const Navbar = () => {
               onClick={handleLogoClick}
               className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             >
-              <img 
-                src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
-                alt="Millux Collection Logo" 
+              <img
+                src="/millux-logo.png"
+                alt="Millux Collection Logo"
                 className="h-12 w-auto sm:h-16"
               />
             </div>

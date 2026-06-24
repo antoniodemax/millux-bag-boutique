@@ -46,7 +46,7 @@ const About = () => {
               <div className="md:col-span-1">
                 <div className="h-64 w-full rounded-lg overflow-hidden">
                   <img 
-                    src="/lovable-uploads/be8feb59-6ba3-45a2-a52e-5a7b4940d995.png" 
+                    src="/images/founder.png"
                     alt="Milkah Adhiambo - Founder of MilluxCollections"
                     className="w-full h-full object-cover"
                   />

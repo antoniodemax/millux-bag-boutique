@@ -21,9 +21,9 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-secondary flex items-center justify-center z-50 animate-fade-out">
         <div className="text-center animate-scale-out">
-          <img 
-            src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
-            alt="Millux Collection" 
+          <img
+            src="/millux-logo.png"
+            alt="Millux Collection"
             className="h-32 w-auto mx-auto mb-4"
           />
           <div className="text-brand-light text-xl font-semibold">MilluxCollections</div>
@@ -35,9 +35,9 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-secondary flex items-center justify-center z-50">
       <div className="text-center animate-fade-in">
-        <img 
-          src="/lovable-uploads/1d2236a3-cd00-401f-a3ac-6eecf0583bd1.png" 
-          alt="Millux Collection" 
+        <img
+          src="/millux-logo.png"
+          alt="Millux Collection"
           className="h-32 w-auto mx-auto mb-4 animate-pulse"
         />
         <div className="text-brand-light text-xl font-semibold animate-fade-in delay-500">MilluxCollections</div>

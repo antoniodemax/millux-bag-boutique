@@ -46,7 +46,7 @@ const AboutSection = () => {
 
           <div className="relative animate-fade-in delay-300">
             <img 
-              src="/lovable-uploads/be8feb59-6ba3-45a2-a52e-5a7b4940d995.png" 
+              src="/images/founder.png"
               alt="Milkah Adhiambo - Founder of MilluxCollections"
               className="w-full max-w-md mx-auto rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-500"
             />
