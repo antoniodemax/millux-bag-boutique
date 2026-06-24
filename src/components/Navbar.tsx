@@ -1,18 +1,12 @@
-
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, MessageCircle, ShoppingCart } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useCart } from "@/hooks/useCart";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems } = useCart();
-  const { user } = useAuth();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -23,27 +17,19 @@ const Navbar = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    console.log("Logo clicked, navigating to homepage");
-    navigate("/");
-  };
-
   const handleWhatsAppContact = () => {
     const message = "Hi! I'm interested in your products at MilluxCollections.";
     const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
-  const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-
   return (
     <nav className="bg-brand-light shadow-lg sticky top-0 z-50 border-b border-brand-accent/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20">
           <div className="flex items-center">
-            <div 
-              onClick={handleLogoClick}
+            <div
+              onClick={() => navigate("/")}
               className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
             >
               <img
@@ -69,22 +55,7 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            
-            {user && (
-              <Link to="/cart" className="relative p-2">
-                <ShoppingCart className="h-5 w-5 lg:h-6 lg:w-6 text-brand-dark/70 hover:text-brand-primary" />
-                {cartItemCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            )}
-            
-            <Button 
+            <Button
               onClick={handleWhatsAppContact}
               className="ml-2 lg:ml-4 bg-green-600 hover:bg-green-700 text-xs lg:text-sm px-3 lg:px-4 py-2"
             >
@@ -95,20 +66,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
-            {user && (
-              <Link to="/cart" className="relative p-2">
-                <ShoppingCart className="h-5 w-5 text-brand-dark/70 hover:text-brand-primary" />
-                {cartItemCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs"
-                  >
-                    {cartItemCount}
-                  </Badge>
-                )}
-              </Link>
-            )}
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-brand-primary hover:text-brand-dark hover:bg-brand-accent/20"
@@ -136,7 +94,6 @@ const Navbar = () => {
                   {item.name}
                 </Link>
               ))}
-              
               <button
                 onClick={() => {
                   handleWhatsAppContact();
