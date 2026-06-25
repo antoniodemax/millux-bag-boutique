@@ -38,11 +38,11 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
         <img
           src="/millux-logo.png"
           alt="Millux Collection"
-          className="h-32 w-auto mx-auto mb-4 animate-pulse"
+          className="h-32 w-auto mx-auto mb-4"
         />
         <div className="text-brand-light text-xl font-semibold animate-fade-in delay-500">MilluxCollections</div>
         <div className="mt-4">
-          <div className="w-16 h-1 bg-brand-accent rounded-full mx-auto animate-pulse"></div>
+          <div className="w-16 h-1 bg-brand-accent rounded-full mx-auto"></div>
         </div>
       </div>
     </div>
