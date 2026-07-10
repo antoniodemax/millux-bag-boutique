@@ -11,7 +11,7 @@ const HeroBanner = () => {
         <img
           src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80"
           alt="Premium bags background"
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-16"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-brand-dark/80 via-brand-primary/70 to-brand-secondary/80"></div>
       </div>
