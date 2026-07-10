@@ -26,7 +26,7 @@ const PremiumNavbar = () => {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 h-[72px] transition-all duration-300 ${
+      className={`fixed top-0 inset-x-0 z-50 h-[88px] transition-all duration-300 ${
         scrolled
           ? 'bg-white/95 backdrop-blur border-b border-[#EAE5DF]'
           : 'bg-transparent border-b border-transparent'
@@ -58,15 +58,19 @@ const PremiumNavbar = () => {
         {/* Center brand mark */}
         <Link
           to="/"
-          className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+          className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-[170px] h-full"
         >
+        {/* <Link
+          to="/"
+          className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
+        > */}
           <motion.img
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
             src="/MILLUX COLLECTIONS LOGO.png"
             alt="Millux Collections"
-            className="h-24 md:h-14 w-auto object-contain"
+            className="h-20 md:h-20 w-auto object-contain"
           />
         </Link>
 
