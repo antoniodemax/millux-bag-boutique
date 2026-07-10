@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,15 +12,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import BackToTop from "./components/BackToTop";
-import LogoSplash from "./components/LogoSplash";
 
 const App = () => {
-  const [showSplash, setShowSplash] = useState(true);
-
-  if (showSplash) {
-    return <LogoSplash onComplete={() => setShowSplash(false)} />;
-  }
-
   return (
     <HelmetProvider>
       <TooltipProvider>
