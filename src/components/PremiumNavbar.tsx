@@ -58,7 +58,7 @@ const PremiumNavbar = () => {
         {/* Center brand mark */}
         <Link
           to="/"
-          className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center w-[170px] h-full"
+          className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center overflow-hidden w-[220px] h-full"
         >
         {/* <Link
           to="/"
@@ -70,7 +70,7 @@ const PremiumNavbar = () => {
             transition={{ duration: 0.5 }}
             src="/MILLUX COLLECTIONS LOGO.png"
             alt="Millux Collections"
-            className="h-20 md:h-20 w-auto object-contain"
+            className="w-[320px] max-w-none scale-[3.2] object-contain"
           />
         </Link>
 
