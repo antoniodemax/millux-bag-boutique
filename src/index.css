@@ -163,19 +163,54 @@
   }
 }
 
-    --sidebar-primary: 210 100% 45%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 210 30% 93%;
-    --sidebar-accent-foreground: 210 40% 20%;
-    --sidebar-border: 210 30% 90%;
-    --sidebar-ring: 200 100% 75%;
+@layer base {
+  :root {
+    --radius: 0.5rem;
 
-    /* Custom brand colors - Blue, White, Unisex theme */
-    --brand-primary: 210 100% 45%; /* Classic blue */
-    --brand-secondary: 210 40% 98%; /* Clean white */
-    --brand-accent: 200 100% 75%; /* Light blue accent */
-    --brand-dark: 210 40% 15%; /* Navy blue */
-    --brand-light: 210 40% 100%; /* Pure white */
+    /* shadcn/ui base tokens - Millux gold/charcoal editorial theme */
+    --background: 36 33% 97%;
+    --foreground: 0 0% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+
+    --primary: 39 48% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 33 21% 90%;
+    --secondary-foreground: 0 0% 12%;
+
+    --muted: 33 21% 90%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 39 48% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 33 21% 90%;
+    --input: 33 21% 90%;
+    --ring: 39 48% 48%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-primary: 39 48% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 33 21% 90%;
+    --sidebar-accent-foreground: 0 0% 12%;
+    --sidebar-border: 33 21% 90%;
+    --sidebar-ring: 39 48% 48%;
+
+    /* Custom brand colors - Millux gold/charcoal editorial theme */
+    --brand-primary: 0 0% 12%; /* Deep charcoal #1F1F1F */
+    --brand-secondary: 0 0% 40%; /* Muted grey #666666 */
+    --brand-accent: 39 48% 48%; /* Luxury gold/tan #B68D40 */
+    --brand-dark: 30 11% 7%; /* Near-black footer */
+    --brand-light: 36 33% 97%; /* Warm editorial off-white #FAF8F5 */
   }
 
   .dark {
@@ -216,12 +251,12 @@
     --sidebar-border: 210 30% 15%;
     --sidebar-ring: 200 100% 75%;
 
-    /* Custom brand colors for dark mode - Blue, White, Unisex theme */
-    --brand-primary: 200 100% 70%;
-    --brand-secondary: 210 30% 18%;
-    --brand-accent: 200 100% 80%;
-    --brand-dark: 210 40% 8%;
-    --brand-light: 210 30% 20%;
+    /* Custom brand colors for dark mode - Millux gold/charcoal editorial theme */
+    --brand-primary: 36 33% 97%;
+    --brand-secondary: 0 0% 65%;
+    --brand-accent: 39 55% 58%;
+    --brand-dark: 30 11% 7%;
+    --brand-light: 0 0% 15%;
   }
 }
 

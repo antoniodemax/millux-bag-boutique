@@ -1,284 +1,398 @@
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Truck, Heart, Award, Clock, CheckCircle } from 'lucide-react';
-import PremiumHero from '@/components/PremiumHero';
-import { PremiumSection, PremiumCard, FeatureRow } from '@/components/PremiumComponents';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const sectionReveal = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+function Reveal({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.2 }}
+      variants={fadeUp}
+      transition={{ duration: 0.7, ease: 'easeOut' }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const newArrivals = [
+  {
+    title: 'Obsidian Structured Tote',
+    price: '£480',
+    category: 'Tote',
+    badge: 'New',
+    gradient: 'linear-gradient(160deg,#2E2E2E,#0A0A0A)',
+  },
+  {
+    title: 'Cognac Shoulder Bag',
+    price: '£360',
+    category: 'Shoulder',
+    badge: null,
+    gradient: 'linear-gradient(150deg,#C88A4F,#8C5A2A)',
+  },
+  {
+    title: 'Scarlet Mini Crossbody',
+    price: '£295',
+    category: 'Crossbody',
+    badge: 'Bestseller',
+    gradient: 'linear-gradient(150deg,#A33B34,#6E211D)',
+  },
+  {
+    title: 'Onyx Leather Duffel',
+    price: '£620',
+    category: 'Travel',
+    badge: 'Last 3',
+    gradient: 'linear-gradient(150deg,#3A3A3A,#141414)',
+  },
+];
+
+const pillars = [
+  {
+    n: '01',
+    title: 'Master Leather-Work',
+    body: 'Every bag is hand-stitched in limited runs by artisans with decades of craft — no shortcuts, no compromise.',
+  },
+  {
+    n: '02',
+    title: 'Ethically Sourced',
+    body: 'We use only certified full-grain and vegetable-tanned leathers — because true luxury leaves no debt to the planet.',
+  },
+  {
+    n: '03',
+    title: 'Lifetime Repair',
+    body: 'Every Millux bag comes with free lifetime repair and re-conditioning. Buy once, carry always.',
+  },
+];
 
 const HomePage = () => {
-  const featuredProducts = [
-    {
-      id: 1,
-      title: 'Classic Leather Tote',
-      price: '$249',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-    },
-    {
-      id: 2,
-      title: 'Elegant Shoulder Bag',
-      price: '$189',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-    },
-    {
-      id: 3,
-      title: 'Premium Laptop Bag',
-      price: '$299',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
-    },
-  ];
-
-  const categories = [
-    {
-      name: 'Handbags',
-      image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
-      description: 'Timeless elegance for every occasion',
-    },
-    {
-      name: 'Laptop Bags',
-      image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
-      description: 'Professional and stylish',
-    },
-    {
-      name: 'Travel Bags',
-      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
-      description: 'Adventure ready companions',
-    },
-  ];
+  const [email, setEmail] = useState('');
 
   return (
-    <div className="bg-light overflow-hidden">
-      <PremiumHero />
-
-      <PremiumSection
-        title="Featured Collection"
-        subtitle="Handpicked pieces that define modern elegance"
-        background="white"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {featuredProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="group"
-            >
-              <motion.div
-                whileHover={{ y: -8 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white card"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                  className="mb-6 rounded-lg overflow-hidden h-64 sm:h-72"
-                >
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3
-                      className="text-lg font-bold text-primary"
-                      style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                      {product.title}
-                    </h3>
-                    <p className="text-accent font-medium text-sm mt-1">{product.price}</p>
-                  </div>
-                  <button className="p-2 text-gray-400 hover:text-accent transition-colors">
-                    <Heart className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="flex gap-1 mb-4">
-                  {Array.from({ length: product.rating }).map((_, i) => (
-                    <span key={i} className="text-accent text-xs">★</span>
-                  ))}
-                </div>
-
-                <button className="w-full py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 rounded-lg font-medium text-sm">
-                  Quick View
-                </button>
-              </motion.div>
-            </motion.div>
-          ))}
+    <div className="bg-[#FAF8F5] overflow-hidden">
+      {/* ---------------- HERO ---------------- */}
+      <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="/images/handbags-category.png"
+            alt="Millux Collections leather handbags"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.15),transparent_55%)]" />
         </div>
+        <div className="absolute bottom-0 inset-x-0 h-72 bg-gradient-to-t from-[#FAF8F5] via-[#FAF8F5]/60 to-transparent" />
+
+        <div className="relative z-10 h-full flex items-center px-6 md:px-16">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="max-w-xl"
+          >
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#1F1F1F]/80 mb-4">
+              Summer / Autumn 2026
+            </p>
+            <h1 className="font-playfair font-light text-5xl md:text-7xl leading-tight text-[#1F1F1F] mb-6">
+              <span className="italic">Carried</span>{' '}
+              <span className="font-bold text-[#B68D40] not-italic">
+                with Intent.
+              </span>
+            </h1>
+            <p className="text-sm leading-relaxed text-[#1F1F1F]/70 max-w-md mb-8">
+              Bags that speak before you say a word — crafted in the world's
+              finest leathers for the woman who never needs to announce
+              herself.
+            </p>
+            <div className="flex items-center gap-8 flex-wrap">
+              <Link
+                to="/shop"
+                className="inline-flex items-center gap-2 bg-[#B68D40] text-white uppercase text-xs tracking-wider px-8 py-4 hover:bg-[#1F1F1F] transition-colors duration-300"
+              >
+                Explore Collection <ArrowRight size={14} />
+              </Link>
+              <Link
+                to="/shop"
+                className="uppercase text-xs tracking-wider text-[#1F1F1F] border-b border-[#1F1F1F]/40 pb-1 hover:border-[#B68D40] hover:text-[#B68D40] transition-colors duration-300"
+              >
+                View Lookbook
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10">
+          <span
+            className="text-[10px] uppercase tracking-[0.3em] text-[#1F1F1F]/60 font-light"
+            style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+          >
+            Scroll to discover
+          </span>
+        </div>
+      </section>
+
+      {/* ---------------- THE COLLECTIONS ---------------- */}
+      <section className="py-24 md:py-32 px-6 md:px-12">
+        <Reveal className="flex items-end justify-between mb-12 flex-wrap gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
+              Curated Edits
+            </p>
+            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
+              The Collections
+            </h2>
+          </div>
+          <Link
+            to="/shop"
+            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
+          >
+            All Collections ›
+          </Link>
+        </Reveal>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Reveal>
+            <Link to="/shop" className="group block">
+              <div
+                data-placeholder="noir-eclat"
+                className="aspect-[3/4] w-full bg-[linear-gradient(160deg,#2A2A2A_0%,#0D0D0D_100%)] overflow-hidden"
+              >
+                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
+              </div>
+              <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
+                Tote
+              </p>
+              <h3 className="font-playfair text-xl text-[#1F1F1F] mt-1">
+                Noir Éclat
+              </h3>
+              <p className="text-sm text-[#666666] mt-1">
+                Structured black leather — minimal hardware, maximum
+                presence.
+              </p>
+            </Link>
+          </Reveal>
+
+          <div className="flex flex-col gap-6">
+            <Reveal>
+              <Link to="/shop" className="group flex flex-col sm:flex-row gap-5 items-start">
+                <div
+                  data-placeholder="aurum"
+                  className="aspect-[4/3] w-full sm:w-64 shrink-0 bg-[linear-gradient(135deg,#D8A857_0%,#A9762E_55%,#6E4A1C_100%)] overflow-hidden"
+                >
+                  <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+                </div>
+                <div className="pt-1">
+                  <p className="text-[10px] uppercase tracking-widest text-[#666666]">
+                    Clutch
+                  </p>
+                  <h3 className="font-playfair text-xl text-[#1F1F1F] mt-1">
+                    Aurum
+                  </h3>
+                  <p className="text-[10px] uppercase tracking-widest text-[#B68D40] mt-2">
+                    Limited Edition
+                  </p>
+                </div>
+              </Link>
+            </Reveal>
+
+            <Reveal>
+              <Link to="/shop" className="group flex flex-col sm:flex-row gap-5 items-start">
+                <div
+                  data-placeholder="velum"
+                  className="aspect-[4/3] w-full sm:w-64 shrink-0 bg-[linear-gradient(135deg,#C15A2E_0%,#8A3B1B_55%,#4F2110_100%)] overflow-hidden"
+                >
+                  <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+                </div>
+                <div className="pt-1">
+                  <p className="text-[10px] uppercase tracking-widest text-[#666666]">
+                    Top-Handle
+                  </p>
+                  <h3 className="font-playfair text-xl text-[#1F1F1F] mt-1">
+                    Velum
+                  </h3>
+                  <p className="text-[10px] uppercase tracking-widest text-[#B68D40] mt-2">
+                    Heritage Edit
+                  </p>
+                </div>
+              </Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- NEW ARRIVALS ---------------- */}
+      <section className="py-24 md:py-32 px-6 md:px-8">
+        <Reveal className="flex items-end justify-between mb-12 flex-wrap gap-4 px-2">
+          <div>
+            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
+              Featured
+            </p>
+            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
+              New Arrivals
+            </h2>
+          </div>
+          <Link
+            to="/shop"
+            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
+          >
+            Shop All ›
+          </Link>
+        </Reveal>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="flex justify-center mt-12"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={sectionReveal}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2"
         >
-          <Link to="/shop" className="btn-primary flex items-center gap-2">
-            View All Products
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
-      </PremiumSection>
-
-      <PremiumSection
-        title="Shop by Category"
-        subtitle="Explore our curated collections"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {categories.map((category, index) => (
+          {newArrivals.map((p) => (
             <motion.div
-              key={category.name}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -4 }}
-              className="group cursor-pointer"
+              variants={fadeUp}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              key={p.title}
             >
-              <div className="relative rounded-xl overflow-hidden h-72 sm:h-80 bg-gray-200">
-                <motion.img
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                  src={category.image}
-                  alt={category.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center">
-                  <h3
-                    className="text-3xl font-bold mb-2"
-                    style={{ fontFamily: "'Playfair Display', serif" }}
-                  >
-                    {category.name}
-                  </h3>
-                  <p className="text-sm opacity-90">{category.description}</p>
-                  <div className="mt-6 flex items-center gap-2 group-hover:gap-4 transition-all">
-                    <span className="text-sm font-medium">Explore</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
+              <Link to="/shop" className="group block">
+                <div
+                  data-placeholder={p.title}
+                  className="relative aspect-[3/4] w-full overflow-hidden"
+                  style={{ background: p.gradient }}
+                >
+                  <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
+                  {p.badge && (
+                    <span className="absolute top-3 left-3 bg-[#B68D40] text-white text-[9px] uppercase tracking-wider px-2 py-1">
+                      {p.badge}
+                    </span>
+                  )}
                 </div>
-              </div>
+                <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
+                  {p.category}
+                </p>
+                <h3 className="font-playfair text-sm text-[#1F1F1F] mt-1">
+                  {p.title}
+                </h3>
+                <p className="text-xs text-[#666666] mt-1">{p.price}</p>
+              </Link>
             </motion.div>
           ))}
-        </div>
-      </PremiumSection>
+        </motion.div>
+      </section>
 
-      <PremiumSection
-        title="Why Choose Millux"
-        subtitle="Excellence in every detail"
-        background="white"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <FeatureRow
-            icon={<Award className="w-6 h-6" />}
-            title="Premium Craftsmanship"
-            description="Each bag is meticulously crafted with the finest materials and attention to detail, ensuring timeless quality."
-          />
-          <FeatureRow
-            icon={<Heart className="w-6 h-6" />}
-            title="Handpicked Collection"
-            description="Every piece is carefully selected to meet our rigorous standards for design, durability, and style."
-          />
-          <FeatureRow
-            icon={<Truck className="w-6 h-6" />}
-            title="Fast & Secure Delivery"
-            description="We partner with trusted logistics providers to ensure your order arrives safely and promptly."
-          />
-          <FeatureRow
-            icon={<Shield className="w-6 h-6" />}
-            title="Secure Shopping"
-            description="Your transactions are protected with industry-leading encryption and security protocols."
-          />
-          <FeatureRow
-            icon={<Clock className="w-6 h-6" />}
-            title="24/7 Support"
-            description="Our dedicated team is always here to assist you with any questions or concerns."
-          />
-          <FeatureRow
-            icon={<CheckCircle className="w-6 h-6" />}
-            title="Quality Guarantee"
-            description="We stand behind every product with our commitment to excellence and customer satisfaction."
+      {/* ---------------- THE HOUSE ---------------- */}
+      <section className="flex flex-col md:flex-row min-h-[600px]">
+        <div className="w-full md:w-1/2 min-h-[420px] md:min-h-0 overflow-hidden">
+          <img
+            src="/images/handbags-category.png"
+            alt="Millux Collections craftsmanship"
+            className="w-full h-full object-cover"
           />
         </div>
-      </PremiumSection>
-
-      <PremiumSection title="What Our Customers Say">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              name: 'Sarah Johnson',
-              role: 'Fashion Enthusiast',
-              quote: 'The quality and elegance of these bags surpassed my expectations. Truly a luxury experience.',
-              avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-            },
-            {
-              name: 'Emily Rodriguez',
-              role: 'Business Professional',
-              quote: 'Finally found a laptop bag that looks as professional as it is functional. Worth every penny.',
-              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-            },
-            {
-              name: 'Jessica Lee',
-              role: 'Travel Blogger',
-              quote: 'These bags are my travel companions. Durable, stylish, and built to last through adventures.',
-              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
-            },
-          ].map((testimonial, index) => (
-            <motion.div
-              key={testimonial.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white card text-center"
-            >
-              <img
-                src={testimonial.avatar}
-                alt={testimonial.name}
-                className="w-16 h-16 rounded-full mx-auto mb-4 object-cover"
-              />
-              <p className="text-secondary italic mb-4">"{testimonial.quote}"</p>
-              <h4 className="font-bold text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>
-                {testimonial.name}
-              </h4>
-              <p className="text-muted text-sm">{testimonial.role}</p>
-            </motion.div>
-          ))}
+        <div className="w-full md:w-1/2 bg-[#FAF8F5] p-10 md:p-16 lg:p-24 flex flex-col justify-center">
+          <Reveal>
+            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-4">
+              The House
+            </p>
+            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F] mb-6 leading-snug">
+              <span className="italic">Carried in</span> Intention.
+            </h2>
+            <p className="text-sm leading-relaxed text-[#666666] max-w-md mb-10">
+              Millux Collections was born from one conviction: a bag is not
+              an accessory — it is an extension of who you are. Every seam
+              is deliberate. Every clasp, a quiet declaration. We partner
+              with master leather-workers across London, Lagos, and
+              Florence to bring you bags that outlast trends — built to be
+              carried, loved, and eventually inherited.
+            </p>
+            <div className="flex items-center gap-8 flex-wrap">
+              <Link
+                to="/about"
+                className="border border-[#1F1F1F]/40 uppercase text-xs tracking-wider px-8 py-4 hover:border-[#B68D40] hover:text-[#B68D40] transition-colors duration-300"
+              >
+                Our Story
+              </Link>
+              <Link
+                to="/about"
+                className="uppercase text-xs tracking-wider text-[#1F1F1F] border-b border-[#1F1F1F]/40 pb-1 hover:border-[#B68D40] hover:text-[#B68D40] transition-colors duration-300"
+              >
+                Meet the Makers
+              </Link>
+            </div>
+          </Reveal>
         </div>
-      </PremiumSection>
+      </section>
 
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="py-16 md:py-20 bg-primary text-white"
-      >
-        <div className="container-wide max-w-2xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Stay Updated
+      {/* ---------------- BRAND PILLARS ---------------- */}
+      <section className="grid grid-cols-1 md:grid-cols-3 border-y border-[#EAE5DF] divide-y md:divide-y-0 md:divide-x divide-[#EAE5DF] bg-white">
+        {pillars.map((pillar) => (
+          <Reveal key={pillar.n} className="p-10 md:p-14">
+            <span className="font-playfair font-light text-3xl text-[#B68D40]/70">
+              {pillar.n}
+            </span>
+            <h3 className="text-xs uppercase tracking-widest text-[#1F1F1F] mt-4 mb-3">
+              {pillar.title}
+            </h3>
+            <p className="text-sm text-[#666666] leading-relaxed">
+              {pillar.body}
+            </p>
+          </Reveal>
+        ))}
+      </section>
+
+      {/* ---------------- NEWSLETTER ---------------- */}
+      <section className="py-24 md:py-32 px-6">
+        <Reveal className="max-w-xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-4 mb-5">
+            <span className="h-px w-8 bg-[#EAE5DF]" />
+            <p className="text-xs uppercase tracking-widest text-[#666666]">
+              The Inner Circle
+            </p>
+            <span className="h-px w-8 bg-[#EAE5DF]" />
+          </div>
+          <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F] mb-4">
+            First Access. Always.
           </h2>
-          <p className="mb-8 text-white/80">Subscribe to receive exclusive offers and updates about new collections.</p>
+          <p className="text-sm text-[#666666] leading-relaxed mb-10">
+            Join our private list for early collection drops, exclusive
+            events, and invitations to our seasonal presentations.
+          </p>
 
-          <form className="flex flex-col sm:flex-row gap-3">
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex items-stretch border border-[#EAE5DF] max-w-md mx-auto"
+          >
             <input
               type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-3 rounded-lg bg-white text-primary placeholder-gray-400 focus:outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email address"
+              className="flex-1 bg-transparent px-5 py-4 text-sm text-[#1F1F1F] placeholder:text-[#666666]/70 focus:outline-none"
             />
-            <button type="submit" className="btn-primary">
-              Subscribe
+            <button
+              type="submit"
+              className="bg-[#B68D40] text-white uppercase text-xs tracking-wider px-6 hover:bg-[#1F1F1F] transition-colors duration-300 whitespace-nowrap"
+            >
+              Join the Circle
             </button>
           </form>
-        </div>
-      </motion.section>
+        </Reveal>
+      </section>
     </div>
   );
 };
