@@ -48,7 +48,7 @@ const PremiumNavbar = () => {
           className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center overflow-hidden w-[220px] h-full"
         >
           <motion.img
-            src="/MILLUX COLLECTIONS LOGO.png"
+            src="/millux-collections-logo.png"
             alt="Millux Collections"
             // initial={{ opacity: 0 }}
             // animate={{ opacity: 1 }}
