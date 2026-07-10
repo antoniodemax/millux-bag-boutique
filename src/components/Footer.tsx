@@ -34,7 +34,7 @@ const Footer = () => {
             <img
               src="/MILLUX COLLECTIONS LOGO.png"
               alt="Millux Collections"
-              className="h-12 w-auto object-contain"
+              className="h-35 w-auto object-contain"
             />
           </Link>
           <p className="text-sm text-[#666666] leading-relaxed max-w-[220px]">
