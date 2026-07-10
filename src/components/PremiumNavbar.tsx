@@ -70,7 +70,7 @@ const PremiumNavbar = () => {
             transition={{ duration: 0.5 }}
             src="/MILLUX COLLECTIONS LOGO.png"
             alt="Millux Collections"
-            className="w-[300px] max-w-none scale-[3.0] object-contain"
+            className="w-[270px] max-w-none scale-[2.8] object-contain"
           />
         </Link>
 
