@@ -8,7 +8,7 @@ import Shop from "./pages/Shop";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import Navbar from "./components/Navbar";
+import PremiumNavbar from "./components/PremiumNavbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import BackToTop from "./components/BackToTop";
@@ -20,8 +20,8 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen bg-background">
-            <Navbar />
+          <div className="min-h-screen bg-light">
+            <PremiumNavbar />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/shop" element={<Shop />} />

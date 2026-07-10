@@ -1,133 +1,286 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import CategoryGrid from "@/components/CategoryGrid";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import HeroBanner from "@/components/HeroBanner";
-import AboutSection from "@/components/AboutSection";
-import { Sparkles, Shield, Truck } from "lucide-react";
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Shield, Truck, Heart, Award, Clock, CheckCircle } from 'lucide-react';
+import PremiumHero from '@/components/PremiumHero';
+import { PremiumSection, PremiumCard, FeatureRow } from '@/components/PremiumComponents';
 
-const Index = () => {
+const HomePage = () => {
+  const featuredProducts = [
+    {
+      id: 1,
+      title: 'Classic Leather Tote',
+      price: '$249',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+    },
+    {
+      id: 2,
+      title: 'Elegant Shoulder Bag',
+      price: '$189',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+    },
+    {
+      id: 3,
+      title: 'Premium Laptop Bag',
+      price: '$299',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60',
+    },
+  ];
+
+  const categories = [
+    {
+      name: 'Handbags',
+      image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
+      description: 'Timeless elegance for every occasion',
+    },
+    {
+      name: 'Laptop Bags',
+      image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
+      description: 'Professional and stylish',
+    },
+    {
+      name: 'Travel Bags',
+      image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=60',
+      description: 'Adventure ready companions',
+    },
+  ];
+
   return (
-    <div className="min-h-screen overflow-hidden">
-      <HeroBanner />
-      <AboutSection />
+    <div className="bg-light overflow-hidden">
+      <PremiumHero />
 
-      {/* Features Section */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-brand-light via-white to-brand-secondary/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-brand-dark mb-4 sm:mb-6">
-              Why Choose Our Bags?
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-brand-primary max-w-3xl mx-auto px-4">
-              Experience the perfect blend of style, quality, and innovation
-            </p>
-          </div>
+      <PremiumSection
+        title="Featured Collection"
+        subtitle="Handpicked pieces that define modern elegance"
+        background="white"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {featuredProducts.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <motion.div
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white card"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-6 rounded-lg overflow-hidden h-64 sm:h-72"
+                >
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            <div className="group text-center p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white to-brand-light/50 hover:from-brand-accent/10 hover:to-brand-secondary/20 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-brand-secondary/30">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-dark to-brand-primary rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-brand-light" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-brand-dark mb-3 sm:mb-4 group-hover:text-brand-primary transition-colors">Premium Quality</h3>
-              <p className="text-sm sm:text-base text-brand-primary leading-relaxed">
-                Crafted with the finest materials and attention to detail for lasting elegance and durability.
-              </p>
-            </div>
-
-            <div className="group text-center p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white to-brand-light/50 hover:from-brand-accent/10 hover:to-brand-secondary/20 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-brand-secondary/30 md:translate-y-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-primary to-brand-accent rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-brand-light" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-brand-dark mb-3 sm:mb-4 group-hover:text-brand-primary transition-colors">Lifetime Guarantee</h3>
-              <p className="text-sm sm:text-base text-brand-primary leading-relaxed">
-                Every bag comes with our comprehensive satisfaction guarantee and premium quality assurance.
-              </p>
-            </div>
-
-            <div className="group text-center p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-white to-brand-light/50 hover:from-brand-accent/10 hover:to-brand-secondary/20 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl border border-brand-secondary/30">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-brand-accent to-brand-secondary rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
-                <Truck className="w-8 h-8 sm:w-10 sm:h-10 text-brand-dark" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-brand-dark mb-3 sm:mb-4 group-hover:text-brand-primary transition-colors">Express Delivery</h3>
-              <p className="text-sm sm:text-base text-brand-primary leading-relaxed">
-                Lightning-fast and secure delivery to bring your perfect bag right to your doorstep.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Collection */}
-      <section className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-brand-light mb-4 sm:mb-6">
-              Featured Collection
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-brand-light/90 max-w-3xl mx-auto leading-relaxed px-4">
-              Discover our signature handbags for women — where luxury meets functionality in perfect harmony
-            </p>
-          </div>
-
-          <div className="group cursor-pointer">
-            <Card className="max-w-6xl mx-auto overflow-hidden shadow-2xl rounded-3xl bg-gradient-to-br from-brand-light/95 via-white to-brand-secondary/50 border border-brand-accent/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.3)] transition-shadow duration-500">
-              <CardContent className="p-0">
-                <div className="grid grid-cols-1 lg:grid-cols-2">
-                  <div className="relative h-64 sm:h-80 lg:h-[500px] overflow-hidden">
-                    <img
-                      src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
-                      alt="Handbags for Women"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/40 via-transparent to-transparent"></div>
-                    <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-gradient-to-r from-brand-accent to-brand-secondary text-brand-dark px-3 py-1 sm:px-4 sm:py-2 rounded-full font-medium text-xs sm:text-sm shadow-lg">
-                      New Collection
-                    </div>
-                  </div>
-
-                  <div className="p-6 sm:p-8 lg:p-12 xl:p-16 flex flex-col justify-center">
-                    <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-brand-dark mb-4 sm:mb-6">
-                      Handbags for Women
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h3
+                      className="text-lg font-bold text-primary"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      {product.title}
                     </h3>
-                    <p className="text-sm sm:text-base lg:text-lg text-brand-primary mb-6 sm:mb-8 leading-relaxed">
-                      Elevate your style with our exquisite collection of handbags.
-                      From everyday essentials to statement pieces, find the perfect
-                      bag to complement your unique style and sophisticated lifestyle.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
-                      <div className="flex items-center text-brand-primary">
-                        <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-brand-accent" />
-                        <span className="font-medium text-sm sm:text-base">Premium Leather</span>
-                      </div>
-                      <div className="flex items-center text-brand-primary">
-                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-brand-accent" />
-                        <span className="font-medium text-sm sm:text-base">Handcrafted</span>
-                      </div>
-                      <div className="flex items-center text-brand-primary">
-                        <Shield className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-brand-accent" />
-                        <span className="font-medium text-sm sm:text-base">Lifetime Warranty</span>
-                      </div>
-                    </div>
-                    <Link to="/shop?category=handbags-women">
-                      <Button className="w-full sm:w-auto bg-gradient-to-r from-brand-primary to-brand-dark hover:from-brand-dark hover:to-brand-primary text-brand-light px-6 sm:px-8 lg:px-10 py-3 sm:py-4 text-base sm:text-lg font-medium rounded-full transition-all duration-300 hover:scale-105 shadow-xl">
-                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        Shop Collection
-                      </Button>
-                    </Link>
+                    <p className="text-accent font-medium text-sm mt-1">{product.price}</p>
+                  </div>
+                  <button className="p-2 text-gray-400 hover:text-accent transition-colors">
+                    <Heart className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: product.rating }).map((_, i) => (
+                    <span key={i} className="text-accent text-xs">★</span>
+                  ))}
+                </div>
+
+                <button className="w-full py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300 rounded-lg font-medium text-sm">
+                  Quick View
+                </button>
+              </motion.div>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="flex justify-center mt-12"
+        >
+          <Link to="/shop" className="btn-primary flex items-center gap-2">
+            View All Products
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+      </PremiumSection>
+
+      <PremiumSection
+        title="Shop by Category"
+        subtitle="Explore our curated collections"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {categories.map((category, index) => (
+            <motion.div
+              key={category.name}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -4 }}
+              className="group cursor-pointer"
+            >
+              <div className="relative rounded-xl overflow-hidden h-72 sm:h-80 bg-gray-200">
+                <motion.img
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center">
+                  <h3
+                    className="text-3xl font-bold mb-2"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
+                    {category.name}
+                  </h3>
+                  <p className="text-sm opacity-90">{category.description}</p>
+                  <div className="mt-6 flex items-center gap-2 group-hover:gap-4 transition-all">
+                    <span className="text-sm font-medium">Explore</span>
+                    <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
-      </section>
+      </PremiumSection>
 
-      <CategoryGrid />
-      <TestimonialsSection />
+      <PremiumSection
+        title="Why Choose Millux"
+        subtitle="Excellence in every detail"
+        background="white"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <FeatureRow
+            icon={<Award className="w-6 h-6" />}
+            title="Premium Craftsmanship"
+            description="Each bag is meticulously crafted with the finest materials and attention to detail, ensuring timeless quality."
+          />
+          <FeatureRow
+            icon={<Heart className="w-6 h-6" />}
+            title="Handpicked Collection"
+            description="Every piece is carefully selected to meet our rigorous standards for design, durability, and style."
+          />
+          <FeatureRow
+            icon={<Truck className="w-6 h-6" />}
+            title="Fast & Secure Delivery"
+            description="We partner with trusted logistics providers to ensure your order arrives safely and promptly."
+          />
+          <FeatureRow
+            icon={<Shield className="w-6 h-6" />}
+            title="Secure Shopping"
+            description="Your transactions are protected with industry-leading encryption and security protocols."
+          />
+          <FeatureRow
+            icon={<Clock className="w-6 h-6" />}
+            title="24/7 Support"
+            description="Our dedicated team is always here to assist you with any questions or concerns."
+          />
+          <FeatureRow
+            icon={<CheckCircle className="w-6 h-6" />}
+            title="Quality Guarantee"
+            description="We stand behind every product with our commitment to excellence and customer satisfaction."
+          />
+        </div>
+      </PremiumSection>
+
+      <PremiumSection title="What Our Customers Say">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              name: 'Sarah Johnson',
+              role: 'Fashion Enthusiast',
+              quote: 'The quality and elegance of these bags surpassed my expectations. Truly a luxury experience.',
+              avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
+            },
+            {
+              name: 'Emily Rodriguez',
+              role: 'Business Professional',
+              quote: 'Finally found a laptop bag that looks as professional as it is functional. Worth every penny.',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
+            },
+            {
+              name: 'Jessica Lee',
+              role: 'Travel Blogger',
+              quote: 'These bags are my travel companions. Durable, stylish, and built to last through adventures.',
+              avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80',
+            },
+          ].map((testimonial, index) => (
+            <motion.div
+              key={testimonial.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white card text-center"
+            >
+              <img
+                src={testimonial.avatar}
+                alt={testimonial.name}
+                className="w-16 h-16 rounded-full mx-auto mb-4 object-cover"
+              />
+              <p className="text-secondary italic mb-4">"{testimonial.quote}"</p>
+              <h4 className="font-bold text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>
+                {testimonial.name}
+              </h4>
+              <p className="text-muted text-sm">{testimonial.role}</p>
+            </motion.div>
+          ))}
+        </div>
+      </PremiumSection>
+
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="py-16 md:py-20 bg-primary text-white"
+      >
+        <div className="container-wide max-w-2xl text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Stay Updated
+          </h2>
+          <p className="mb-8 text-white/80">Subscribe to receive exclusive offers and updates about new collections.</p>
+
+          <form className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-6 py-3 rounded-lg bg-white text-primary placeholder-gray-400 focus:outline-none"
+            />
+            <button type="submit" className="btn-primary">
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </motion.section>
     </div>
   );
 };
 
-export default Index;
+export default HomePage;
