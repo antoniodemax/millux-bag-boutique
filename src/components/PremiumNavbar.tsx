@@ -64,7 +64,7 @@ const PremiumNavbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            src="/millux-logo.png"
+            src="/MILLUX COLLECTIONS LOGO.png"
             alt="Millux Collections"
             className="h-10 md:h-11 w-auto object-contain"
           />
