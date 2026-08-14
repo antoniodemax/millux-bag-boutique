@@ -38,7 +38,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           {/* Alternative: small button in corner */}
           <button
             onClick={() => addItem(product)}
-            className="absolute top-3 right-3 z-10 p-1 bg-white/80 hover:bg-white/90 rounded-full transition-all duration-200 hover:scale-105 border border-border/30"
+            className="absolute top-3 right-3 z-10 p-1 bg-white/80 hover:bg-white/90 rounded-full transition-all duration-200 hover:scale-105 border border-border/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
             aria-label="Add to bag"
           >
             <ShoppingBag className="h-4 w-4 text-brand-primary" />

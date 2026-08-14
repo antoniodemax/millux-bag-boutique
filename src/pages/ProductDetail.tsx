@@ -121,7 +121,7 @@ const ProductDetail = () => {
                   onClick={() => {
                     addItem(product);
                   }}
-                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-all duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                 >
                   Add to Bag
                 </button>
@@ -132,7 +132,7 @@ const ProductDetail = () => {
                     const msg = `Hi! I have a question about the ${product.name}. Could you please provide more details?`;
                     window.open(`https://wa.me/254723425778?text=${encodeURIComponent(msg)}`, '_blank');
                   }}
-                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 border border-primary/20 text-primary text-sm font-medium rounded-lg hover:border-primary/30 transition-all duration-200"
+                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 border border-primary/20 text-primary text-sm font-medium rounded-lg hover:border-primary/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                 >
                   WhatsApp Assistance
                 </button>

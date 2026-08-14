@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, MessageCircle, Search, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { formatPrice } from "@/lib/utils";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -118,7 +119,8 @@ const Navbar = () => {
               {/* Cart */}
               <button
                 onClick={() => setCartDrawerOpen(!cartDrawerOpen)}
-                className="relative px-2 lg:px-3 py-2 text-sm font-medium transition-colors duration-200 text-brand-dark/70 hover:text-brand-primary"
+                className="relative px-2 lg:px-3 py-2 text-sm font-medium transition-colors duration-200 text-brand-dark/70 hover:text-brand-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
+                aria-label="View cart"
               >
                 <ShoppingBag className="h-4 w-4" />
                 {cartCount > 0 && (
@@ -134,7 +136,9 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-brand-primary hover:text-brand-dark hover:bg-brand-accent/20"
+              className="inline-flex items-center justify-center p-2 rounded-md text-brand-primary hover:text-brand-dark hover:bg-brand-accent/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
+              aria-expanded={isOpen}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -153,7 +157,7 @@ const Navbar = () => {
                 className={`block px-3 py-4 text-base font-medium transition-colors duration-200 rounded-md ${
                   isActive(item.path)
                     ? "text-brand-primary bg-brand-accent/20"
-                    : "text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10"
+                    : "text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10 focus:text-brand-primary focus:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
@@ -222,14 +226,14 @@ const Navbar = () => {
                               removeItem(item.id);
                             }
                           }}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200"
+                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
                         >
                           <span className="text-[9px]">−</span>
                         </button>
                         <span className="w-4 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200"
+                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
                         >
                           <span className="text-[9px]">+</span>
                         </button>

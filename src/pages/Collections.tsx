@@ -80,7 +80,11 @@ const Collections = () => {
             <div className="flex-1 md:w-64">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
+                <label htmlFor="search-input" className="sr-only">
+                  Search collections
+                </label>
                 <input
+                  id="search-input"
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -92,7 +96,11 @@ const Collections = () => {
 
             {/* Category Filter */}
             <div className="flex-1 md:w-64">
+              <label htmlFor="category-filter" className="sr-only">
+                Filter by category
+              </label>
               <select
+                id="category-filter"
                 value={selectedCategory || ""}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
                 className="w-full py-3 bg-transparent border border-border/30 rounded-lg focus:border-accent focus:outline-none text-sm text-primary"
@@ -108,7 +116,11 @@ const Collections = () => {
 
             {/* Sort By */}
             <div className="flex-1 md:w-64">
+              <label htmlFor="sort-select" className="sr-only">
+                Sort products
+              </label>
               <select
+                id="sort-select"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full py-3 bg-transparent border border-border/30 rounded-lg focus:border-accent focus:outline-none text-sm text-primary"
