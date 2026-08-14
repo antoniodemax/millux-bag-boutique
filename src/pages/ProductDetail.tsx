@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/ProductCard";
+import { useCart } from "@/context/CartContext";
 import SEO from "@/components/SEO";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { addItem } = useCart();
 
   useEffect(() => {
     const findProduct = products.find(p => p.slug === slug);
@@ -117,9 +119,7 @@ const ProductDetail = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => {
-                    // Add to Bag via WhatsApp
-                    const msg = `Hi! I'd like to purchase the ${product.name} for ${formatPrice(product.price)}. Please confirm availability and proceed with order.`;
-                    window.open(`https://wa.me/254723425778?text=${encodeURIComponent(msg)}`, '_blank');
+                    addItem(product);
                   }}
                   className="w-full sm:w-auto flex items-center justify-center px-8 py-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-all duration-200"
                 >
