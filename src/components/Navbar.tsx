@@ -150,7 +150,7 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md ${
+                className={`block px-3 py-4 text-base font-medium transition-colors duration-200 rounded-md ${
                   isActive(item.path)
                     ? "text-brand-primary bg-brand-accent/20"
                     : "text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10"
