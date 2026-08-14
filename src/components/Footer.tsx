@@ -1,27 +1,27 @@
 import { Link } from "react-router-dom";
 
 const shopLinks = [
-  { label: "Totes", path: "/shop" },
-  { label: "Shoulder Bags", path: "/shop" },
-  { label: "Crossbody", path: "/shop" },
-  { label: "Clutches & Evening", path: "/shop" },
-  { label: "Travel", path: "/shop" },
+  { label: "Collections", path: "/shop" },
+  { label: "New Arrivals", path: "/shop" },
+  { label: "Bespoke", path: "/#" },
 ];
 
-const houseLinks = [
-  { label: "Our Story", path: "/about" },
-  { label: "Craftsmanship", path: "/about" },
-  { label: "Sustainability", path: "/about" },
-  { label: "Press", path: "/about" },
-  { label: "Careers", path: "/contact" },
+const companyLinks = [
+  { label: "About", path: "/about" },
+  { label: "Contact", path: "/contact" },
+  { label: "Stockists", path: "/#" },
 ];
 
-const helpLinks = [
-  { label: "Bag Care Guide", path: "/contact" },
-  { label: "Delivery & Returns", path: "/contact" },
-  { label: "Bespoke Orders", path: "/contact" },
-  { label: "Contact Us", path: "/contact" },
-  { label: "FAQs", path: "/contact" },
+const clientServiceLinks = [
+  { label: "Shipping", path: "/#" },
+  { label: "Returns", path: "/#" },
+  { label: "Privacy", path: "/#" },
+  { label: "Terms", path: "/#" },
+];
+
+const socialLinks = [
+  { label: "Instagram", path: "https://instagram.com/milluxcollections", external: true },
+  { label: "WhatsApp", path: "https://wa.me/254723425778", external: true },
 ];
 
 const Footer = () => {
@@ -61,13 +61,13 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* House */}
+        {/* Company */}
         <div>
           <h4 className="text-xs uppercase tracking-widest text-[#1F1F1F] mb-5">
-            House
+            Company
           </h4>
           <ul className="flex flex-col gap-3">
-            {houseLinks.map((l) => (
+            {companyLinks.map((l) => (
               <li key={l.label}>
                 <Link
                   to={l.path}
@@ -80,13 +80,13 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Help */}
+        {/* Client Services */}
         <div>
           <h4 className="text-xs uppercase tracking-widest text-[#1F1F1F] mb-5">
-            Help
+            Client Services
           </h4>
           <ul className="flex flex-col gap-3">
-            {helpLinks.map((l) => (
+            {clientServiceLinks.map((l) => (
               <li key={l.label}>
                 <Link
                   to={l.path}
@@ -100,28 +100,27 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Legal row */}
+      {/* Social Section */}
       <div className="border-t border-[#EAE5DF]">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <p className="text-xs text-[#666666]">
             © 2026 Millux Collections Ltd. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            {["Privacy", "Terms of Use", "Cookies"].map((l) => (
-              
-              <a>
-                key={l}
-                href="#"
-                className="text-xs text-[#666666] hover:text-[#B68D40] transition-colors duration-300"
-              
-                {1}
+            {socialLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.path}
+                className={`text-xs text-[#666666] hover:text-[#B68D40] transition-colors duration-300 ${
+                  link.external ? "after:[content:'→'] after:ml-1" : ""
+                }`}
+              >
+                {link.label}
               </a>
             ))}
           </div>
         </div>
       </div>
-
-     
     </footer>
   );
 };
