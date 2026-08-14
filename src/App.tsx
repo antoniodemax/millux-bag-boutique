@@ -4,11 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import Index from "./pages/Index";
-import Shop from "./pages/Shop";
+import Collections from "./pages/Collections";
+import NewArrivals from "./pages/NewArrivals";
+import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import PremiumNavbar from "./components/PremiumNavbar";
+import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import BackToTop from "./components/BackToTop";
@@ -21,10 +23,13 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <div className="min-h-screen bg-light">
-            <PremiumNavbar />
+            <Navbar />
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/shop" element={<Shop />} />
+              <Route path="/shop" element={<Collections />} />
+              <Route path="/collections" element={<Collections />} />
+              <Route path="/new-arrivals" element={<NewArrivals />} />
+              <Route path="/products/:slug" element={<ProductDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<NotFound />} />
