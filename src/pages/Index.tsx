@@ -89,7 +89,7 @@ const HomePage = () => {
   return (
     <div className="overflow-hidden">
       {/* ---------------- HERO ---------------- */}
-      <section className="relative min-h-[640px] w-full">
+      <section className="relative min-h-[100vh] w-full">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1597633125184-9fd7e54f0ff7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -100,9 +100,8 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,248,245,0.7)_0%,rgba(250,248,245,0.9)_100%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,248,245,0.3)_0%,transparent_50%)]" />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-gradient-to-t from-[#FAF8F5] via-[#FAF8F5]/60 to-transparent" />
 
-        <div className="relative z-10 flex h-[640px] min-h-[640px] items-center px-6 md:px-16">
+        <div className="relative z-10 flex min-h-[100vh] items-start px-6 md:px-16 pt-[88px]">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -151,10 +150,10 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ---------------- FEATURED COLLECTION ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-12">
-        <Reveal className="flex items-end justify-between mb-16 flex-wrap gap-4">
-          <div>
+      {/* ---------------- COLLECTION SECTION ---------------- */}
+      <section className="bg-[#FAF8F5] py-20 md:py-28 px-6 md:px-12">
+        <div className="flex flex-col md:flex-row items-end justify-between mb-16">
+          <div className="md:mb-0">
             <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
               THE COLLECTION
             </p>
@@ -164,11 +163,11 @@ const HomePage = () => {
           </div>
           <Link
             to="/shop"
-            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
+            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300 md:ml-12"
           >
             View All ›
           </Link>
-        </Reveal>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           <Reveal className="col-span-2 md:col-span-1">
