@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 const shopLinks = [
   { label: "Collections", path: "/shop" },
   { label: "New Arrivals", path: "/shop" },
-  { label: "Bespoke", path: "/#" },
-];
+  ];
 
 const companyLinks = [
   { label: "About", path: "/about" },
