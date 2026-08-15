@@ -87,7 +87,7 @@ const HomePage = () => {
   const [email, setEmail] = useState('');
 
   return (
-    <div className="bg-[#FAF8F5] overflow-hidden">
+    <div className="overflow-hidden">
       {/* ---------------- HERO ---------------- */}
       <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
         <div className="absolute inset-0">
