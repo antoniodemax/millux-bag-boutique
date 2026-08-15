@@ -103,12 +103,12 @@ const Navbar = () => {
               ))}
               {/* Search */}
               <div className="relative">
-                <Search className="h-4 w-4 text-brand-dark/50" />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="ml-2 px-3 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none w-24 md:w-32"
+                  className="pl-10 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none w-24 md:w-32"
                 />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-brand-dark/50" />
               </div>
               {/* Cart */}
               <button
@@ -201,12 +201,12 @@ const Navbar = () => {
         <div className="flex items-center space-x-3">
           {/* Search Icon */}
           <div className="relative">
-            <Search className="h-5 w-5 text-brand-dark/50" />
             <input
               type="text"
               placeholder="Search"
-              className="absolute left-0 top-0 w-full h-full opacity-0 pointer-events-none"
+              className="pl-8 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none"
             />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-dark/50" />
           </div>
           {/* Cart Icon */}
           <button
@@ -232,6 +232,26 @@ const Navbar = () => {
           </button>
         </div>
       </div>
+
+      {/* Mobile Search Overlay */}
+      {searchOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex items-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-xs p-4 bg-white rounded-lg shadow-lg">
+            <label htmlFor="mobile-search" className="sr-only">
+              Search
+            </label>
+            <div className="relative">
+              <input
+                id="mobile-search"
+                type="text"
+                placeholder="Search"
+                className="pl-10 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none block w-full"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-dark/50" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cart Drawer */}
       {cartDrawerOpen && (
