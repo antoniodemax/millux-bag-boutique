@@ -28,7 +28,7 @@ const PremiumNavbar = () => {
             <motion.img
               src="/images/millux.png"
               alt="Millux Collections"
-              className="h-[24px] w-auto"
+              className="h-[24px] md:h-[28px] w-auto"
             />
           </Link>
         </div>
@@ -43,7 +43,7 @@ const PremiumNavbar = () => {
           {/* Mobile menu button - shown on mobile, hidden on desktop */}
           <div className="md:hidden">
             <button
-              className="text-[#1F1F1F] hover:text-[#B68D40] transition-colors duration-200"
+              className="text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-200"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle menu"
             >
@@ -58,7 +58,7 @@ const PremiumNavbar = () => {
               <Link
                 key={link.label}
                 to={link.path}
-                className="text-xs uppercase tracking-[0.2em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+                className="text-sm uppercase tracking-[0.2em] text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-300"
               >
                 {link.label}
               </Link>
@@ -67,7 +67,7 @@ const PremiumNavbar = () => {
             {/* Search icon */}
             <button
               aria-label="Search"
-              className="text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+              className="text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-300"
             >
               <Search size={18} strokeWidth={1.5} />
             </button>
@@ -75,7 +75,7 @@ const PremiumNavbar = () => {
             {/* Shopping cart icon */}
             <button
               aria-label="Shopping Bag"
-              className="relative text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+              className="relative text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-300"
             >
               <ShoppingBag size={18} strokeWidth={1.5} />
               <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center bg-[#B68D40] text-[9px] font-medium text-white">
