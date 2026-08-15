@@ -61,21 +61,20 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Fixed Navbar */}
-      <nav className={`fixed inset-x-0 top-0 z-50 h-16 sm:h-20 transition-colors duration-200 ${scrolled ? "bg-brand-light/90 backdrop-blur-sm border-b border-brand-accent/20 shadow-lg" : "bg-transparent"}`}>
+      {/* Fixed Navbar with subtle overlay for better contrast */}
+      <nav className={`fixed inset-x-0 top-0 z-50 h-16 sm:h-20 transition-colors duration-200 ${scrolled ? "bg-white/90 backdrop-blur-sm border-b border-gray-200" : "bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-full sm:h-20 items-center justify-between">
-          {/* Brand Logo */}
+          {/* Brand Logo - matching footer exactly */}
           <div className="flex items-center flex-shrink-0">
             <div
               onClick={() => navigate("/")}
-              className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+              className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-90 transition-opacity"
             >
-              <span className="font-playfair text-xl lg:text-2xl font-bold text-brand-primary">
-                MILLUX
-              </span>
-              <span className="font-playfair text-xs lg:text-sm font-light text-brand-primary ml-1">
-                COLLECTIONS
-              </span>
+              <img
+                src="/millux-collections-logo.png"
+                alt="Millux Collections"
+                className="h-12 sm:h-14 w-auto object-contain"
+              />
             </div>
           </div>
 
@@ -91,10 +90,10 @@ const Navbar = () => {
                     isActive(item.path)
                       ? scrolled
                         ? "text-brand-primary"
-                        : "text-brand-light"
+                        : "text-gray-800"
                       : scrolled
-                        ? "text-brand-dark/70 hover:text-brand-primary"
-                        : "text-brand-light/70 hover:text-brand-light"
+                        ? "text-gray-600 hover:text-brand-primary"
+                        : "text-gray-300 hover:text-white"
                   }`}
                 >
                   {item.name}
@@ -112,10 +111,10 @@ const Navbar = () => {
                     isActive(item.path)
                       ? scrolled
                         ? "text-brand-primary"
-                        : "text-brand-light"
+                        : "text-gray-800"
                       : scrolled
-                        ? "text-brand-dark/70 hover:text-brand-primary"
-                        : "text-brand-light/70 hover:text-brand-light"
+                        ? "text-gray-600 hover:text-brand-primary"
+                        : "text-gray-300 hover:text-white"
                   }`}
                 >
                   {item.name}
@@ -126,22 +125,18 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder="Search"
-                  className={`pl-10 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none w-24 md:w-32 ${scrolled ? "text-brand-dark" : "text-brand-light"} placeholder-${scrolled ? "text-brand-dark/60" : "text-brand-light/60"}`}
+                  className={`pl-10 pr-4 py-2 text-sm font-medium border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none w-24 md:w-32 ${scrolled ? "text-gray-800" : "text-gray-200"} placeholder-${scrolled ? "text-gray-600" : "text-gray-400"}`}
                 />
-                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${scrolled ? "text-brand-dark/50" : "text-brand-light/50"}`} />
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${scrolled ? "text-gray-600" : "text-gray-400"}`} />
               </div>
               {/* Cart */}
               <button
                 onClick={() => setCartDrawerOpen(!cartDrawerOpen)}
-                className={`relative ml-4 flex items-center px-2 py-2 rounded-md border border-brand-accent/30 ${scrolled ? "text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10" : "text-brand-light/70 hover:text-brand-light hover:bg-brand-accent/20"} transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20`}
+                className={`relative ml-4 flex items-center px-2 py-2 rounded-md border border-gray-300 ${scrolled ? "text-gray-800 hover:text-brand-primary hover:bg-gray-100" : "text-gray-300 hover:text-white hover:bg-gray-700/20"} transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200`}
                 aria-label="View cart"
               >
                 <ShoppingBag className="h-4 w-4" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">
-                    {cartCount}
-                  </span>
-                )}
+                {cartCount > 0 && <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">{cartCount}</span>}
               </button>
             </div>
           </div>
@@ -153,27 +148,23 @@ const Navbar = () => {
               <input
                 type="text"
                 placeholder="Search"
-                className={`pl-8 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none ${scrolled ? "text-brand-dark" : "text-brand-light"} placeholder-${scrolled ? "text-brand-dark/60" : "text-brand-light/60"}`}
+                className={`pl-8 pr-4 py-2 text-sm font-medium border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none ${scrolled ? "text-gray-800" : "text-gray-200"} placeholder-${scrolled ? "text-gray-600" : "text-gray-400"}`}
               />
-              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${scrolled ? "text-brand-dark/50" : "text-brand-light/50"}`} />
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${scrolled ? "text-gray-600" : "text-gray-400"}`} />
             </div>
             {/* Cart Icon */}
             <button
               onClick={() => setCartDrawerOpen(!cartDrawerOpen)}
-              className={`relative p-1 rounded hover:bg-brand-accent/10 ${scrolled ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20" : "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"}`}
+              className={`relative p-1 rounded hover:bg-gray-700/20 ${scrolled ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200" : "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"}`}
               aria-label="View cart"
             >
               <ShoppingBag className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">
-                  {cartCount}
-                </span>
-              )}
+              {cartCount > 0 && <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">{cartCount}</span>}
             </button>
             {/* Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`p-1 rounded hover:bg-brand-accent/10 ${scrolled ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20" : "focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"}`}
+              className={`p-1 rounded hover:bg-gray-700/20 ${scrolled ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200" : "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"}`}
               aria-expanded={isOpen}
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
@@ -186,7 +177,7 @@ const Navbar = () => {
       {/* Mobile Navigation Drawer */}
       {isOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-brand-light/90 backdrop-blur-sm border-t border-brand-accent/20">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white/90 backdrop-blur-sm border-t border-gray-200">
             {/* Primary Navigation */}
             {navItems.map((item) => (
               <Link
@@ -194,8 +185,8 @@ const Navbar = () => {
                 to={item.path}
                 className={`block px-3 py-4 text-base font-medium transition-colors duration-200 rounded-md ${
                   isActive(item.path)
-                    ? "text-brand-primary bg-brand-accent/20"
-                    : "text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10 focus:text-brand-primary focus:bg-brand-accent/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
+                    ? "text-brand-primary bg-gray-100"
+                    : "text-gray-700 hover:text-brand-primary hover:bg-gray-50"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
@@ -207,18 +198,18 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md text-brand-dark/70 hover:text-brand-primary hover:bg-brand-accent/10`}
+                className={`block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md text-gray-700 hover:text-brand-primary hover:bg-gray-50`}
                 onClick={() => setIsOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
             <div className="flex items-center px-3 py-2 text-base font-medium transition-colors duration-200">
-              <Search className="h-4 w-4 mr-2 text-brand-dark/50" />
+              <Search className="h-4 w-4 mr-2 text-gray-600" />
               <input
                 type="text"
                 placeholder="Search"
-                className="flex-1 px-3 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none"
+                className="flex-1 px-3 py-2 text-sm font-medium border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none"
               />
             </div>
             <button
@@ -226,7 +217,7 @@ const Navbar = () => {
                 handleWhatsAppContact();
                 setIsOpen(false);
               }}
-              className="flex items-center w-full px-3 py-2 text-base font-medium text-green-600 hover:text-green-700 hover:bg-brand-accent/10 rounded-md"
+              className="flex items-center w-full px-3 py-2 text-base font-medium text-green-600 hover:text-green-700 hover:bg-gray-100"
             >
               <MessageCircle className="h-5 w-5 mr-2" />
               Order on WhatsApp
@@ -247,9 +238,9 @@ const Navbar = () => {
                 id="mobile-search"
                 type="text"
                 placeholder="Search"
-                className="pl-10 pr-4 py-2 text-sm font-medium border border-brand-accent/20 rounded-md focus:border-brand-accent/50 focus:outline-none block w-full"
+                className="pl-10 pr-4 py-2 text-sm font-medium border border-gray-300 rounded-md focus:border-gray-500 focus:outline-none block w-full"
               />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-dark/50" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600" />
             </div>
           </div>
         </div>
@@ -268,7 +259,7 @@ const Navbar = () => {
               ) : (
                 <>
                   {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between pb-2 border-b border-brand-accent/20">
+                    <div key={item.id} className="flex items-center justify-between pb-2 border-b border-gray-200">
                       <div className="flex-1">
                         <p className="font-playfair text-lg text-primary">{item.name}</p>
                         <p className="text-text-muted">{item.quantity}x £{formatPrice(item.price)}</p>
@@ -283,42 +274,42 @@ const Navbar = () => {
                               removeItem(item.id);
                             }
                           }}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
+                          className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"
                         >
                           <span className="text-[9px]">−</span>
                         </button>
                         <span className="w-4 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-brand-accent/30 hover:bg-brand-accent/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
+                          className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"
                         >
                           <span className="text-[9px]">+</span>
                         </button>
                       </div>
                     </div>
                   ))}
-                  <div className="mt-4 pt-4 border-t border-brand-accent/20">
+                  <div className="mt-4 pt-4 border-t border-gray-200">
                     <p className="flex justify-between">
                       <span className="font-playfair text-lg text-primary">Subtotal:</span>
                       <span className="font-playfair text-lg text-accent">£{formatPrice(cartTotal)}</span>
                     </p>
                   </div>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setCartDrawerOpen(false)}
+                      className="px-4 py-2 border border-gray-300 text-gray-800 hover:text-gray-600 transition-colors duration-200"
+                    >
+                      Close
+                    </button>
+                    <button
+                      onClick={handleCartWhatsAppOrder}
+                      className="ml-4 px-6 py-3 bg-brand-accent text-white text-sm font-medium rounded-lg hover:bg-brand-accent/90 transition-colors duration-200"
+                    >
+                      Order via WhatsApp
+                    </button>
+                  </div>
                 </>
               )}
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setCartDrawerOpen(false)}
-                  className="px-4 py-2 border border-brand-accent/30 text-brand-primary hover:text-brand-dark/80 transition-colors duration-200"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={handleCartWhatsAppOrder}
-                  className="ml-4 px-6 py-3 bg-brand-accent text-white text-sm font-medium rounded-lg hover:bg-brand-accent/90 transition-colors duration-200"
-                >
-                  Order via WhatsApp
-                </button>
-              </div>
             </div>
           </div>
         </div>
