@@ -17,26 +17,13 @@ const PremiumNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-[#F8F6F2] border-b border-[#ECE7E0]">
+    <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-transparent">
       <div className="h-full px-6 md:px-12 flex items-center justify-between relative">
-        {/* Left Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {leftLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.path}
-              className="text-xs uppercase tracking-[0.2em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Logo - Mobile: Left-aligned, Desktop: Centered */}
-        <div className="flex-1 md:flex md:items-center md:justify-center">
+        {/* Logo - Left aligned for both mobile and desktop */}
+        <div className="flex-shrink-0">
           <Link
             to="/"
-            className="block md:hidden"
+            className="block"
           >
             <motion.img
               src="/images/millux.png"
@@ -44,52 +31,58 @@ const PremiumNavbar = () => {
               className="h-[24px] w-auto"
             />
           </Link>
-
-          {/* Desktop logo - centered */}
-          <motion.img
-            src="/images/millux.png"
-            alt="Millux Collections"
-            className="hidden md:block w-[220px] max-w-none scale-[2.8] object-contain"
-          />
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-[#1F1F1F]"
-          onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* Center spacer for mobile - pushes menu button to right */}
+        <div className="hidden md:block flex-1">
+          {/* This space is hidden on mobile, shown on desktop to create proper spacing */}
+        </div>
 
-        {/* Right Navigation - Desktop only */}
-        <div className="hidden md:flex items-center gap-7">
-          {rightLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.path}
-              className="text-xs uppercase tracking-[0.2em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+        {/* Right side controls */}
+        <div className="flex items-center space-x-3">
+          {/* Mobile menu button - shown on mobile, hidden on desktop */}
+          <div className="md:hidden">
+            <button
+              className="text-[#1F1F1F] hover:text-[#B68D40] transition-colors duration-200"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle menu"
             >
-              {link.label}
-            </Link>
-          ))}
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
 
-          <button
-            aria-label="Search"
-            className="text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
-          >
-            <Search size={18} strokeWidth={1.5} />
-          </button>
+          {/* Desktop navigation - shown on desktop, hidden on mobile */}
+          <div className="hidden md:flex items-center space-x-6">
+            {/* Navigation links: leftLinks + rightLinks */}
+            {[...leftLinks, ...rightLinks].map((link) => (
+              <Link
+                key={link.label}
+                to={link.path}
+                className="text-xs uppercase tracking-[0.2em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+              >
+                {link.label}
+              </Link>
+            ))}
 
-          <button
-            aria-label="Shopping Bag"
-            className="relative text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
-          >
-            <ShoppingBag size={18} strokeWidth={1.5} />
-            <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center bg-[#B68D40] text-[9px] font-medium text-white">
-              2
-            </span>
-          </button>
+            {/* Search icon */}
+            <button
+              aria-label="Search"
+              className="text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+            >
+              <Search size={18} strokeWidth={1.5} />
+            </button>
+
+            {/* Shopping cart icon */}
+            <button
+              aria-label="Shopping Bag"
+              className="relative text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+            >
+              <ShoppingBag size={18} strokeWidth={1.5} />
+              <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center bg-[#B68D40] text-[9px] font-medium text-white">
+                2
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 

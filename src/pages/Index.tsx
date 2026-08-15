@@ -89,7 +89,7 @@ const HomePage = () => {
   return (
     <div className="overflow-hidden">
       {/* ---------------- HERO ---------------- */}
-      <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
+      <section className="relative min-h-[640px] w-full">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1597633125184-9fd7e54f0ff7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -100,9 +100,9 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,248,245,0.7)_0%,rgba(250,248,245,0.9)_100%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,248,245,0.3)_0%,transparent_50%)]" />
         </div>
-        <div className="absolute bottom-0 inset-x-0 h-72 bg-gradient-to-t from-[#FAF8F5] via-[#FAF8F5]/60 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[72px] bg-gradient-to-t from-[#FAF8F5] via-[#FAF8F5]/60 to-transparent" />
 
-        <div className="relative z-10 h-full flex items-center px-6 md:px-16">
+        <div className="relative z-10 flex h-[640px] min-h-[640px] items-center px-6 md:px-16">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
