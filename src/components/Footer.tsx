@@ -31,7 +31,7 @@ const Footer = () => {
         <div className="col-span-2 md:col-span-1">
           <Link to="/" className="inline-block mb-5">
             <img
-              src="/millux-collections-logo.png"
+              src="/images/millux.png"
               alt="Millux Collections"
               className="h-35 w-auto object-contain"
             />

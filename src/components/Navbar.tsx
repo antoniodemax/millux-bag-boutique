@@ -71,7 +71,7 @@ const Navbar = () => {
               className="flex-shrink-0 flex items-center cursor-pointer hover:opacity-90 transition-opacity"
             >
               <img
-                src="/millux-collections-logo.png"
+                src="/images/millux.png"
                 alt="Millux Collections"
                 className="h-12 sm:h-14 w-auto object-contain"
               />
