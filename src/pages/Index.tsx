@@ -108,17 +108,17 @@ const HomePage = () => {
             transition={{ duration: 0.9, ease: 'easeOut' }}
             className="max-w-xl"
           >
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#1F1F1F]/80 mb-6">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#FAF8F5]/90 mb-6">
               Summer / Autumn 2026
             </p>
-            <h1 className="font-playfair font-light text-5xl md:text-6xl lg:text-7xl leading-tight text-[#1F1F1F] mb-6">
+            <h1 className="font-playfair font-light text-5xl md:text-6xl lg:text-7xl leading-tight text-[#FAF8F5] mb-6">
               <span className="block">Carried</span>
               <span className="block mt-2">
                 <span className="font-bold text-[#B68D40]">with</span> {' '}
                 <span className="font-normal">Intent.</span>
               </span>
             </h1>
-            <p className="text-base leading-relaxed text-[#1F1F1F]/80 max-w-lg mb-8">
+            <p className="text-base leading-relaxed text-[#FAF8F5]/90 max-w-lg mb-8">
               Bags that speak before you say a word — crafted in the world's
               finest leathers for the woman who never needs to announce
               herself.
@@ -132,7 +132,7 @@ const HomePage = () => {
               </Link>
               <Link
                 to="/shop"
-                className="uppercase text-xs tracking-wider text-[#1F1F1F]/80 hover:text-[#B68D40] border-b-[1px] border-[#B68D40]/30 pb-1 transition-colors duration-300"
+                className="uppercase text-xs tracking-wider text-[#FAF8F5]/90 hover:text-[#B68D40] border-b-[1px] border-[#FAF8F5]/30 pb-1 transition-colors duration-300"
               >
                 View Lookbook
               </Link>
@@ -141,7 +141,7 @@ const HomePage = () => {
 
           <div className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10">
             <span
-              className="text-[10px] uppercase tracking-[0.3em] text-[#1F1F1F]/60 font-light"
+              className="text-[10px] uppercase tracking-[0.3em] text-[#FAF8F5]/60 font-light"
               style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
             >
               Scroll to discover
