@@ -92,8 +92,8 @@ const HomePage = () => {
       <section className="relative h-screen min-h-[640px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/handbags-category.png"
-            alt="Millux Collections leather handbags"
+            src="https://images.unsplash.com/photo-1597633125184-9fd7e54f0ff7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            alt="Premium bags background"
             className="w-full h-full object-cover"
           />
           {/* Enhanced overlay for better text readability */}
