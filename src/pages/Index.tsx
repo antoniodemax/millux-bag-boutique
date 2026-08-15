@@ -97,11 +97,11 @@ const HomePage = () => {
             className="w-full h-full object-cover"
           />
           {/* Enhanced overlay for better text readability */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(250,248,245,0.7)_0%,rgba(250,248,245,0.9)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(250,248,245,0.3)_0%,transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.35)_0%,rgba(0,0,0,0.45)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.4)_50%)]" />
         </div>
 
-        <div className="relative z-10 flex min-h-[100vh] items-start px-6 md:px-16 pt-[88px]">
+        <div className="relative z-10 flex min-h-[100vh] items-center px-6 md:px-16 pt-[88px]">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
