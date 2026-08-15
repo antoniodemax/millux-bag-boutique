@@ -19,16 +19,29 @@ const PremiumNavbar = () => {
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-transparent">
       <div className="h-full px-6 md:px-12 flex items-center justify-between relative">
-        {/* Logo - Left aligned for both mobile and desktop */}
+        {/* Logo - Mobile: Left-aligned, Desktop: Left-aligned */}
         <div className="flex-shrink-0">
           <Link
             to="/"
-            className="block"
+            className="block md:hidden"
           >
             <motion.img
               src="/images/millux.png"
               alt="Millux Collections"
-              className="h-[24px] md:h-[28px] w-auto"
+              className="h-[24px] w-auto"
+            />
+          </Link>
+
+          {/* Desktop logo - left-aligned */}
+          <Link
+            to="/"
+            className="hidden md:block"
+          >
+            <motion.img
+              src="/images/millux.png"
+              alt="Millux Collections"
+              className="h-[28px] w-auto"
+              style={{ filter: 'brightness(1.7) sepia(0.15) hue-rotate(15deg)' }}
             />
           </Link>
         </div>
