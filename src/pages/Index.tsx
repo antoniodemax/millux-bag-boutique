@@ -480,30 +480,7 @@ const HomePage = () => {
         </motion.div>
       </section>
 
-      {/* ---------------- BESPOKE ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-12 text-center">
-        <Reveal className="max-w-2xl mx-auto">
-          <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-4">
-            BESPOKE
-          </p>
-          <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F] mb-6">
-            Something made with you in mind.
-          </h2>
-          <p className="text-lg leading-relaxed text-[#666666] max-w-xl mb-10">
-            For those who seek something truly personal, Millux offers a bespoke
-            service where your vision is brought to life through expert
-            craftsmanship and the finest materials. Each piece is a
-            collaboration between you and our artisans.
-          </p>
-          <Link
-            to="/#"
-            className="inline-flex items-center gap-3 bg-[#B68D40] text-white uppercase text-xs tracking-wider px-8 py-5 hover:bg-[#1F1F1F] hover:text-[#B68D40] transition-all duration-300"
-          >
-            Explore Bespoke <ArrowRight size={16} />
-          </Link>
-        </Reveal>
-      </section>
-
+      
       {/* ---------------- SOCIAL / INSTAGRAM-STYLE SECTION ---------------- */}
       <section className="py-20 md:py-28 px-6 md:px-12">
         <Reveal className="mb-16 text-center">
