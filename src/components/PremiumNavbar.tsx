@@ -26,7 +26,7 @@ const PremiumNavbar = () => {
             className="block md:hidden"
           >
             <motion.img
-              src="/images/millux.png"
+              src="/images/milluxlogo.png"
               alt="Millux Collections"
               className="h-[24px] w-auto"
             />
@@ -38,10 +38,9 @@ const PremiumNavbar = () => {
             className="hidden md:block"
           >
             <motion.img
-              src="/images/millux.png"
+              src="/images/milluxlogo.png"
               alt="Millux Collections"
-              className="h-[28px] w-auto"
-              style={{ filter: 'brightness(1.7) sepia(0.15) hue-rotate(15deg)' }}
+              className="h-[32px] w-auto"
             />
           </Link>
         </div>
