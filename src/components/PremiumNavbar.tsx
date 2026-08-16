@@ -15,7 +15,7 @@ const PremiumNavbar = () => {
   ];
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-[rgba(0,0,0,0.04)]">
+    <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-transparent">
       <div className="h-full px-6 md:px-12 flex items-start justify-between relative">
         {/* Logo - Mobile: Left-aligned, Desktop: Left-aligned */}
         <div className="flex-shrink-0 flex flex-col items-start self-start mt-2 ml-2">
