@@ -18,9 +18,9 @@ const PremiumNavbar = () => {
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 h-[88px] bg-transparent">
-      <div className="h-full px-6 md:px-12 flex items-center justify-between relative">
+      <div className="h-full px-6 md:px-12 flex items-start justify-between relative">
         {/* Logo - Mobile: Left-aligned, Desktop: Left-aligned */}
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 flex flex-col items-center self-start">
           <Link
             to="/"
             className="block md:hidden"
@@ -40,7 +40,7 @@ const PremiumNavbar = () => {
             <motion.img
               src="/images/milluxlogo.png"
               alt="Millux Collections"
-              className="h-[32px] w-auto"
+              className="h-[48px] w-auto"
             />
           </Link>
         </div>
