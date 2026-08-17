@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper: Check if user is an admin
+    function isAdmin() {
+      return request.auth != null &&
+             exists(/databases/$(request.auth.token.firebase.project_id)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(request.auth.token.firebase.project_id)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Public can read files in the products and categories folders
+    match /products/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin can read/write to any other folder (e.g., for temporary uploads, admin assets, etc.)
+    match /{folder}/{fileName} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny for any other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
