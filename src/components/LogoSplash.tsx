@@ -22,7 +22,7 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
       <div className="fixed inset-0 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-secondary flex items-center justify-center z-50 animate-fade-out">
         <div className="text-center animate-scale-out">
           <img
-            src="/millux-logo.png"
+            src="/images/milluxlogo-removebg-preview.png"
             alt="Millux Collection"
             className="h-32 w-auto mx-auto mb-4"
           />
@@ -36,7 +36,7 @@ const LogoSplash = ({ onComplete }: LogoSplashProps) => {
     <div className="fixed inset-0 bg-gradient-to-br from-brand-dark via-brand-primary to-brand-secondary flex items-center justify-center z-50">
       <div className="text-center animate-fade-in">
         <img
-          src="/millux-logo.png"
+          src="/images/milluxlogo-removebg-preview.png"
           alt="Millux Collection"
           className="h-32 w-auto mx-auto mb-4"
         />

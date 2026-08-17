@@ -24,7 +24,7 @@ const PremiumNavbar = () => {
             className="block md:hidden"
           >
             <motion.img
-              src="/images/milluxlogo.png"
+              src="/images/milluxlogo-removebg-preview.png"
               alt="Millux Collections"
               className="h-[24px] w-auto"
             />
@@ -36,7 +36,7 @@ const PremiumNavbar = () => {
             className="hidden md:block"
           >
             <motion.img
-              src="/images/milluxlogo.png"
+              src="/images/milluxlogo-removebg-preview.png"
               alt="Millux Collections"
               className="h-[48px] w-auto"
             />
