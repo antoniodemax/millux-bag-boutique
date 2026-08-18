@@ -1,30 +1,74 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { products } from "@/data/products";
 import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/context/CartContext";
 import SEO from "@/components/SEO";
+import { getProductBySlug } from "@/services/productService";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { addItem } = useCart();
 
   useEffect(() => {
-    const findProduct = products.find(p => p.slug === slug);
-    setProduct(findProduct);
-    setLoading(false);
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const fetchedProduct = await getProductBySlug(slug);
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+        } else {
+          setError('Product not found');
+        }
+      } catch (err) {
+        setError('Failed to load product');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (slug) {
+      fetchProduct();
+    }
   }, [slug]);
 
   // Related products: same category, exclude current, limit to 4
-  const relatedProducts = useMemo(() => {
-    if (!product) return [];
-    return products
-      .filter(p => p.category === product.category && p.id !== product.id)
-      .slice(0, 4);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
+  const [relatedError, setRelatedError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product) {
+        setRelatedProducts([]);
+        return;
+      }
+
+      try {
+        setRelatedLoading(true);
+        setRelatedError(null);
+        // Get products in the same category, excluding the current product
+        const categoryProducts = await getProductsByCategory(product.category);
+        const filtered = categoryProducts
+          .filter(p => p.id !== product.id)
+          .slice(0, 4);
+        setRelatedProducts(filtered);
+      } catch (err) {
+        console.error('Failed to fetch related products:', err);
+        setRelatedError('Failed to load related products');
+        setRelatedProducts([]);
+      } finally {
+        setRelatedLoading(false);
+      }
+    };
+
+    fetchRelatedProducts();
   }, [product]);
 
   if (loading) {
@@ -215,7 +259,25 @@ const ProductDetail = () => {
           </div>
 
           {/* Related Products */}
-          {relatedProducts.length > 0 && (
+          {relatedLoading && (
+            <div className="mt-16">
+              <h2 className="font-playfair text-xl text-primary mb-6">
+                You May Also Like
+              </h2>
+              <div className="min-h-[200px] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            </div>
+          )}
+          {relatedError && (
+            <div className="mt-16">
+              <h2 className="font-playfair text-xl text-primary mb-6">
+                You May Also Like
+              </h2>
+              <p className="text-text-muted">Unable to load related products right now.</p>
+            </div>
+          )}
+          {!relatedLoading && !relatedError && relatedProducts.length > 0 && (
             <div className="mt-16">
               <h2 className="font-playfair text-xl text-primary mb-6">
                 You May Also Like
