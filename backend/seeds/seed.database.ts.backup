@@ -1,7 +1,6 @@
 import { Pool } from 'pg';
 import { config } from '../src/config';
 import { products } from '../../src/data/products';
-import { hash } from 'bcryptjs';
 
 // Extract unique categories from products
 const getUniqueCategories = (products: any[]): Array<{name: string; image: string; available: boolean; orderNumber: number}> => {
@@ -24,27 +23,6 @@ const getUniqueCategories = (products: any[]): Array<{name: string; image: strin
 };
 
 const categories = getUniqueCategories(products);
-
-const seedAdminUser = async (client: any) => {
-  // Check if admin user already exists
-  const adminCheckResult = await client.query(
-    'SELECT id FROM users WHERE email = $1',
-    ['admin@millux.com']
-  );
-  
-  if (adminCheckResult.rows.length === 0) {
-    // Create admin user
-    const passwordHash = await hash('AdminSecurePassword123!', 12);
-    await client.query(
-      `INSERT INTO users (email, password_hash, role) 
-       VALUES ($1, $2, $3)`,
-      ['admin@millux.com', passwordHash, 'admin']
-    );
-    console.log('  ✓ Created admin user: admin@millux.com');
-  } else {
-    console.log('  ⚠ Admin user already exists: admin@millux.com');
-  }
-};
 
 const seedDatabase = async () => {
   const pool = new Pool({
@@ -119,10 +97,6 @@ const seedDatabase = async () => {
         console.log(`  ⚠ Product already exists: ${product.name}`);
       }
     }
-
-    // Seed admin user (idempotent)
-    console.log('Seeding admin user...');
-    await seedAdminUser(client);
 
     // Commit transaction
     await client.query('COMMIT');
