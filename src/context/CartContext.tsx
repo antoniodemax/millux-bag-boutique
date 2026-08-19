@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { Product } from '@/types/firebase';
+import { Product } from '@/types/models';
 
 interface CartItem extends Product {
   quantity: number;

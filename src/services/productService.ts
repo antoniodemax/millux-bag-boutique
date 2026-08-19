@@ -1,5 +1,5 @@
 import apiClient from '@/lib/api/client';
-import { Product } from '@/types/firebase';
+import { Product } from '@/types/models';
 
 /**
  * Get all products from backend API

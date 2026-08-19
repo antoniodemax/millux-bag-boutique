@@ -42,7 +42,7 @@ const Collections = () => {
   }, []); // Empty deps means run once on mount
 
   // Get unique categories from products (for the filter dropdown we already have categoriesList, but we also need to compute from products for the filter? Actually we use categoriesList for the dropdown.
-  // However, the filter dropdown uses categoriesList, which is from Firestore.
+  // The filter dropdown uses categoriesList, which comes from the PostgreSQL backend via the category service.
   // We also need to compute the categories from products for the case where we want to show only categories that have products? But the original code used all categories from products.
   // We'll keep the categoriesList as the source for the dropdown, but we can also filter it to only those that have products if desired.
   // For now, we'll use categoriesList as is.

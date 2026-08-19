@@ -1,20 +1,19 @@
-// Firebase data types for future migration
+// Data models for the application
 export interface User {
   uid: string;
   email: string;
   name?: string;
-  role?: 'admin' | 'user'; // For now, we anticipate admin role
-  createdAt?: string; // ISO string or Firestore timestamp (we'll handle conversion)
-  // Note: In practice, Firestore timestamps are not strings, but for TypeScript compatibility we can use string or Firestore types.
+  role?: 'admin' | 'user';
+  createdAt?: string;
 }
 
 export interface Product {
   id: string;
   slug: string;
   name: string;
-  category: string; // Could be reference to Category.id or just string for simplicity
+  category: string;
   price: number; // in pounds
-  images: string[]; // Firebase Storage URLs or paths
+  images: string[]; // Image URLs or paths
   description: string;
   materials: string;
   dimensions: string;
@@ -30,7 +29,7 @@ export interface Product {
 export interface Category {
   id: string;
   name: string;
-  image?: string; // Firebase Storage URL
+  image?: string; // Image URL or path
   available: boolean;
   orderNumber?: number;
   createdAt?: string;

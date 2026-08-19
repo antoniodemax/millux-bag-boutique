@@ -1,5 +1,5 @@
 import apiClient from '@/lib/api/client';
-import { Category } from '@/types/firebase';
+import { Category } from '@/types/models';
 
 /**
  * Get all categories from backend API
