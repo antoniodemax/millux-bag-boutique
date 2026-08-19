@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Product } from '../models/Product';
-import { 
-  createProduct as createProductService, 
-  getProductBySlug as getProductBySlugService, 
-  getProducts as getProductsService, 
-  updateProduct as updateProductService, 
-  deleteProduct as deleteProductService 
+import {
+  createProduct as createProductService,
+  getProductBySlug as getProductBySlugService,
+  getProducts as getProductsService,
+  getProductsWithFilters,
+  updateProduct as updateProductService,
+  deleteProduct as deleteProductService
 } from '../services/productService';
 import { z } from 'zod';
 
@@ -27,11 +28,41 @@ const productSchema = z.object({
 });
 
 /**
- * Get all products
+ * Get all products with optional filtering
  */
-export const getProducts = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const products = await getProductsService();
+    const query = req.query;
+
+    // Check if any filter parameters are present
+    const hasFilters =
+      query.featured !== undefined ||
+      query.newArrival !== undefined ||
+      query.bestseller !== undefined ||
+      query.category !== undefined;
+
+    let products: Product[];
+    if (hasFilters) {
+      // Parse boolean parameters
+      const filters: any = {};
+      if (query.featured !== undefined) {
+        filters.featured = query.featured === 'true';
+      }
+      if (query.newArrival !== undefined) {
+        filters.newArrival = query.newArrival === 'true';
+      }
+      if (query.bestseller !== undefined) {
+        filters.bestseller = query.bestseller === 'true';
+      }
+      if (query.category !== undefined) {
+        filters.category = query.category as string;
+      }
+
+      products = await getProductsWithFilters(filters);
+    } else {
+      products = await getProductsService();
+    }
+
     res.json(products);
   } catch (error) {
     next(error);
@@ -63,7 +94,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
   try {
     // Validate request body
     const validatedData = productSchema.parse(req.body);
-    
+
     // Convert to service format with proper defaults for undefined fields
     const serviceData = {
       name: validatedData.name,
@@ -80,7 +111,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
       newArrival: validatedData.newArrival ?? false,
       bestseller: validatedData.bestseller ?? false
     };
-    
+
     const product = await createProductService(serviceData);
     res.status(201).json(product);
   } catch (error) {
@@ -99,10 +130,10 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
   try {
     const param = req.params.slug;
     const slug = Array.isArray(param) ? param[0] : param;
-    
+
     // Validate request body (partial updates allowed)
     const validatedData = productSchema.partial().parse(req.body);
-    
+
     // Convert to service format, only include fields that were provided
     const serviceData: any = {};
     if (validatedData.name !== undefined) serviceData.name = validatedData.name;
@@ -118,7 +149,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     if (validatedData.featured !== undefined) serviceData.featured = validatedData.featured;
     if (validatedData.newArrival !== undefined) serviceData.newArrival = validatedData.newArrival;
     if (validatedData.bestseller !== undefined) serviceData.bestseller = validatedData.bestseller;
-    
+
     const product = await updateProductService(slug, serviceData);
     if (!product) {
       res.status(404).json({ error: 'Product not found' });

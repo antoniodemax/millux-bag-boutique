@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Category } from '../models/Category';
-import { 
-  createCategory as createCategoryService, 
-  getCategoryById as getCategoryByIdService, 
-  getCategories as getCategoriesService, 
-  updateCategory as updateCategoryService, 
-  deleteCategory as deleteCategoryService 
+import {
+  createCategory as createCategoryService,
+  getCategoryById as getCategoryByIdService,
+  getCategories as getCategoriesService,
+  getCategoriesWithFilters,
+  updateCategory as updateCategoryService,
+  deleteCategory as deleteCategoryService
 } from '../services/categoryService';
 import { z } from 'zod';
 
@@ -17,11 +18,20 @@ const categorySchema = z.object({
 });
 
 /**
- * Get all categories
+ * Get all categories with optional filtering
  */
-export const getCategories = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getCategories = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const categories = await getCategoriesService();
+    const query = req.query;
+
+    let categories: Category[];
+    if (query.available !== undefined) {
+      const available = query.available === 'true';
+      categories = await getCategoriesWithFilters({ available });
+    } else {
+      categories = await getCategoriesService();
+    }
+
     res.json(categories);
   } catch (error) {
     next(error);
@@ -53,7 +63,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
   try {
     // Validate request body
     const validatedData = categorySchema.parse(req.body);
-    
+
     // Map to service format (service expects different fields)
     const serviceData = {
       name: validatedData.name,
@@ -61,7 +71,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
       available: true, // Default availability
       orderNumber: 0 // Default order
     };
-    
+
     const category = await createCategoryService(serviceData);
     res.status(201).json(category);
   } catch (error) {
@@ -80,16 +90,16 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
   try {
     const param = req.params.id;
     const id = Array.isArray(param) ? param[0] : param;
-    
+
     // Validate request body (partial updates allowed)
     const validatedData = categorySchema.partial().parse(req.body);
-    
+
     // Map to service format
     const serviceData: any = {};
     if (validatedData.name !== undefined) serviceData.name = validatedData.name;
     if (validatedData.description !== undefined) serviceData.description = validatedData.description;
     // Note: image, available, orderNumber not in update schema for now
-    
+
     const category = await updateCategoryService(id, serviceData);
     if (!category) {
       res.status(404).json({ error: 'Category not found' });

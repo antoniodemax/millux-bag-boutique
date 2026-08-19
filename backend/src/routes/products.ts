@@ -6,11 +6,11 @@ const router = Router();
 
 // Public routes
 router.get('/', getProducts);
-router.get('/:id', getProductById);
+router.get('/:slug', getProductById);
 
 // Protected routes (admin only)
 router.post('/', requireAuth, requireAdmin, createProduct);
-router.put('/:id', requireAuth, requireAdmin, updateProduct);
-router.delete('/:id', requireAuth, requireAdmin, deleteProduct);
+router.put('/:slug', requireAuth, requireAdmin, updateProduct);
+router.delete('/:slug', requireAuth, requireAdmin, deleteProduct);
 
 export default router;

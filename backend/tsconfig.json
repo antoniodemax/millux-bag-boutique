@@ -8,5 +8,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": [
+    "./seeds/**",
+    "./node_modules/**",
+    "./dist/**"
+  ]
 }

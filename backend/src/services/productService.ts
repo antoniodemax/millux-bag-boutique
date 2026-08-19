@@ -15,14 +15,65 @@ const mapToProduct = (row: any): Product => ({
   care: row.care,
   availability: row.availability as Product['availability'],
   featured: row.featured,
-  newArrival: row.newArrival,
+  newArrival: row.newarrival,
   bestseller: row.bestseller,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
 });
 
+/**
+ * Build SQL query and parameters for products with optional filters
+ */
+const buildProductQuery = (filters: {
+  featured?: boolean;
+  newArrival?: boolean;
+  bestseller?: boolean;
+  category?: string;
+}) => {
+  let queryStr = 'SELECT * FROM products';
+  const params: any[] = [];
+  const conditions: string[] = [];
+
+  if (filters.featured !== undefined) {
+    conditions.push('featured = $' + (params.length + 1));
+    params.push(filters.featured);
+  }
+  if (filters.newArrival !== undefined) {
+    conditions.push('newarrival = $' + (params.length + 1));
+    params.push(filters.newArrival);
+  }
+  if (filters.bestseller !== undefined) {
+    conditions.push('bestseller = $' + (params.length + 1));
+    params.push(filters.bestseller);
+  }
+  if (filters.category !== undefined) {
+    conditions.push('category = $' + (params.length + 1));
+    params.push(filters.category);
+  }
+
+  if (conditions.length > 0) {
+    queryStr += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  queryStr += ' ORDER BY createdAt DESC';
+
+  return { queryStr, params };
+};
+
 export const getProducts = async (): Promise<Product[]> => {
-  const result = await query('SELECT * FROM products ORDER BY createdAt DESC');
+  const { queryStr, params } = buildProductQuery({});
+  const result = await query(queryStr, params);
+  return result.rows.map(mapToProduct);
+};
+
+export const getProductsWithFilters = async (filters: {
+  featured?: boolean;
+  newArrival?: boolean;
+  bestseller?: boolean;
+  category?: string;
+}): Promise<Product[]> => {
+  const { queryStr, params } = buildProductQuery(filters);
+  const result = await query(queryStr, params);
   return result.rows.map(mapToProduct);
 };
 
@@ -55,7 +106,7 @@ export const createProduct = async (product: Omit<Product, 'id' | 'createdAt' | 
   const result = await query(
     `INSERT INTO products (
       slug, name, category, price, images, description, materials, dimensions, care,
-      availability, featured, newArrival, bestseller
+      availability, featured, newarrival, bestseller
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
     RETURNING *`,
     [
@@ -89,7 +140,11 @@ export const updateProduct = async (
   }
 
   const setClause = fields
-    .map((field, index) => `${field} = $${index + 2}`)
+    .map((field, index) => {
+      // Map camelCase field names to snake_case column names where needed
+      const columnName = field === 'newArrival' ? 'newarrival' : field;
+      return `${columnName} = $${index + 2}`;
+    })
     .join(', ');
 
   // Handle images array conversion

@@ -11,8 +11,41 @@ const mapToCategory = (row: any): Category => ({
   updatedAt: row.updatedAt,
 });
 
+/**
+ * Build SQL query and parameters for categories with optional filters
+ */
+const buildCategoryQuery = (filters: {
+  available?: boolean;
+}) => {
+  let queryStr = 'SELECT * FROM categories';
+  const params: any[] = [];
+  const conditions: string[] = [];
+
+  if (filters.available !== undefined) {
+    conditions.push('available = $' + (params.length + 1));
+    params.push(filters.available);
+  }
+
+  if (conditions.length > 0) {
+    queryStr += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  queryStr += ' ORDER BY orderNumber ASC';
+
+  return { queryStr, params };
+};
+
 export const getCategories = async (): Promise<Category[]> => {
-  const result = await query('SELECT * FROM categories ORDER BY orderNumber ASC');
+  const { queryStr, params } = buildCategoryQuery({});
+  const result = await query(queryStr, params);
+  return result.rows.map(mapToCategory);
+};
+
+export const getCategoriesWithFilters = async (filters: {
+  available?: boolean;
+}): Promise<Category[]> => {
+  const { queryStr, params } = buildCategoryQuery(filters);
+  const result = await query(queryStr, params);
   return result.rows.map(mapToCategory);
 };
 
