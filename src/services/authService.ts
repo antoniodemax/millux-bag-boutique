@@ -24,8 +24,8 @@ export const login = async (email: string, password: string): Promise<User> => {
  * Redirects to Google OAuth endpoint
  */
 export const googleLogin = (): void => {
-  // Redirect to Google OAuth endpoint - handled by window.location
-  window.location.href = '/api/auth/google';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  window.location.href = `${API_BASE_URL}/api/auth/google`;
 };
 
 /**
