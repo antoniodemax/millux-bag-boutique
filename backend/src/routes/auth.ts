@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { login, logout, me, registerUser } from '../services/authService';
 import { requireAuth, requireAdmin } from '../middleware/auth';
+import { googleAuth, googleAuthCallback } from '../controllers/googleOAuth/controller';
 
 const router = Router();
 
@@ -57,5 +58,19 @@ router.post('/logout', requireAuth, logout);
  * @access  Private
  */
 router.get('/me', requireAuth, me);
+
+/**
+ * @route   GET /api/auth/google
+ * @desc    Initiate Google OAuth flow
+ * @access  Public
+ */
+router.get('/google', googleAuth);
+
+/**
+ * @route   GET /api/auth/google/callback
+ * @desc    Google OAuth callback handler
+ * @access  Public
+ */
+router.get('/google/callback', googleAuthCallback);
 
 export default router;

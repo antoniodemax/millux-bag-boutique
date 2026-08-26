@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login } from '@/services/authService';
+import { login, googleLogin } from '@/services/authService';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -47,17 +48,28 @@ const AdminLogin = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    setGoogleLoading(true);
+    try {
+      googleLogin(); // This will redirect to Google OAuth
+    } catch (err: any) {
+      setGoogleLoading(false);
+      const message = err.response?.data?.error || 'Google login failed';
+      toast.error(message);
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-88px)] bg-background flex items-center justify-center">
       <div className="w-full max-w-md space-y-6 p-6 bg-card/80 backdrop-blur rounded-xl shadow-md">
         <h2 className="text-2xl font-bold text-center text-primary">Admin Login</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="antonypeterke@gmail.com"
               {...register('email')}
               className={errors.email ? 'border-destructive' : ''}
             />
@@ -86,6 +98,32 @@ const AdminLogin = () => {
             {isLoading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
+        
+        {/* Google Sign-In Section */}
+        <div className="space-y-4">
+          <div className="flex items-center">
+            <div className="w-full h-px bg-border"></div>
+            <span className="px-2 text-text-sm text-text-muted">OR</span>
+            <div className="w-full h-px bg-border"></div>
+          </div>
+          
+          <Button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-3"
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <Loader className="h-4 w-4" />
+            ) : (
+              <>
+                {/* Using text instead of icon since Google icon name may vary */}
+                <span className="text-[22px] font-bold">G</span>
+                <span className="text-left ml-2">Continue with Google</span>
+              </>
+            )}
+          </Button>
+        </div>
+        
         <p className="text-text-sm text-center">
           Don't have an account? Contact system administrator.
         </p>

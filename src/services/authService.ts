@@ -20,6 +20,15 @@ export const login = async (email: string, password: string): Promise<User> => {
 };
 
 /**
+ * Login user with Google OAuth
+ * Redirects to Google OAuth endpoint
+ */
+export const googleLogin = (): void => {
+  // Redirect to Google OAuth endpoint - handled by window.location
+  window.location.href = '/api/auth/google';
+};
+
+/**
  * Logout user by calling backend endpoint
  */
 export const logout = async (): Promise<void> => {
