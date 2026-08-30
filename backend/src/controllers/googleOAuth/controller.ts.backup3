@@ -92,17 +92,11 @@ export const googleAuthCallback = async (req: Request, res: Response): Promise<v
     });
 
     // Redirect to admin dashboard on frontend
-    const frontendUrl = config.frontendUrl.endsWith('/')
-      ? config.frontendUrl.slice(0, -1)
-      : config.frontendUrl;
-    res.redirect(`${frontendUrl}/admin/`);
+    res.redirect(`${config.frontendUrl}admin/`);
   } catch (error: any) {
     console.error('Google OAuth callback error:', error);
     // Redirect back to login with error on frontend
-    const frontendUrl = config.frontendUrl.endsWith('/')
-      ? config.frontendUrl.slice(0, -1)
-      : config.frontendUrl;
-    res.redirect(`${frontendUrl}/admin/login?error=google_auth_failed`);
+    res.redirect(`${config.frontendUrl}admin/login?error=google_auth_failed`);
   }
 };
 
