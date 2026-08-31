@@ -13,11 +13,18 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import AdminOrders from "./pages/admin/Orders";
+import CustomerRegister from "./pages/CustomerRegister";
+import CustomerLogin from "./pages/CustomerLogin";
+import CustomerProfile from "./pages/CustomerProfile";
+import CustomerOrderHistory from "./pages/CustomerOrderHistory";
+import CartPage from "./pages/CartPage";
+import CustomerProtectedRoute from "./components/CustomerProtectedRoute";
 import PremiumNavbar from "./components/PremiumNavbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import BackToTop from "./components/BackToTop";
-import { me } from "@/services/authService";
+import { me, customerRegister, customerLogin, customerLogout, getCustomerProfile, getCustomerOrders } from "@/services/authService";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { useEffect, useState } from "react";
 
@@ -151,16 +158,62 @@ const App = () => {
               <Route path="/products/:slug" element={<ProductDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/customer/register" element={<CustomerRegister />} />
+              <Route path="/customer/login" element={<CustomerLogin />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/*" element={
                 <ProtectedRoute>
                   <AdminLayout>
                     <Routes>
                       <Route index element={<AdminDashboard />} />
+                      <Route path="orders" element={<AdminOrders />} />
                       {/* Additional admin routes will go here */}
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>}/>
+              <Route path="/customer/*" element={
+                <CustomerProtectedRoute>
+                  <div className="flex min-h-[calc(100vh-88px)]">
+                    {/* Sidebar - simplified for customer area */}
+                    <aside className="w-64 bg-white border-r shadow-sm">
+                      <div className="p-6">
+                        <h2 className="text-xl font-bold text-primary">My Account</h2>
+                        <nav className="mt-6 space-y-2">
+                          <a
+                            href="#"
+                            className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // In a real app, this would navigate to profile
+                            }}
+                          >
+                            Profile
+                          </a>
+                          <a
+                            href="#"
+                            className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              // In a real app, this would navigate to order history
+                            }}
+                          >
+                            Order History
+                          </a>
+                        </nav>
+                      </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 p-6">
+                      <Routes>
+                        <Route path="profile" element={<CustomerProfile />} />
+                        <Route path="orders" element={<CustomerOrderHistory />} />
+                        <Route index element={<CustomerProfile />} />
+                      </Routes>
+                    </main>
+                  </div>
+                </CustomerProtectedRoute>}/>
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />

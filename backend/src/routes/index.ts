@@ -5,6 +5,7 @@ import categoriesRouter from './categories';
 import uploadsRouter from './uploads';
 import dashboardRouter from './dashboard';
 import ordersRouter from './orders';
+import customersRouter from './customers';
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.use('/categories', categoriesRouter);
 router.use('/uploads', uploadsRouter);
 router.use('/dashboard', dashboardRouter);
 router.use('/orders', ordersRouter);
+router.use('/customers', customersRouter);
 
 export function registerRoutes(app: any) {
   app.use('/api', router);

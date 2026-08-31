@@ -96,7 +96,7 @@ export const createOrder = async (
     const order = await createOrderService({
       items: validatedData.items,
       whatsappMessage: validatedData.whatsappMessage,
-      customerId: validatedData.customerId,
+      customerId: (req as any).customer?.id ?? validatedData.customerId,
     });
 
     res.status(201).json(order);

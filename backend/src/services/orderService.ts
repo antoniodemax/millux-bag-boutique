@@ -1,5 +1,5 @@
 import { query } from '../db/index';
-import { Order, OrderItem } from '../models/Order';
+import { Order, OrderItem, OrderItemWithProduct } from '../models/Order';
 import { Product } from '../models/Product';
 
 // Helper to convert database row to Order object
@@ -137,14 +137,57 @@ export const createOrder = async (
 };
 
 /**
- * Get order by ID
+ * Get order by ID with items and product details
  */
-export const getOrderById = async (id: string): Promise<Order | null> => {
+export const getOrderById = async (id: string): Promise<(Order & { items: OrderItemWithProduct[] }) | null> => {
   console.log('getOrderById called with id:', id);
-  const result = await query('SELECT * FROM orders WHERE id = $1', [id]);
-  console.log('query result rows:', result.rows);
-  if (result.rows.length === 0) return null;
-  return mapToOrder(result.rows[0]);
+
+  // Fetch the order
+  const orderResult = await query('SELECT * FROM orders WHERE id = $1', [id]);
+  console.log('query result rows:', orderResult.rows);
+  if (orderResult.rows.length === 0) return null;
+
+  const order = mapToOrder(orderResult.rows[0]);
+
+  // Fetch order items with product details
+  const itemsResult = await query(
+    `SELECT oi.*, p.id as "productId", p.slug, p.name, p.category, p.price,
+            p.images, p.description, p.materials, p.dimensions, p.care,
+            p.availability, p.featured, p.newarrival, p.bestseller, p.createdat as "productCreatedAt", p.updatedat as "productUpdatedAt"
+     FROM order_items oi
+     JOIN products p ON oi.productid = p.id
+     WHERE oi.orderid = $1`,
+    [id]
+  );
+
+  const items = itemsResult.rows.map((row: any) => ({
+    id: row.id,
+    orderId: row.orderid,
+    productId: row.productid,
+    quantity: parseInt(row.quantity),
+    priceAtPurchase: parseFloat(row.priceatpurchase),
+    createdAt: row.createdat,
+    product: {
+      id: row.productId,
+      slug: row.slug,
+      name: row.name,
+      category: row.category,
+      price: parseFloat(row.price),
+      images: row.images ? JSON.parse(row.images) : [],
+      description: row.description,
+      materials: row.materials,
+      dimensions: row.dimensions,
+      care: row.care,
+      availability: row.availability as Product['availability'],
+      featured: row.featured,
+      newArrival: row.newarrival,
+      bestseller: row.bestseller,
+      createdAt: row.productCreatedAt,
+      updatedAt: row.productUpdatedAt
+    }
+  }));
+
+  return { ...order, items };
 };
 
 /**

@@ -1,4 +1,5 @@
 import apiClient from '@/lib/api/client';
+import { Customer } from '@/types/models';
 
 // User interface (without password)
 export interface User {
@@ -42,4 +43,62 @@ export const logout = async (): Promise<void> => {
 export const me = async (): Promise<User> => {
   const response = await apiClient.get('/api/auth/me');
   return response.data.user;
+};
+
+/**
+ * Register a new customer
+ * @param customerData - Customer registration data (email, password, name, phone)
+ * @returns Promise resolving to customer data
+ */
+export const customerRegister = async (
+  customerData: {
+    email: string;
+    password: string;
+    name: string;
+    phone?: string;
+  }
+): Promise<{ id: string; email: string; name: string }> => {
+  const response = await apiClient.post('/api/customers/register', customerData);
+  return response.data.customer;
+};
+
+/**
+ * Login customer
+ * @param credentials - Customer login credentials (email, password)
+ * @returns Promise resolving to customer data or throws if not authenticated
+ */
+export const customerLogin = async (
+  credentials: {
+    email: string;
+    password: string;
+  }
+): Promise<{ id: string; email: string; name: string }> => {
+  const response = await apiClient.post('/api/customers/login', credentials);
+  return response.data.customer;
+};
+
+/**
+ * Logout customer by calling backend endpoint
+ * @returns Promise resolving to void
+ */
+export const customerLogout = async (): Promise<void> => {
+  await apiClient.post('/api/customers/logout');
+};
+
+/**
+ * Get current authenticated customer
+ * @returns Promise resolving to customer data or throws if not authenticated
+ */
+export const getCustomerProfile = async (): Promise<Customer> => {
+  const response = await apiClient.get('/api/customers/profile');
+  return response.data.customer;
+};
+
+/**
+ * Get customer order history
+ * @returns Promise resolving to array of orders with items
+ */
+export const getCustomerOrders = async (): Promise<Array<any>> => {
+  const response = await apiClient.get('/api/customers/orders');
+  return response.data;
 };

@@ -5,14 +5,17 @@ import {
   getOrders,
   updateOrderStatus,
 } from '../controllers/orders';
-import { requireAuth } from '../middleware/auth';
+import { requireAdmin } from '../middleware/auth';
+import { requireAuth as requireCustomerAuth } from '../middleware/customerAuth';
 
 const router = Router();
 
-// Public routes (for now, we'll protect later if needed)
-router.get('/', getOrders);
-router.get('/:id', getOrderById);
-router.post('/', createOrder);
-router.patch('/:id/status', updateOrderStatus);
+// Customer routes
+router.post('/', requireCustomerAuth, createOrder);
+
+// Admin routes
+router.get('/', requireAuth, getOrders);
+router.get('/:id', requireAuth, getOrderById);
+router.patch('/:id/status', requireAuth, updateOrderStatus);
 
 export default router;

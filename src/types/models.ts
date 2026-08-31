@@ -47,20 +47,27 @@ export interface Customer {
 }
 
 export interface OrderItem {
+  id: string;
+  orderId: string;
   productId: string;
   quantity: number;
   priceAtPurchase: number; // Store price at time of order
+  createdAt: string; // ISO date string from backend
+}
+
+export interface OrderItemWithProduct extends OrderItem {
+  product: Product;
 }
 
 export interface Order {
   id: string;
-  customerId: string; // Reference to Customer
-  items: OrderItem[];
+  customerId: string | null; // Reference to Customer (can be null for guest orders)
+  items?: (OrderItem | OrderItemWithProduct)[]; // Made optional and widened type to handle both list and detail views
   totalAmount: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   whatsappMessage?: string; // The message sent to WhatsApp for reference
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: string; // ISO date string from backend
+  updatedAt?: string; // ISO date string from backend
 }
 
 export interface InventoryMovement {

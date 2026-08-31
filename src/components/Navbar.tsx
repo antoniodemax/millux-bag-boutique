@@ -130,14 +130,14 @@ const Navbar = () => {
                 <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${scrolled ? "text-gray-600" : "text-gray-400"}`} />
               </div>
               {/* Cart */}
-              <button
-                onClick={() => setCartDrawerOpen(!cartDrawerOpen)}
+              <Link
+                to="/cart"
                 className={`relative ml-4 flex items-center px-2 py-2 rounded-md border border-gray-300 ${scrolled ? "text-gray-800 hover:text-brand-primary hover:bg-gray-100" : "text-gray-300 hover:text-white hover:bg-gray-700/20"} transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200`}
                 aria-label="View cart"
               >
                 <ShoppingBag className="h-4 w-4" />
                 {cartCount > 0 && <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">{cartCount}</span>}
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -153,14 +153,14 @@ const Navbar = () => {
               <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${scrolled ? "text-gray-600" : "text-gray-400"}`} />
             </div>
             {/* Cart Icon */}
-            <button
-              onClick={() => setCartDrawerOpen(!cartDrawerOpen)}
+            <Link
+              to="/cart"
               className={`relative p-1 rounded hover:bg-gray-700/20 ${scrolled ? "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200" : "focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"}`}
               aria-label="View cart"
             >
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-brand-primary text-[9px] font-medium text-white rounded-full">{cartCount}</span>}
-            </button>
+            </Link>
             {/* Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
@@ -204,6 +204,14 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
+            {/* Mobile Cart Link */}
+            <Link
+              to="/cart"
+              className="block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md text-gray-700 hover:text-brand-primary hover:bg-gray-50"
+            >
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              View Cart
+            </Link>
             <div className="flex items-center px-3 py-2 text-base font-medium transition-colors duration-200">
               <Search className="h-4 w-4 mr-2 text-gray-600" />
               <input
@@ -246,74 +254,8 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Cart Drawer */}
-      {cartDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-xs bg-white p-6 space-y-6">
-            <div className="space-y-4">
-              <p className="font-playfair text-xl text-primary mb-2">
-                Your Cart
-              </p>
-              {cartCount === 0 ? (
-                <p className="text-text-muted">Your cart is empty.</p>
-              ) : (
-                <>
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between pb-2 border-b border-gray-200">
-                      <div className="flex-1">
-                        <p className="font-playfair text-lg text-primary">{item.name}</p>
-                        <p className="text-text-muted">{item.quantity}x £{formatPrice(item.price)}</p>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <button
-                          onClick={() => {
-                            const newQty = item.quantity - 1;
-                            if (newQty >= 1) {
-                              updateQuantity(item.id, newQty);
-                            } else {
-                              removeItem(item.id);
-                            }
-                          }}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"
-                        >
-                          <span className="text-[9px]">−</span>
-                        </button>
-                        <span className="w-4 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-200"
-                        >
-                          <span className="text-[9px]">+</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <p className="flex justify-between">
-                      <span className="font-playfair text-lg text-primary">Subtotal:</span>
-                      <span className="font-playfair text-lg text-accent">£{formatPrice(cartTotal)}</span>
-                    </p>
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setCartDrawerOpen(false)}
-                      className="px-4 py-2 border border-gray-300 text-gray-800 hover:text-gray-600 transition-colors duration-200"
-                    >
-                      Close
-                    </button>
-                    <button
-                      onClick={handleCartWhatsAppOrder}
-                      className="ml-4 px-6 py-3 bg-brand-accent text-white text-sm font-medium rounded-lg hover:bg-brand-accent/90 transition-colors duration-200"
-                    >
-                      Order via WhatsApp
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Mobile Cart Section (replaces cart drawer) */}
+      {/* We'll keep the mobile cart section accessible via the mobile menu */}
     </>
   );
 };

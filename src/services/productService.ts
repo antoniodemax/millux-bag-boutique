@@ -63,3 +63,49 @@ export const getProductsByCategory = async (category: string): Promise<Product[]
   const response = await apiClient.get(`/api/products?category=${category}`);
   return response.data;
 };
+
+/**
+ * Create a new product
+ * @param productData - Product data (without id)
+ * @returns Promise resolving to created product
+ */
+export const createProduct = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
+  const response = await apiClient.post('/api/products', productData);
+  return response.data;
+};
+
+/**
+ * Update an existing product
+ * @param slug - Product slug
+ * @param productData - Partial product data to update
+ * @returns Promise resolving to updated product
+ */
+export const updateProduct = async (slug: string, productData: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
+  const response = await apiClient.put(`/api/products/${slug}`, productData);
+  return response.data;
+};
+
+/**
+ * Delete a product
+ * @param slug - Product slug
+ * @returns Promise resolving to void
+ */
+export const deleteProduct = async (slug: string): Promise<void> => {
+  await apiClient.delete(`/api/products/${slug}`);
+};
+
+/**
+ * Upload an image file
+ * @param file - File to upload
+ * @returns Promise resolving to upload response (typically { url: string })
+ */
+export const uploadImage = async (file: File): Promise<{ url: string }> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await apiClient.post('/api/uploads', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
