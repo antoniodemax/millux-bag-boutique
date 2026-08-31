@@ -14,8 +14,8 @@ const router = Router();
 router.post('/', requireCustomerAuth, createOrder);
 
 // Admin routes
-router.get('/', requireAuth, getOrders);
-router.get('/:id', requireAuth, getOrderById);
-router.patch('/:id/status', requireAuth, updateOrderStatus);
+router.get('/', requireAdmin, getOrders);
+router.get('/:id', requireAdmin, getOrderById);
+router.patch('/:id/status', requireAdmin, updateOrderStatus);
 
 export default router;
