@@ -22,13 +22,22 @@ export const login = async (email: string, password: string): Promise<User> => {
   return response.data.user;
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 /**
- * Login user with Google OAuth
- * Redirects to Google OAuth endpoint
+ * Admin sign-in with Google (full-page redirect to the backend OAuth endpoint)
  */
 export const googleLogin = (): void => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-  window.location.href = `${API_BASE_URL}/api/auth/google`;
+  window.location.href = `${API_BASE_URL}/api/auth/google?flow=admin`;
+};
+
+/**
+ * Customer sign-in / sign-up with Google. `returnTo` is a relative path on
+ * this site the backend sends the customer back to after Google.
+ */
+export const googleCustomerLogin = (returnTo: string = '/customer/profile'): void => {
+  const params = new URLSearchParams({ flow: 'customer', returnTo });
+  window.location.href = `${API_BASE_URL}/api/auth/google?${params.toString()}`;
 };
 
 /**

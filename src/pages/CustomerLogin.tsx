@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { isAxiosError } from 'axios';
-import { customerLogin } from '@/services/authService';
+import { customerLogin, googleCustomerLogin } from '@/services/authService';
 import { toast } from '@/components/ui/sonner';
 import { Logo } from '@/components/brand/Logo';
 import { StoreButton } from '@/components/store/Button';
 import { Field, inputClass } from '@/components/store/Primitives';
+import { GoogleButton, OrDivider } from '@/components/store/GoogleButton';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 const loginSchema = z.object({
@@ -23,7 +25,22 @@ const CustomerLogin = () => {
   const location = useLocation();
   const redirectTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const oauthFailed = searchParams.get('error') === 'google_auth_failed';
+
+  useEffect(() => {
+    if (oauthFailed) {
+      setServerError('Google sign-in did not complete. Please try again.');
+      toast.error('Google sign-in did not complete');
+    }
+  }, [oauthFailed]);
+
+  const handleGoogle = () => {
+    setGoogleLoading(true);
+    googleCustomerLogin(redirectTo === '/' ? '/customer/profile' : redirectTo);
+  };
 
   const {
     register,
@@ -90,10 +107,15 @@ const CustomerLogin = () => {
             </p>
           )}
 
-          <StoreButton type="submit" full size="lg" loading={isLoading}>
+          <StoreButton type="submit" full size="lg" loading={isLoading} disabled={googleLoading}>
             Sign in
           </StoreButton>
         </form>
+
+        <div className="mt-6 space-y-6">
+          <OrDivider />
+          <GoogleButton onClick={handleGoogle} loading={googleLoading} disabled={isLoading} />
+        </div>
 
         <p className="mt-8 text-center text-sm text-soft">
           New to Millux?{' '}

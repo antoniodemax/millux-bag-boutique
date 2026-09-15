@@ -75,6 +75,33 @@ export const registerCustomer = async (
 };
 
 /**
+ * Find or create a customer from a verified Google account.
+ * Matching is by email (Google verifies it), so a customer who registered
+ * with a password can also sign in with Google, and vice versa.
+ */
+export const findOrCreateGoogleCustomer = async (googleUser: { email: string; name: string }): Promise<Customer> => {
+  const email = googleUser.email.trim().toLowerCase();
+  const existing = await query('SELECT * FROM customers WHERE LOWER(email) = LOWER($1)', [email]);
+  if (existing.rows.length > 0) {
+    const row = existing.rows[0];
+    // Fill in a missing name from the Google profile without overwriting one the customer set
+    if (!row.name && googleUser.name) {
+      await query('UPDATE customers SET name = $1, updatedat = CURRENT_TIMESTAMP WHERE id = $2', [googleUser.name, row.id]);
+      row.name = googleUser.name;
+    }
+    return { id: row.id, name: row.name, email: row.email, phone: row.phone, createdAt: row.createdat, updatedAt: row.updatedat };
+  }
+  const result = await query(
+    `INSERT INTO customers (email, name, password_hash)
+     VALUES ($1, $2, NULL)
+     RETURNING id, email, name, phone, createdat, updatedat`,
+    [email, googleUser.name || null]
+  );
+  const row = result.rows[0];
+  return { id: row.id, name: row.name, email: row.email, phone: row.phone, createdAt: row.createdat, updatedAt: row.updatedat };
+};
+
+/**
  * Find customer by email
  */
 export const findCustomerByEmail = async (

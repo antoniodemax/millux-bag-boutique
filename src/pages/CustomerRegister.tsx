@@ -4,11 +4,12 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
-import { customerRegister, customerLogin } from '@/services/authService';
+import { customerRegister, customerLogin, googleCustomerLogin } from '@/services/authService';
 import { toast } from '@/components/ui/sonner';
 import { Logo } from '@/components/brand/Logo';
 import { StoreButton } from '@/components/store/Button';
 import { Field, inputClass } from '@/components/store/Primitives';
+import { GoogleButton, OrDivider } from '@/components/store/GoogleButton';
 
 const registerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -22,6 +23,7 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const CustomerRegister = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
@@ -117,10 +119,17 @@ const CustomerRegister = () => {
             </p>
           )}
 
-          <StoreButton type="submit" full size="lg" loading={isLoading}>
+          <StoreButton type="submit" full size="lg" loading={isLoading} disabled={googleLoading}>
             Create account
           </StoreButton>
         </form>
+
+        <div className="mt-6 space-y-6">
+          <OrDivider />
+          <GoogleButton onClick={() => { setGoogleLoading(true); googleCustomerLogin('/customer/profile'); }} loading={googleLoading} disabled={isLoading}>
+            Sign up with Google
+          </GoogleButton>
+        </div>
 
         <p className="mt-8 text-center text-sm text-soft">
           Already have an account?{' '}

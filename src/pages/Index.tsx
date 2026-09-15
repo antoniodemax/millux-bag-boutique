@@ -66,7 +66,7 @@ const HomePage = () => {
 
       {/* ---------------- HERO ---------------- */}
       <section className="border-b border-line">
-        <Container className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
+        <Container className="grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-2 lg:gap-16 lg:py-14 xl:py-16">
           <div className="order-2 lg:order-1">
             <p className="brand-label text-gold-deep">Nairobi · Luxury bags &amp; accessories</p>
             <h1 className="mt-5 text-display-xl">
@@ -86,7 +86,8 @@ const HomePage = () => {
           </div>
 
           <div className="order-1 lg:order-2">
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-stone lg:max-w-none">
+            {/* Capped width keeps the bag refined on wide screens instead of filling the column */}
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden bg-stone sm:max-w-md lg:mr-0 lg:max-w-[460px] xl:max-w-[520px] 2xl:max-w-[560px]">
               <img
                 src={HERO_IMAGE}
                 alt="A structured Millux handbag with quilted leather and gold clasp"

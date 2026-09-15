@@ -4,11 +4,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { isAxiosError } from 'axios';
+import { ArrowLeft } from 'lucide-react';
 import { login, googleLogin, me } from '@/services/authService';
 import { toast } from '@/components/ui/sonner';
 import { Logo } from '@/components/brand/Logo';
 import { StoreButton } from '@/components/store/Button';
 import { Field, inputClass } from '@/components/store/Primitives';
+import { GoogleButton, OrDivider } from '@/components/store/GoogleButton';
 import { Loader } from '@/components/ui/Loader';
 
 const loginSchema = z.object({
@@ -19,15 +21,23 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const OAUTH_ERRORS: Record<string, string> = {
-  google_auth_failed: 'Google sign-in failed. Make sure you are using the authorised admin Google account.',
+  google_auth_failed: 'Google sign-in did not complete. Use the authorised Millux admin Google account and try again.',
 };
 
+const capabilities = ['Catalogue and stock', 'Orders and fulfilment', 'Customers', 'Sales analytics'];
+
+/**
+ * Admin sign-in. Split composition: the dark panel carries the white lockup
+ * (its native setting) and the operational context; the light panel is the
+ * form. Collapses to a single column with a compact dark header on phones.
+ */
 const AdminLogin = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [serverError, setServerError] = useState<string | null>(null);
   const oauthError = searchParams.get('error');
   const oauthMessage = oauthError ? OAUTH_ERRORS[oauthError] ?? 'Sign-in failed. Please try again.' : null;
 
@@ -55,14 +65,19 @@ const AdminLogin = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (oauthMessage) toast.error(oauthMessage);
+    if (oauthMessage) {
+      setServerError(oauthMessage);
+      toast.error('Google sign-in did not complete');
+    }
   }, [oauthMessage]);
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    setServerError(null);
     try {
       const user = await login(data.email, data.password);
       if (user.role !== 'admin') {
+        setServerError('This account does not have admin access.');
         toast.error('This account does not have admin access');
         return;
       }
@@ -72,6 +87,7 @@ const AdminLogin = () => {
       const message = isAxiosError(err) && typeof err.response?.data?.error === 'string'
         ? err.response.data.error
         : err instanceof Error && err.message ? err.message : 'Login failed';
+      setServerError(message);
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -92,22 +108,48 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone px-4 py-16">
-      <div className="w-full max-w-[420px]">
-        <div className="flex flex-col items-center text-center">
-          <Logo on="light" className="h-12" />
-          <p className="brand-label mt-8 text-gold-deep">Admin</p>
-          <h1 className="mt-2 text-display-sm">Sign in</h1>
+    <div className="grid min-h-screen bg-paper lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      {/* ---------- Brand panel ---------- */}
+      <aside className="relative flex flex-col justify-between bg-ink px-6 py-8 text-paper sm:px-10 lg:min-h-screen lg:px-14 lg:py-12">
+        <div className="flex items-center justify-between">
+          <Logo on="dark" className="h-12 sm:h-14 lg:h-16" linked={false} />
+          <span className="brand-label text-gold-bright">Admin</span>
         </div>
 
-        <div className="mt-8 space-y-6 border border-line bg-paper p-6 sm:p-8">
-          {oauthMessage && (
-            <p role="alert" className="border border-danger/30 bg-danger-tint px-4 py-3 text-sm text-danger">
-              {oauthMessage}
+        <div className="hidden lg:block">
+          <p className="brand-label text-gold-bright">Back office</p>
+          <h2 className="mt-4 font-display text-4xl leading-tight text-paper">
+            Run the house from one place.
+          </h2>
+          <ul className="mt-8 space-y-3 border-t border-paper/15 pt-8">
+            {capabilities.map((c) => (
+              <li key={c} className="flex items-center gap-3 text-sm text-paper/75">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold-bright" aria-hidden="true" />
+                {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <Link to="/" className="brand-label mt-8 inline-flex items-center gap-2 text-paper/70 transition-colors hover:text-gold-bright focus-ring lg:mt-0">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to store
+        </Link>
+      </aside>
+
+      {/* ---------- Form panel ---------- */}
+      <main className="flex items-center justify-center px-4 py-12 sm:px-8 lg:px-16 lg:py-20">
+        <div className="w-full max-w-[440px]">
+          <p className="brand-label text-gold-deep">Staff sign in</p>
+          <h1 className="mt-2 text-display-md">Welcome back</h1>
+          <p className="mt-3 text-sm text-soft">Sign in with your Millux staff account to manage the store.</p>
+
+          {serverError && (
+            <p role="alert" className="mt-6 border border-danger/30 bg-danger-tint px-4 py-3 text-sm text-danger">
+              {serverError}
             </p>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-8 space-y-5">
             <Field id="email" label="Email" error={errors.email?.message}>
               <input
                 id="email"
@@ -137,38 +179,16 @@ const AdminLogin = () => {
             </StoreButton>
           </form>
 
-          <div className="flex items-center gap-3" aria-hidden="true">
-            <div className="h-px flex-1 bg-line" />
-            <span className="brand-label text-faint">or</span>
-            <div className="h-px flex-1 bg-line" />
+          <div className="mt-6 space-y-6">
+            <OrDivider />
+            <GoogleButton onClick={handleGoogleLogin} loading={googleLoading} disabled={isLoading} />
           </div>
 
-          <StoreButton
-            type="button"
-            variant="secondary"
-            full
-            size="lg"
-            onClick={handleGoogleLogin}
-            loading={googleLoading}
-            disabled={isLoading}
-          >
-            {!googleLoading && (
-              <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-                <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.3 6.6 2.3 12S6.6 21.8 12 21.8c5.6 0 9.3-3.9 9.3-9.5 0-.6-.1-1.1-.2-1.6H12z" />
-              </svg>
-            )}
-            Continue with Google
-          </StoreButton>
-
-          <p className="text-center text-xs leading-relaxed text-faint">
-            Access is restricted to Millux staff. Contact the store owner for an account.
+          <p className="mt-8 text-xs leading-relaxed text-faint">
+            Access is restricted to Millux staff. Ask the store owner if you need an account.
           </p>
         </div>
-
-        <p className="mt-8 text-center">
-          <Link to="/" className="brand-link">Back to store</Link>
-        </p>
-      </div>
+      </main>
     </div>
   );
 };
