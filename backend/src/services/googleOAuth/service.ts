@@ -63,15 +63,15 @@ export const findOrCreateGoogleUser = async (googleUser: {
     const user = userRecord.rows[0];
     // Update last login time
     await query(
-      'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = $1',
+      'UPDATE users SET updatedat = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
     return {
       id: user.id,
       email: user.email,
       role: user.role,
-      createdAt: user.created_at,
-      updatedAt: user.updated_at,
+      createdAt: user.createdat,
+      updatedAt: user.updatedat,
     };
   }
   
@@ -85,15 +85,15 @@ export const findOrCreateGoogleUser = async (googleUser: {
     const user = userRecord.rows[0];
     // Link Google ID to existing account
     await query(
-      'UPDATE users SET google_id = $1, google_email_verified = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+      'UPDATE users SET google_id = $1, google_email_verified = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3',
       [googleUser.googleId, googleUser.emailVerified, user.id]
     );
     return {
       id: user.id,
       email: user.email,
       role: user.role,
-      createdAt: user.created_at,
-      updatedAt: user.updated_at,
+      createdAt: user.createdat,
+      updatedAt: user.updatedat,
     };
   }
   
@@ -112,7 +112,7 @@ export const findOrCreateGoogleUser = async (googleUser: {
   const result = await query(
     `INSERT INTO users (email, google_id, google_email_verified, role) 
      VALUES ($1, $2, $3, $4) 
-     RETURNING id, email, role, created_at, updated_at`,
+     RETURNING id, email, role, createdat, updatedat`,
     [googleUser.email, googleUser.googleId, googleUser.emailVerified, role]
   );
   
@@ -120,8 +120,8 @@ export const findOrCreateGoogleUser = async (googleUser: {
     id: result.rows[0].id,
     email: result.rows[0].email,
     role: result.rows[0].role,
-    createdAt: result.rows[0].created_at,
-    updatedAt: result.rows[0].updated_at,
+    createdAt: result.rows[0].createdat,
+    updatedAt: result.rows[0].updatedat,
   };
 };
 

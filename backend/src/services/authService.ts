@@ -125,7 +125,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     return;
   }
   const userRecord = await findUserByEmail(email.trim().toLowerCase());
-  if (!userRecord) {
+  // Google-only users have no password_hash; treat as invalid credentials rather than crashing bcrypt
+  if (!userRecord || !userRecord.password_hash) {
     res.status(401).json({ error: 'Invalid credentials' });
     return;
   }
