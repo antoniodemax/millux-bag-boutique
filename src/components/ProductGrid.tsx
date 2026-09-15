@@ -7,7 +7,7 @@ interface ProductGridProps {
     slug: string;
     category: string;
     price: number;
-    images: String[];
+    images: string[];
   }[];
   className?: string;
 }

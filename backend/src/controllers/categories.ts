@@ -12,10 +12,13 @@ import { z } from 'zod';
 
 // Validation schemas
 const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().optional(),
-  slug: z.string().min(1, 'Slug is required')
+  name: z.string().trim().min(1, 'Name is required'),
+  image: z.string().optional(),
+  available: z.boolean().optional(),
+  orderNumber: z.number().int().min(0).optional(),
 });
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Get all categories with optional filtering
@@ -45,6 +48,10 @@ export const getCategoryById = async (req: Request, res: Response, next: NextFun
   try {
     const param = req.params.id;
     const id = Array.isArray(param) ? param[0] : param;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
     const category = await getCategoryByIdService(id);
     if (!category) {
       res.status(404).json({ error: 'Category not found' });
@@ -64,12 +71,11 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
     // Validate request body
     const validatedData = categorySchema.parse(req.body);
 
-    // Map to service format (service expects different fields)
     const serviceData = {
       name: validatedData.name,
-      image: '', // Default image since not in schema
-      available: true, // Default availability
-      orderNumber: 0 // Default order
+      image: validatedData.image ?? '',
+      available: validatedData.available ?? true,
+      orderNumber: validatedData.orderNumber ?? 0,
     };
 
     const category = await createCategoryService(serviceData);
@@ -90,15 +96,23 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
   try {
     const param = req.params.id;
     const id = Array.isArray(param) ? param[0] : param;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
 
     // Validate request body (partial updates allowed)
     const validatedData = categorySchema.partial().parse(req.body);
 
-    // Map to service format
     const serviceData: any = {};
     if (validatedData.name !== undefined) serviceData.name = validatedData.name;
-    if (validatedData.description !== undefined) serviceData.description = validatedData.description;
-    // Note: image, available, orderNumber not in update schema for now
+    if (validatedData.image !== undefined) serviceData.image = validatedData.image;
+    if (validatedData.available !== undefined) serviceData.available = validatedData.available;
+    if (validatedData.orderNumber !== undefined) serviceData.orderNumber = validatedData.orderNumber;
+    if (Object.keys(serviceData).length === 0) {
+      res.status(400).json({ error: 'No fields to update' });
+      return;
+    }
 
     const category = await updateCategoryService(id, serviceData);
     if (!category) {
@@ -122,6 +136,10 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
   try {
     const param = req.params.id;
     const id = Array.isArray(param) ? param[0] : param;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Category not found' });
+      return;
+    }
     const deleted = await deleteCategoryService(id);
     if (!deleted) {
       res.status(404).json({ error: 'Category not found' });

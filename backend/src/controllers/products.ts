@@ -16,7 +16,7 @@ const productSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive('Price must be positive'),
   category: z.string().min(1, 'Category is required'),
-  images: z.array(z.string().url('Invalid URL')).optional(),
+  images: z.array(z.string().min(1, 'Image URL is required')).optional(),
   materials: z.string().optional(),
   dimensions: z.string().optional(),
   care: z.string().optional(),
@@ -24,7 +24,8 @@ const productSchema = z.object({
   featured: z.boolean().optional(),
   newArrival: z.boolean().optional(),
   bestseller: z.boolean().optional(),
-  slug: z.string().min(1, 'Slug is required')
+  stock: z.number().int().min(0, 'Stock cannot be negative').optional(),
+  slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase letters, numbers and hyphens')
 });
 
 /**
@@ -109,14 +110,19 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
       availability: validatedData.availability ?? 'in_stock',
       featured: validatedData.featured ?? false,
       newArrival: validatedData.newArrival ?? false,
-      bestseller: validatedData.bestseller ?? false
+      bestseller: validatedData.bestseller ?? false,
+      stock: validatedData.stock ?? 0
     };
 
     const product = await createProductService(serviceData);
     res.status(201).json(product);
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: 'Validation failed', details: error.issues });
+      return;
+    }
+    if (error?.code === '23505') {
+      res.status(409).json({ error: 'A product with this slug already exists' });
       return;
     }
     next(error);
@@ -149,6 +155,7 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     if (validatedData.featured !== undefined) serviceData.featured = validatedData.featured;
     if (validatedData.newArrival !== undefined) serviceData.newArrival = validatedData.newArrival;
     if (validatedData.bestseller !== undefined) serviceData.bestseller = validatedData.bestseller;
+    if (validatedData.stock !== undefined) serviceData.stock = validatedData.stock;
 
     const product = await updateProductService(slug, serviceData);
     if (!product) {
@@ -156,9 +163,13 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
       return;
     }
     res.json(product);
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: 'Validation failed', details: error.issues });
+      return;
+    }
+    if (error?.code === '23505') {
+      res.status(409).json({ error: 'A product with this slug already exists' });
       return;
     }
     next(error);
@@ -178,7 +189,11 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
       return;
     }
     res.status(204).send();
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.statusCode === 409) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 };

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCart } from '@/context/CartContext';
 
 const PremiumNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { cartCount } = useCart();
 
   const navItems = [
     { label: 'Collections', path: '/shop' },
@@ -80,16 +82,28 @@ const PremiumNavbar = () => {
               <Search size={20} strokeWidth={1.5} />
             </button>
 
-            {/* Shopping cart icon */}
-            <button
-              aria-label="Shopping Bag"
+            {/* Account */}
+            <Link
+              to="/customer/profile"
+              aria-label="My account"
+              className="text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-200"
+            >
+              <User size={20} strokeWidth={1.5} />
+            </Link>
+
+            {/* Shopping bag */}
+            <Link
+              to="/cart"
+              aria-label={`Shopping bag, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
               className="relative text-[#FAF8F5]/90 hover:text-[#B68D40] transition-colors duration-300"
             >
               <ShoppingBag size={20} strokeWidth={1.5} />
-              <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center bg-[#B68D40] text-[9px] font-medium text-white">
-                2
-              </span>
-              </button>
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#B68D40] text-[9px] font-medium text-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
             </div>
           </div>
         </div>
@@ -126,17 +140,24 @@ const PremiumNavbar = () => {
               />
             </div>
 
-            {/* Shopping Bag Section */}
-            <div className="border-t border-[#ECE7E0] pt-4 mt-4 flex items-center">
-              <button
-                aria-label="Shopping Bag"
-                className="relative flex-1 text-center text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-300"
+            {/* Account & Shopping Bag */}
+            <div className="border-t border-[#ECE7E0] pt-4 mt-4 flex items-center gap-6 px-4">
+              <Link
+                to="/customer/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-sm uppercase tracking-[0.05em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-200"
               >
-                <ShoppingBag size={20} strokeWidth={1.5} />
-                <span className="absolute -top-1 -right-1/2 -translate-x-1/2 flex h-4 w-4 items-center justify-center bg-[#B68D40] text-[9px] font-medium text-white">
-                  2
-                </span>
-              </button>
+                <User size={18} strokeWidth={1.5} />
+                Account
+              </Link>
+              <Link
+                to="/cart"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 text-sm uppercase tracking-[0.05em] text-[#1F1F1F]/80 hover:text-[#B68D40] transition-colors duration-200"
+              >
+                <ShoppingBag size={18} strokeWidth={1.5} />
+                Bag{cartCount > 0 ? ` (${cartCount})` : ''}
+              </Link>
             </div>
           </motion.div>
         )}

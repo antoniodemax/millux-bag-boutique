@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
+import { toast } from "@/components/ui/sonner";
 
 interface ProductCardProps {
   product: {
@@ -37,7 +38,13 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </div>
           {/* Alternative: small button in corner */}
           <button
-            onClick={() => addItem(product)}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              addItem(product);
+              toast.success(`${name} added to your bag`);
+            }}
             className="absolute top-3 right-3 z-10 p-1 bg-white/80 hover:bg-white/90 rounded-full transition-all duration-200 hover:scale-105 border border-border/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20"
             aria-label="Add to bag"
           >

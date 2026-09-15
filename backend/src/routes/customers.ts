@@ -6,8 +6,11 @@ import {
   getCustomerProfile,
   getCustomerOrders,
   updateCustomerProfile,
+  listCustomers,
+  getCustomerById,
 } from '../controllers/customers';
 import { requireAuth } from '../middleware/customerAuth';
+import { requireAuth as requireStaffAuth, requireAdmin } from '../middleware/auth';
 
 const router = Router();
 
@@ -52,5 +55,20 @@ router.get('/orders', requireAuth, getCustomerOrders);
  * @access  Private
  */
 router.put('/profile', requireAuth, updateCustomerProfile);
+
+/**
+ * @route   GET /api/customers
+ * @desc    List customers (admin)
+ * @access  Private/Admin
+ */
+router.get('/', requireStaffAuth, requireAdmin, listCustomers);
+
+/**
+ * @route   GET /api/customers/:id
+ * @desc    Customer detail with order history (admin). Declared after the
+ *          fixed customer routes so /profile and /orders are never captured.
+ * @access  Private/Admin
+ */
+router.get('/:id', requireStaffAuth, requireAdmin, getCustomerById);
 
 export default router;

@@ -1,15 +1,22 @@
 import { query } from '../db/index';
 import { Category } from '../models/Category';
 
-const mapToCategory = (row: any): Category => ({
+const mapToCategory = (row: any): Category & { productCount: number } => ({
   id: row.id,
   name: row.name,
   image: row.image ?? '',
   available: row.available,
-  orderNumber: row.orderNumber,
-  createdAt: row.createdAt,
-  updatedAt: row.updatedAt,
+  orderNumber: row.ordernumber,
+  productCount: row.product_count !== undefined ? parseInt(row.product_count, 10) : 0,
+  createdAt: row.createdat,
+  updatedAt: row.updatedat,
 });
+
+// Products reference categories by name, so expose how many products use each category
+const CATEGORY_SELECT = `
+  SELECT c.*, (SELECT COUNT(*) FROM products p WHERE p.category = c.name) AS product_count
+  FROM categories c
+`;
 
 /**
  * Build SQL query and parameters for categories with optional filters
@@ -17,12 +24,12 @@ const mapToCategory = (row: any): Category => ({
 const buildCategoryQuery = (filters: {
   available?: boolean;
 }) => {
-  let queryStr = 'SELECT * FROM categories';
+  let queryStr = CATEGORY_SELECT;
   const params: any[] = [];
   const conditions: string[] = [];
 
   if (filters.available !== undefined) {
-    conditions.push('available = $' + (params.length + 1));
+    conditions.push('c.available = $' + (params.length + 1));
     params.push(filters.available);
   }
 
@@ -30,7 +37,7 @@ const buildCategoryQuery = (filters: {
     queryStr += ' WHERE ' + conditions.join(' AND ');
   }
 
-  queryStr += ' ORDER BY orderNumber ASC';
+  queryStr += ' ORDER BY c.ordernumber ASC, c.name ASC';
 
   return { queryStr, params };
 };
@@ -50,7 +57,7 @@ export const getCategoriesWithFilters = async (filters: {
 };
 
 export const getCategoryById = async (id: string): Promise<Category | null> => {
-  const result = await query('SELECT * FROM categories WHERE id = $1', [id]);
+  const result = await query(`${CATEGORY_SELECT} WHERE c.id = $1`, [id]);
   if (result.rows.length === 0) return null;
   return mapToCategory(result.rows[0]);
 };
@@ -68,37 +75,38 @@ export const createCategory = async (
   const result = await query(
     `INSERT INTO categories (name, image, available, orderNumber)
      VALUES ($1, $2, $3, $4)
-     RETURNING *`,
+     RETURNING id`,
     [name, image, available, orderNumber]
   );
 
-  return mapToCategory(result.rows[0]);
+  return (await getCategoryById(result.rows[0].id)) as Category;
 };
 
 export const updateCategory = async (
   id: string,
   updates: Partial<Omit<Category, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<Category | null> => {
-  const fields = Object.keys(updates);
+  const COLUMN_MAP: Record<string, string> = { name: 'name', image: 'image', available: 'available', orderNumber: 'ordernumber' };
+  const fields = Object.keys(updates).filter((f) => COLUMN_MAP[f] && (updates as any)[f] !== undefined);
   if (fields.length === 0) {
     throw new Error('No fields to update');
   }
 
-  const setClause = fields.map((f, idx) => `${f} = $${idx + 2}`).join(', ');
-  const values = [id, ...Object.values(updates)];
+  const setClause = fields.map((f, idx) => `${COLUMN_MAP[f]} = $${idx + 2}`).join(', ');
+  const values = [id, ...fields.map((f) => (updates as any)[f])];
 
   const result = await query(
     `
     UPDATE categories
-    SET ${setClause}, updatedAt = CURRENT_TIMESTAMP
+    SET ${setClause}, updatedat = CURRENT_TIMESTAMP
     WHERE id = $1
-    RETURNING *
+    RETURNING id
     `,
     values
   );
 
   if (result.rows.length === 0) return null;
-  return mapToCategory(result.rows[0]);
+  return getCategoryById(id);
 };
 
 export const deleteCategory = async (id: string): Promise<boolean> => {

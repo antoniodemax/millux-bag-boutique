@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { getCustomerProfile, customerLogout } from '@/services/authService';
+import { getCustomerProfile } from '@/services/authService';
 import { createOrderFromCart } from '@/services/orderService';
 import { toast } from '@/components/ui/sonner';
 
@@ -14,16 +14,14 @@ const CartPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [customerName, setCustomerName] = useState<string | null>(null);
 
-  // Fetch customer name on load
-  const loadCustomerInfo = async () => {
-    try {
-      const profile = await getCustomerProfile();
-      setCustomerName(profile.customer.name);
-    } catch (err) {
-      // Not logged in, that's okay for guest checkout
-      setCustomerName(null);
-    }
-  };
+  // Fetch customer name on load (guests are fine; they can still send a WhatsApp inquiry)
+  useEffect(() => {
+    let active = true;
+    getCustomerProfile()
+      .then((profile) => { if (active) setCustomerName(profile?.name ?? null); })
+      .catch(() => { if (active) setCustomerName(null); });
+    return () => { active = false; };
+  }, []);
 
   // Handle placing order
   const handlePlaceOrder = async () => {
@@ -53,6 +51,11 @@ const CartPage = () => {
       // Redirect to order history
       navigate('/customer/orders');
     } catch (err: any) {
+      if (err.response?.status === 401) {
+        toast.info('Please sign in to place an order, or continue as a guest via WhatsApp.');
+        navigate('/customer/login', { state: { from: { pathname: '/cart' } } });
+        return;
+      }
       const message = err.response?.data?.error || 'Failed to place order';
       toast.error(message);
     } finally {
@@ -72,10 +75,10 @@ const CartPage = () => {
     // Note: The order object from createOrder doesn't include items by default
     // We'll use the cart data instead since we have it
     cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (x${item.quantity}) - £${formatPrice(item.price * item.quantity)}\n`;
+      message += `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}\n`;
     });
 
-    message += `\n*Total:* £${formatPrice(order.totalAmount)}\n\n`;
+    message += `\n*Total:* ${formatPrice(order.totalAmount)}\n\n`;
     message += `*Status:* ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n`;
     message += `Thank you for shopping with Millux Collections!`;
 
@@ -96,11 +99,11 @@ const CartPage = () => {
     message += `*Items:*\n`;
 
     cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (x${item.quantity}) - £${formatPrice(item.price * item.quantity)}\n`;
+      message += `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}\n`;
     });
 
     const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    message += `\n*Total:* £${formatPrice(total)}\n\n`;
+    message += `\n*Total:* ${formatPrice(total)}\n\n`;
     message += `Please confirm availability and proceed with order.`;
 
     const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
@@ -189,7 +192,7 @@ const CartPage = () => {
                             <p className="text-text-xs text-muted-foreground">{item.category}</p>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center whitespace-nowrap">£{formatPrice(item.price)}</TableCell>
+                        <TableCell className="text-center whitespace-nowrap">{formatPrice(item.price)}</TableCell>
                         <TableCell className="text-center whitespace-nowrap">
                           <div className="flex items-center justify-center space-x-2">
                             <button
@@ -214,7 +217,7 @@ const CartPage = () => {
                             </button>
                           </div>
                         </TableCell>
-                        <TableCell className="text-center whitespace-nowrap">£{formatPrice(item.price * item.quantity)}</TableCell>
+                        <TableCell className="text-center whitespace-nowrap">{formatPrice(item.price * item.quantity)}</TableCell>
                         <TableCell className="text-center">
                           <button
                             onClick={() => removeItem(item.id)}
@@ -231,7 +234,7 @@ const CartPage = () => {
                 <div className="mt-6 pt-4 border-t border-muted">
                   <div className="flex justify-between text-lg font-medium">
                     <span>Subtotal:</span>
-                    <span>£{formatPrice(cartTotal)}</span>
+                    <span>{formatPrice(cartTotal)}</span>
                   </div>
                 </div>
               </div>
@@ -241,16 +244,16 @@ const CartPage = () => {
                   <Button
                     variant="outline"
                     onClick={handleGuestOrder}
-                    isLoading={isLoading}
+                    disabled={isLoading}
                   >
                     Continue as Guest (WhatsApp)
                   </Button>
 
                   <Button
                     onClick={handlePlaceOrder}
-                    isLoading={isLoading}
+                    disabled={isLoading}
                   >
-                    Place Order
+                    {isLoading ? 'Placing order…' : customerName ? 'Place Order' : 'Sign in & Place Order'}
                   </Button>
                 </div>
 

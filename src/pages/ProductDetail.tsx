@@ -3,13 +3,16 @@ import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { formatPrice } from "@/lib/utils";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductGrid } from "@/components/ProductGrid";
+import { toast } from "@/components/ui/sonner";
+import type { Product } from "@/types/models";
 import { useCart } from "@/context/CartContext";
 import SEO from "@/components/SEO";
-import { getProductBySlug } from "@/services/productService";
+import { getProductBySlug, getProductsByCategory } from "@/services/productService";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addItem } = useCart();
@@ -164,6 +167,7 @@ const ProductDetail = () => {
                 <button
                   onClick={() => {
                     addItem(product);
+                    toast.success(`${product.name} added to your bag`);
                   }}
                   className="w-full sm:w-auto flex items-center justify-center px-8 py-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
                 >

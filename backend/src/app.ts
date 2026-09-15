@@ -9,8 +9,17 @@ import { notFoundHandler } from './middleware/notFoundHandler';
 const app: Application = express();
 
 // Middleware
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow same-origin / non-browser requests (no Origin header) and the configured frontend(s)
+    // Unknown origins simply get no CORS headers (the browser blocks them); no server error.
+    callback(null, !origin || allowedOrigins.includes(origin));
+  },
   credentials: true
 }));
 app.use(json());

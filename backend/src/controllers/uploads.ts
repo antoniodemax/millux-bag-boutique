@@ -20,7 +20,7 @@ export const uploadFile = async (req: Request, res: Response, next: NextFunction
     res.status(201).json({
       message: 'File uploaded successfully',
       filename,
-      url: `${config.backendUrl}/uploads/${filename}`
+      url: `${config.backendUrl.replace(/\/+$/, '')}/api/uploads/${filename}`
     });
   } catch (error) {
     next(error);

@@ -7,7 +7,11 @@ import {
   getCustomerOrders as getCustomerOrdersService,
   updateCustomerProfile as updateCustomerProfileService,
   logoutCustomer as logoutCustomerService,
+  listCustomersForAdmin,
+  getCustomerForAdmin,
 } from '../services/customerService';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Validation schemas
 const customerRegistrationSchema = z.object({
@@ -156,6 +160,40 @@ export const updateCustomerProfile = async (
       res.status(400).json({ error: 'Validation failed', details: error.issues });
       return;
     }
+    next(error);
+  }
+};
+/**
+ * GET /api/customers
+ * Admin: list customers
+ */
+export const listCustomers = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    res.json(await listCustomersForAdmin());
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * GET /api/customers/:id
+ * Admin: customer detail with order history
+ */
+export const getCustomerById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const param = req.params.id;
+    const id = Array.isArray(param) ? param[0] : param;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Customer not found' });
+      return;
+    }
+    const customer = await getCustomerForAdmin(id);
+    if (!customer) {
+      res.status(404).json({ error: 'Customer not found' });
+      return;
+    }
+    res.json(customer);
+  } catch (error) {
     next(error);
   }
 };

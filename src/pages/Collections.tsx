@@ -6,6 +6,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import SEO from "@/components/SEO";
 import { getProducts } from "@/services/productService";
 import { getCategories } from "@/services/categoryService";
+import type { Product, Category } from "@/types/models";
 
 const Collections = () => {
   const [searchTerm, setSearchTerm] = useState("");

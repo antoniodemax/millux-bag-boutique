@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ProductGrid } from "@/components/ProductGrid";
 import SEO from "@/components/SEO";
 import { getNewArrivals } from "@/services/productService";
+import type { Product } from "@/types/models";
 
 const NewArrivals = () => {
   const [newArrivals, setNewArrivals] = useState<Product[]>([]);

@@ -1,44 +1,62 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Dot } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { formatMoney } from '@/components/admin/ui';
 
 interface SalesChartProps {
   data: Array<{ day: string; total: number }>;
 }
 
+const formatDay = (day: string) => {
+  const d = new Date(`${day}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return day;
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' });
+};
+
 export const SalesChart = ({ data }: SalesChartProps) => {
+  const hasSales = data.some((d) => d.total > 0);
+
   if (data.length === 0) {
-    return (
-      <div className="bg-card/80 backdrop-blur rounded-xl border border-border/20 p-6">
-        <p className="text-text-muted">No sales data available</p>
-      </div>
-    );
+    return <p className="text-sm text-[#6B6B6B] py-8 text-center">No sales data available.</p>;
   }
 
   return (
-    <div className="bg-card/80 backdrop-blur rounded-xl border border-border/20 p-6">
-      <h3 className="text-text-sm font-medium text-text-muted mb-4">Sales by Day (Last 7 Days)</h3>
-      <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="day" tick={({ x, y, width, height, payload }: any) => (
-            <text
-              x={x}
-              y={y + 15}
-              dy={0}
-              textAnchor="middle"
-              style={{ fontSize: 12, fill: '#9CA3AF' }}
-            >
-              {payload}
-            </text>
-          )} />
-          <YAxis tickCount={4} tickFormatter={(value) => `£{value}`} domain={['auto', 'auto']} />
-          <Tooltip
-            formatter={(value) => `£{value}`}
-            contentStyle={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 4, padding: 8 }}
-            labelStyle={{ fontSize: 12, color: '#64748b' }}
-            wrapperStyle={{ pointerEvents: 'none' }}
+    <div>
+      {!hasSales && (
+        <p className="text-xs text-[#999999] mb-3 !leading-normal md:!text-xs">
+          No sales recorded in the last 7 days.
+        </p>
+      )}
+      <ResponsiveContainer width="100%" height={240}>
+        <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+          <CartesianGrid stroke="#ECE7E0" strokeDasharray="3 3" vertical={false} />
+          <XAxis
+            dataKey="day"
+            tickFormatter={formatDay}
+            tick={{ fontSize: 11, fill: '#999999' }}
+            axisLine={{ stroke: '#ECE7E0' }}
+            tickLine={false}
           />
-          <Line type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} />
-          <Dot dataKey="total" stroke="#10b981" strokeWidth={2} r={4} />
+          <YAxis
+            width={64}
+            tick={{ fontSize: 11, fill: '#999999' }}
+            axisLine={false}
+            tickLine={false}
+            tickFormatter={(value: number) => `£${Number(value).toLocaleString('en-GB')}`}
+          />
+          <Tooltip
+            formatter={(value: number) => [formatMoney(Number(value)), 'Sales']}
+            labelFormatter={(label) => formatDay(String(label))}
+            contentStyle={{ background: '#fff', border: '1px solid #ECE7E0', borderRadius: 8, fontSize: 12 }}
+            labelStyle={{ color: '#6B6B6B' }}
+            cursor={{ stroke: '#ECE7E0' }}
+          />
+          <Line
+            type="monotone"
+            dataKey="total"
+            stroke="#B68D40"
+            strokeWidth={2}
+            dot={{ r: 3, stroke: '#B68D40', fill: '#fff', strokeWidth: 1.5 }}
+            activeDot={{ r: 5, fill: '#B68D40' }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>

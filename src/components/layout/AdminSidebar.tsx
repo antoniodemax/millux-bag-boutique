@@ -1,133 +1,149 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
-  Home as LuHome,
-  Package as LuPackage,
-  Building as LuBuilding,
-  Users as LuUsers,
-  Box as LuBox,
-  SquarePen as LuSquarePen,
-  Settings as LuSettings,
-  Receipt as LuReceipt,
-  CreditCard as LuCreditCard,
-  DollarSign as LuDollarSign,
-  BarChart2 as LuBarChart2,
-  PieChart as LuPieChart,
+  LayoutDashboard,
+  Package,
+  Tags,
+  ReceiptText,
+  Users,
+  BarChart3,
+  Settings,
+  LogOut,
+  Store,
+  X,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { logout } from '@/services/authService';
+import { toast } from '@/components/ui/sonner';
 
-const navItems = [
-  { name: 'Dashboard', href: '/admin', icon: LuHome },
-  { name: 'Inventory Levels', href: '/admin/inventory', icon: LuBox },
-  { name: 'Stock Adjustments', href: '/admin/inventory/adjustments', icon: LuSquarePen },
-  { name: 'Stock Movements', href: '/admin/inventory/movements', icon: LuBox },
-  { name: 'Organizations', href: '/admin/organizations', icon: LuBuilding },
-  { name: 'Branches', href: '/admin/branches', icon: LuBuilding },
-  { name: 'Users', href: '/admin/users', icon: LuUsers },
-  { name: 'Products', href: '/admin/products', icon: LuPackage },
-  { name: 'Categories', href: '/admin/categories', icon: LuBox },
-  { name: 'Units', href: '/admin/units', icon: LuPackage },
-  { name: 'Registers', href: '/admin/registers', icon: LuReceipt },
-  { name: 'Register Sessions', href: '/admin/registers/sessions', icon: LuCreditCard },
-  { name: 'Sales', href: '/admin/sales', icon: LuDollarSign },
-  { name: 'Payments', href: '/admin/payments', icon: LuCreditCard },
-  { name: 'Sales Overview', href: '/admin/sales/overview', icon: LuBarChart2 },
-  { name: 'Payment Methods', href: '/admin/payments/methods', icon: LuCreditCard },
-  { name: 'Settings', href: '/admin/settings', icon: LuSettings },
+export const ADMIN_NAV = [
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, end: true },
+  { name: 'Products', href: '/admin/products', icon: Package, end: false },
+  { name: 'Categories', href: '/admin/categories', icon: Tags, end: false },
+  { name: 'Orders', href: '/admin/orders', icon: ReceiptText, end: false },
+  { name: 'Customers', href: '/admin/customers', icon: Users, end: false },
+  { name: 'Analytics', href: '/admin/analytics', icon: BarChart3, end: false },
+  { name: 'Settings', href: '/admin/settings', icon: Settings, end: false },
 ];
 
-export const AdminSidebar = () => {
-  const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface AdminSidebarProps {
+  email?: string;
+  mobileOpen: boolean;
+  onClose: () => void;
+}
 
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      // On tablet and below, we start collapsed to save space
-      if (width < 1024) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
-      }
-      // On mobile, we close the sidebar by default, open via hamburger
-      if (width < 640) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
+export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) => {
+  const navigate = useNavigate();
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+  const handleSignOut = async () => {
+    try {
+      await logout();
+    } catch {
+      // Cookie may already be gone; still send the admin to the login screen
+    } finally {
+      toast.success('Signed out');
+      navigate('/admin/login', { replace: true });
+    }
+  };
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-background/80 backdrop-blur border-r border-border/20 z-50 flex flex-col transition-transform duration-300
-      {isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      {typeof window !== 'undefined' && window.innerWidth < 640 && 'z-[999]'}"
-    >
-      {/* Sidebar Header */}
-      <div className="flex items-center justify-between px-4 py-6 border-b border-border/20">
-        <div className="flex items-center space-x-2">
-          <LuHome className="h-5 w-5 text-primary" />
-          <span className="text-xs font-semibold text-primary">Admin</span>
-        </div>
-        {!isCollapsed && (
-          <button
-            onClick={toggleSidebar}
-            className="p-1 rounded hover:bg-border/20"
-            aria-label="Toggle sidebar"
-          >
-            <LuUsers className="h-4 w-4 text-text-muted" />
-          </button>
-        )}
-      </div>
-
-      {/* Sidebar Content */}
-      <div className="flex-1 overflow-y-auto">
-        <nav className="py-2">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.href);
-            return (
-              <NavLink
-                key={item.href}
-                to={item.href}
-                className={({ isActive }) => `
-                  flex items-center space-x-3 px-3 py-2 text-text-sm font-medium rounded hover:bg-border/20
-                  ${isActive ? 'bg-border/30 text-primary' : 'text-text-muted hover:text-primary'}
-                  ${isCollapsed && !isActive ? 'justify-center px-2' : ''}
-                `}
-              >
-                {isCollapsed && !isActive ? (
-                  <item.icon className="h-4 w-4 text-primary" />
-                ) : (
-                  <>
-                    <item.icon className="h-4 w-4 flex-shrink-0 text-{isActive ? 'primary' : 'text-muted'}" />
-                    <span className={isCollapsed ? 'hidden' : 'block'}>
-                      {item.name}
-                    </span>
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Sidebar Footer */}
-      <div className="px-4 py-4 border-t border-border/20">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
         <button
-          onClick={toggleSidebar}
-          className="w-full flex items-center justify-between px-3 py-2 text-text-sm font-medium rounded hover:bg-border/20"
-        >
-          <span className="flex-1 text-left">Close Sidebar</span>
-          <LuUsers className="h-4 w-4 text-text-muted" />
-        </button>
-      </div>
-    </aside>
+          type="button"
+          aria-label="Close menu"
+          onClick={onClose}
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+        />
+      )}
+
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-[#1F1F1F] text-[#FAF8F5] transition-transform duration-300',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full',
+          'lg:translate-x-0'
+        )}
+      >
+        {/* Brand */}
+        <div className="flex items-center justify-between px-6 h-20 border-b border-white/10">
+          <Link to="/admin" className="flex items-center gap-3" onClick={onClose}>
+            <img
+              src="/images/milluxlogo-removebg-preview.png"
+              alt="Millux Collections"
+              className="h-8 w-auto"
+            />
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#B68D40]">Admin</span>
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="lg:hidden text-[#FAF8F5]/70 hover:text-[#FAF8F5]"
+            aria-label="Close menu"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-6 px-3">
+          <ul className="space-y-1">
+            {ADMIN_NAV.map((item) => (
+              <li key={item.href}>
+                <NavLink
+                  to={item.href}
+                  end={item.end}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    cn(
+                      'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm tracking-wide transition-colors border-l-2',
+                      isActive
+                        ? 'border-[#B68D40] bg-white/[0.06] text-[#FAF8F5]'
+                        : 'border-transparent text-[#FAF8F5]/60 hover:text-[#FAF8F5] hover:bg-white/[0.04]'
+                    )
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon
+                        size={17}
+                        strokeWidth={1.6}
+                        className={isActive ? 'text-[#B68D40]' : 'text-current'}
+                      />
+                      <span>{item.name}</span>
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Footer */}
+        <div className="px-4 py-5 border-t border-white/10 space-y-3">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xs text-[#FAF8F5]/60 hover:text-[#B68D40] transition-colors"
+          >
+            <Store size={14} strokeWidth={1.6} />
+            View store
+          </Link>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-[#FAF8F5]/70 truncate" title={email}>
+              {email ?? 'Signed in'}
+            </p>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 text-xs text-[#FAF8F5]/60 hover:text-[#B68D40] transition-colors flex-shrink-0"
+            >
+              <LogOut size={14} strokeWidth={1.6} />
+              Sign out
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };
+
+export default AdminSidebar;

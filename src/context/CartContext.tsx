@@ -1,13 +1,16 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '@/types/models';
 
-interface CartItem extends Product {
+// Cards only carry the fields needed to display and order an item
+export type CartProduct = Pick<Product, 'id' | 'name' | 'slug' | 'category' | 'price' | 'images'> & Partial<Product>;
+
+export interface CartItem extends CartProduct {
   quantity: number;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addItem: (product: Product) => void;
+  addItem: (product: CartProduct) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -46,7 +49,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addItem = (product: Product) => {
+  const addItem = (product: CartProduct) => {
     setCart(prevCart => {
       const existingItem = prevCart.find(item => item.id === product.id);
       if (existingItem) {

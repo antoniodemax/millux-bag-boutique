@@ -1,9 +1,9 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, Link } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
-import { Home as LuHome } from 'lucide-react';
+import { useEffect, useState } from "react";
 import Index from "./pages/Index";
 import Collections from "./pages/Collections";
 import NewArrivals from "./pages/NewArrivals";
@@ -13,7 +13,13 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/AdminLogin";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import AdminProducts from "./pages/admin/Products";
+import AdminProductForm from "./pages/admin/ProductForm";
+import AdminCategories from "./pages/admin/Categories";
 import AdminOrders from "./pages/admin/Orders";
+import AdminCustomers from "./pages/admin/Customers";
+import AdminAnalytics from "./pages/admin/Analytics";
+import AdminSettings from "./pages/admin/Settings";
 import CustomerRegister from "./pages/CustomerRegister";
 import CustomerLogin from "./pages/CustomerLogin";
 import CustomerProfile from "./pages/CustomerProfile";
@@ -24,119 +30,130 @@ import PremiumNavbar from "./components/PremiumNavbar";
 import Footer from "./components/Footer";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import BackToTop from "./components/BackToTop";
-import { me, customerRegister, customerLogin, customerLogout, getCustomerProfile, getCustomerOrders } from "@/services/authService";
-import { AdminSidebar } from "@/components/layout/AdminSidebar";
-import { useEffect, useState } from "react";
+import { me, User } from "@/services/authService";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 
-// Protected route component that checks authentication
-const ProtectedRoute = ({ children, redirectTo = "/admin/login" }: { children: React.ReactNode; redirectTo?: string }) => {
+/** Admin guard: requires an authenticated staff user with the admin role */
+const AdminProtectedRoute = ({ children }: { children: (user: User) => React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     const checkAuth = async () => {
       try {
-        await me();
-        setIsAuthenticated(true);
-      } catch (err) {
-        setIsAuthenticated(false);
+        const current = await me();
+        if (!cancelled) setUser(current && current.role === 'admin' ? current : null);
+      } catch {
+        if (!cancelled) setUser(null);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
-
     checkAuth();
+    return () => { cancelled = true; };
   }, []);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-[calc(100vh-88px)]">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#FAF8F5]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B68D40]"></div>
+      </div>
+    );
   }
 
-  return isAuthenticated ? children : <Navigate to={redirectTo} replace />;
+  return user ? <>{children(user)}</> : <Navigate to="/admin/login" replace />;
 };
 
-// Admin layout component with sidebar
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+const AdminNotFound = () => (
+  <div className="text-center py-20">
+    <p className="font-playfair text-2xl text-[#1F1F1F]">Page not found</p>
+    <p className="text-sm text-[#6B6B6B] mt-2">This admin page does not exist.</p>
+    <Link to="/admin" className="inline-block mt-6 text-xs uppercase tracking-[0.12em] text-[#B68D40] hover:underline">
+      Back to dashboard
+    </Link>
+  </div>
+);
+
+/** Storefront chrome (navbar, footer, floating widgets) is hidden inside the admin area */
+const Shell = () => {
   const location = useLocation();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      // On tablet and below, we start collapsed to save space
-      if (width < 1024) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
-      }
-      // On mobile, we close the sidebar by default, open via hamburger
-      if (width < 640) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(true);
-      }
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
-  const sidebarWidth = isCollapsed ? 16 : 64; // collapsed width: 4rem (64px) but we use 16 for the icon only? Actually we want 4rem when collapsed? Let's adjust: collapsed we show only icons, width 10rem (160px)? We'll use 16 for the icon column? Better to use fixed numbers.
-  // We'll compute the width for the main content margin.
-  const sidebarWidthValue = isCollapsed ? 16 : 64; // in rem? Actually we are using Tailwind, so we'll use the actual pixel values in the class.
-  // We'll use a different approach: we'll set the width of the sidebar and the margin of the main content via class names.
+  const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {/* Sidebar */}
-      <AdminSidebar
-        isSidebarOpen={isSidebarOpen}
-        isCollapsed={isCollapsed}
-        onToggleSidebar={toggleSidebar}
-        onToggleCollapse={toggleCollapse}
-      />
+    <div className="min-h-screen bg-light">
+      {!isAdmin && <PremiumNavbar />}
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/shop" element={<Collections />} />
+        <Route path="/collections" element={<Collections />} />
+        <Route path="/new-arrivals" element={<NewArrivals />} />
+        <Route path="/products/:slug" element={<ProductDetail />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/customer/register" element={<CustomerRegister />} />
+        <Route path="/customer/login" element={<CustomerLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/*" element={
+          <AdminProtectedRoute>
+            {(user) => (
+              <AdminLayout email={user.email}>
+                <Routes>
+                  <Route index element={<AdminDashboard />} />
+                  <Route path="products" element={<AdminProducts />} />
+                  <Route path="products/new" element={<AdminProductForm />} />
+                  <Route path="products/:slug/edit" element={<AdminProductForm />} />
+                  <Route path="categories" element={<AdminCategories />} />
+                  <Route path="orders" element={<AdminOrders />} />
+                  <Route path="customers" element={<AdminCustomers />} />
+                  <Route path="customers/:id" element={<AdminCustomers />} />
+                  <Route path="analytics" element={<AdminAnalytics />} />
+                  <Route path="settings" element={<AdminSettings />} />
+                  <Route path="*" element={<AdminNotFound />} />
+                </Routes>
+              </AdminLayout>
+            )}
+          </AdminProtectedRoute>}/>
+        <Route path="/customer/*" element={
+          <CustomerProtectedRoute>
+            <div className="flex min-h-[calc(100vh-88px)]">
+              {/* Sidebar - simplified for customer area */}
+              <aside className="w-64 bg-white border-r shadow-sm">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-primary">My Account</h2>
+                  <nav className="mt-6 space-y-2">
+                    <Link
+                      to="/customer/profile"
+                      className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      to="/customer/orders"
+                      className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Order History
+                    </Link>
+                  </nav>
+                </div>
+              </aside>
 
-      {/* Backdrop for mobile sidebar */}
-      {!isSidebarOpen && window.innerWidth < 640 && (
-        <div className="fixed inset-0 bg-black/50 z-40 onClick={toggleSidebar}" />
-      )}
-
-      {/* Main Content */}
-      <main className={`min-h-[calc(100vh-88px)] flex-1 pl-6 pt-6 pb-4
-        ${isSidebarOpen ? (isCollapsed ? 'pl-10' : 'pl-64') : 'pl-6'}
-        ${typeof window !== 'undefined' && window.innerWidth < 640 && !isSidebarOpen ? 'pl-0' : ''}
-        transition-all duration-300`}>
-        {/* Admin Header */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={toggleSidebar}
-              className={`
-                md:hidden
-                p-2 rounded hover:bg-border/20
-                text-text-muted hover:text-primary
-              `}
-              aria-label="Toggle sidebar"
-            >
-              <LuHome className="h-4 w-4" />
-            </button>
-            <h1 className="text-2xl font-semibold text-primary">Admin Panel</h1>
-          </div>
-          <p className="text-text-muted mt-2 md:mt-0">Store performance and inventory overview.</p>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="mt-4 space-y-6">
-          {children}
-        </div>
-      </main>
+              {/* Main Content */}
+              <main className="flex-1 p-6">
+                <Routes>
+                  <Route path="profile" element={<CustomerProfile />} />
+                  <Route path="orders" element={<CustomerOrderHistory />} />
+                  <Route index element={<CustomerProfile />} />
+                </Routes>
+              </main>
+            </div>
+          </CustomerProtectedRoute>}/>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {!isAdmin && <Footer />}
+      {!isAdmin && <WhatsAppFloat />}
+      {!isAdmin && <BackToTop />}
     </div>
   );
 };
@@ -148,78 +165,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <div className="min-h-screen bg-light">
-            <PremiumNavbar />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/shop" element={<Collections />} />
-              <Route path="/collections" element={<Collections />} />
-              <Route path="/new-arrivals" element={<NewArrivals />} />
-              <Route path="/products/:slug" element={<ProductDetail />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/customer/register" element={<CustomerRegister />} />
-              <Route path="/customer/login" element={<CustomerLogin />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/*" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Routes>
-                      <Route index element={<AdminDashboard />} />
-                      <Route path="orders" element={<AdminOrders />} />
-                      {/* Additional admin routes will go here */}
-                    </Routes>
-                  </AdminLayout>
-                </ProtectedRoute>}/>
-              <Route path="/customer/*" element={
-                <CustomerProtectedRoute>
-                  <div className="flex min-h-[calc(100vh-88px)]">
-                    {/* Sidebar - simplified for customer area */}
-                    <aside className="w-64 bg-white border-r shadow-sm">
-                      <div className="p-6">
-                        <h2 className="text-xl font-bold text-primary">My Account</h2>
-                        <nav className="mt-6 space-y-2">
-                          <a
-                            href="#"
-                            className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // In a real app, this would navigate to profile
-                            }}
-                          >
-                            Profile
-                          </a>
-                          <a
-                            href="#"
-                            className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // In a real app, this would navigate to order history
-                            }}
-                          >
-                            Order History
-                          </a>
-                        </nav>
-                      </div>
-                    </aside>
-
-                    {/* Main Content */}
-                    <main className="flex-1 p-6">
-                      <Routes>
-                        <Route path="profile" element={<CustomerProfile />} />
-                        <Route path="orders" element={<CustomerOrderHistory />} />
-                        <Route index element={<CustomerProfile />} />
-                      </Routes>
-                    </main>
-                  </div>
-                </CustomerProtectedRoute>}/>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-            <WhatsAppFloat />
-            <BackToTop />
-          </div>
+          <Shell />
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>

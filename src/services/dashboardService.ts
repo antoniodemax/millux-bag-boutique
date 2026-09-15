@@ -4,18 +4,16 @@ export interface DashboardStats {
   todaySales: number;
   todayItems: number;
   lowStock: number;
+  openOrders: number;
   openRegisters: number;
+  totalRevenue: number;
+  totalOrders: number;
+  productCount: number;
 }
 
 export interface SalesOverviewPoint {
   day: string;
   total: number;
-}
-
-export interface PaymentMethod {
-  method: string;
-  amount: number;
-  count: number;
 }
 
 export interface InventoryHealth {
@@ -24,34 +22,83 @@ export interface InventoryHealth {
   outOfStock: number;
 }
 
-/**
- * Get dashboard statistics for KPI cards
- */
+export interface RecentOrder {
+  id: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  totalAmount: number;
+  createdAt: string;
+  customerName: string | null;
+  customerEmail: string | null;
+  itemCount: number;
+}
+
+export interface BestSeller {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  image: string | null;
+  unitsSold: number;
+  revenue: number;
+}
+
+export interface LowStockProduct {
+  id: string;
+  slug: string;
+  name: string;
+  stock: number;
+}
+
+export interface Analytics {
+  period: { days: number | null; since: string | null };
+  revenue: number;
+  orderCount: number;
+  activeOrderCount: number;
+  averageOrderValue: number;
+  unitsSold: number;
+  customerCount: number;
+  ordersByStatus: {
+    pending: number;
+    processing: number;
+    shipped: number;
+    delivered: number;
+    cancelled: number;
+  };
+  bestSellers: BestSeller[];
+  inventory: {
+    productCount: number;
+    unitsInStock: number;
+    stockValue: number;
+    lowStock: LowStockProduct[];
+  };
+}
+
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   const response = await apiClient.get('/api/dashboard/stats');
   return response.data;
 };
 
-/**
- * Get sales overview for the last 7 days
- */
 export const getSalesOverview = async (): Promise<SalesOverviewPoint[]> => {
   const response = await apiClient.get('/api/dashboard/sales-overview');
   return response.data;
 };
 
-/**
- * Get payment mix (placeholder)
- */
-export const getPaymentMix = async (): Promise<PaymentMethod[]> => {
-  const response = await apiClient.get('/api/dashboard/payment-mix');
+export const getInventoryHealth = async (): Promise<InventoryHealth> => {
+  const response = await apiClient.get('/api/dashboard/inventory-health');
+  return response.data;
+};
+
+export const getRecentOrders = async (): Promise<RecentOrder[]> => {
+  const response = await apiClient.get('/api/dashboard/recent-orders');
   return response.data;
 };
 
 /**
- * Get inventory health
+ * @param days - Number of days to include; omit for all time
  */
-export const getInventoryHealth = async (): Promise<InventoryHealth> => {
-  const response = await apiClient.get('/api/dashboard/inventory-health');
+export const getAnalytics = async (days?: number): Promise<Analytics> => {
+  const response = await apiClient.get('/api/dashboard/analytics', {
+    params: days ? { days } : undefined,
+  });
   return response.data;
 };

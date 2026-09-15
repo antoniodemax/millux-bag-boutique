@@ -6,6 +6,8 @@ export interface User {
   id: string;
   email: string;
   role: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /**
@@ -34,6 +36,18 @@ export const googleLogin = (): void => {
  */
 export const logout = async (): Promise<void> => {
   await apiClient.post('/api/auth/logout');
+};
+
+/**
+ * Register a new staff user (admin only)
+ */
+export const registerUser = async (
+  email: string,
+  password: string,
+  role: 'admin' | 'user' = 'admin'
+): Promise<User> => {
+  const response = await apiClient.post('/api/auth/register', { email, password, role });
+  return response.data.user;
 };
 
 /**

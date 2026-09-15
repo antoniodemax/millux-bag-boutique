@@ -3,6 +3,7 @@ import { sign, verify } from 'jsonwebtoken';
 import { query } from '../db/index';
 import { config } from '../config';
 import { Request, Response, NextFunction } from 'express';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_MAX_AGE, authCookieOptions } from '../utils/cookies';
 
 // Customer interface (without sensitive data)
 // Matches database schema exactly
@@ -44,7 +45,7 @@ export const registerCustomer = async (
 
   // Check if customer already exists
   const existingCustomer = await query(
-    'SELECT * FROM customers WHERE email = $1',
+    'SELECT id FROM customers WHERE LOWER(email) = LOWER($1)',
     [email]
   );
 
@@ -60,7 +61,7 @@ export const registerCustomer = async (
     `INSERT INTO customers (email, password_hash, name, phone)
      VALUES ($1, $2, $3, $4)
      RETURNING id, email, name, phone, createdAt, updatedAt`,
-    [email, passwordHash, name, phone ?? null]
+    [email.trim().toLowerCase(), passwordHash, name, phone ?? null]
   );
 
   return {
@@ -68,8 +69,8 @@ export const registerCustomer = async (
     email: result.rows[0].email,
     name: result.rows[0].name,
     phone: result.rows[0].phone,
-    createdAt: result.rows[0].createdAt,
-    updatedAt: result.rows[0].updatedAt,
+    createdAt: result.rows[0].createdat,
+    updatedAt: result.rows[0].updatedat,
   };
 };
 
@@ -87,8 +88,10 @@ export const findCustomerByEmail = async (
   createdAt: Date;
   updatedAt: Date;
 } | null> => {
-  const result = await query('SELECT * FROM customers WHERE email = $1', [email]);
-  return result.rows.length > 0 ? result.rows[0] : null;
+  const result = await query('SELECT * FROM customers WHERE LOWER(email) = LOWER($1)', [email]);
+  if (result.rows.length === 0) return null;
+  const row = result.rows[0];
+  return { ...row, createdAt: row.createdat, updatedAt: row.updatedat };
 };
 
 /**
@@ -128,9 +131,13 @@ export const authenticateCustomer = async (
 
   try {
     const decoded = verify(token, config.jwtSecret) as {
-      customerId: string;
-      email: string;
+      customerId?: string;
+      email?: string;
     };
+    if (!decoded.customerId || !decoded.email) {
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
     const customerRecord = await findCustomerByEmail(decoded.email);
 
     if (!customerRecord) {
@@ -199,7 +206,7 @@ export const loginCustomer = async (
   const { email, password } = req.body as CustomerLoginCredentials;
   const customerRecord = await findCustomerByEmail(email);
 
-  if (!customerRecord) {
+  if (!customerRecord || !customerRecord.password_hash) {
     res.status(401).json({ error: 'Invalid credentials' });
     return;
   }
@@ -226,13 +233,7 @@ export const loginCustomer = async (
   const token = generateCustomerToken(customer);
 
   // Set HTTP-only cookie
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // HTTPS in production
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  res.cookie(AUTH_COOKIE_NAME, token, { ...authCookieOptions, maxAge: AUTH_COOKIE_MAX_AGE });
 
   res.json({
     message: 'Logged in successfully',
@@ -248,7 +249,7 @@ export const loginCustomer = async (
  * Logout customer by clearing cookie
  */
 export const logoutCustomer = (_req: Request, res: Response): void => {
-  res.clearCookie('token');
+  res.clearCookie(AUTH_COOKIE_NAME, authCookieOptions);
   res.json({ message: 'Logged out successfully' });
 };
 
@@ -324,7 +325,7 @@ export const getCustomerOrders = async (
             slug: row.slug,
             name: row.productName,
             price: parseFloat(row.price),
-            images: row.images ? JSON.parse(row.images) : [],
+            images: Array.isArray(row.images) ? row.images : [],
             description: row.description,
             materials: row.materials,
             dimensions: row.dimensions,
@@ -374,9 +375,6 @@ export const updateCustomerProfile = async (
     return;
   }
 
-  // Add updatedAt timestamp
-  updates.updatedAt = new Date();
-
   // Build SET clause dynamically
   const setClause = Object.keys(updates)
     .map((key, index) => `${key} = $${index + 1}`)
@@ -416,4 +414,71 @@ export const updateCustomerProfile = async (
     console.error('Update customer profile error:', error);
     res.status(500).json({ error: 'Failed to update profile' });
   }
+};
+/**
+ * Admin: list customers with order totals
+ */
+export const listCustomersForAdmin = async () => {
+  const result = await query(
+    `SELECT c.id, c.name, c.email, c.phone, c.createdat, c.updatedat,
+            COUNT(o.id) AS order_count,
+            COALESCE(SUM(CASE WHEN o.status <> 'cancelled' THEN o.totalamount ELSE 0 END), 0) AS total_spent,
+            MAX(o.createdat) AS last_order_at
+     FROM customers c
+     LEFT JOIN orders o ON o.customerid = c.id
+     GROUP BY c.id
+     ORDER BY c.createdat DESC`
+  );
+  return result.rows.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    createdAt: row.createdat,
+    updatedAt: row.updatedat,
+    orderCount: parseInt(row.order_count, 10) || 0,
+    totalSpent: parseFloat(row.total_spent) || 0,
+    lastOrderAt: row.last_order_at ?? null,
+  }));
+};
+
+/**
+ * Admin: single customer with order history
+ */
+export const getCustomerForAdmin = async (id: string) => {
+  const customerResult = await query(
+    'SELECT id, name, email, phone, createdat, updatedat FROM customers WHERE id = $1',
+    [id]
+  );
+  if (customerResult.rows.length === 0) return null;
+  const row = customerResult.rows[0];
+
+  const ordersResult = await query(
+    `SELECT o.id, o.status, o.totalamount, o.createdat,
+            (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi WHERE oi.orderid = o.id) AS item_count
+     FROM orders o
+     WHERE o.customerid = $1
+     ORDER BY o.createdat DESC`,
+    [id]
+  );
+
+  const orders = ordersResult.rows.map((o: any) => ({
+    id: o.id,
+    status: o.status,
+    totalAmount: parseFloat(o.totalamount) || 0,
+    createdAt: o.createdat,
+    itemCount: parseInt(o.item_count, 10) || 0,
+  }));
+
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    createdAt: row.createdat,
+    updatedAt: row.updatedat,
+    orderCount: orders.length,
+    totalSpent: orders.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + o.totalAmount, 0),
+    orders,
+  };
 };

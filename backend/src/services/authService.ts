@@ -3,6 +3,7 @@ import { sign, verify } from 'jsonwebtoken';
 import { query } from '../db/index';
 import { config } from '../config';
 import { Request, Response, NextFunction } from 'express';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_MAX_AGE, authCookieOptions } from '../utils/cookies';
 
 // User interface (without password)
 export interface User {
@@ -26,14 +27,14 @@ export const registerUser = async (email: string, password: string, role: string
   const passwordHash = await hash(password, 12);
   const result = await query(
     `INSERT INTO users (email, password_hash, role) VALUES ($1, $2, $3) RETURNING id, email, role, createdAt, updatedAt`,
-    [email, passwordHash, role]
+    [email.trim().toLowerCase(), passwordHash, role]
   );
   return {
     id: result.rows[0].id,
     email: result.rows[0].email,
     role: result.rows[0].role,
-    createdAt: result.rows[0].createdAt,
-    updatedAt: result.rows[0].updatedAt,
+    createdAt: result.rows[0].createdat,
+    updatedAt: result.rows[0].updatedat,
   };
 };
 
@@ -41,8 +42,10 @@ export const registerUser = async (email: string, password: string, role: string
  * Find user by email
  */
 export const findUserByEmail = async (email: string): Promise<{ id: string; email: string; password_hash: string; role: string; createdAt: Date; updatedAt: Date } | null> => {
-  const result = await query('SELECT * FROM users WHERE email = $1', [email]);
-  return result.rows.length > 0 ? result.rows[0] : null;
+  const result = await query('SELECT * FROM users WHERE LOWER(email) = LOWER($1)', [email]);
+  if (result.rows.length === 0) return null;
+  const row = result.rows[0];
+  return { ...row, createdAt: row.createdat, updatedAt: row.updatedat };
 };
 
 /**
@@ -74,9 +77,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 
   try {
-    const decoded = verify(token, config.jwtSecret) as { userId: string; email: string; role: string };
+    const decoded = verify(token, config.jwtSecret) as { userId?: string; email?: string; role?: string };
+    // Only tokens issued for staff users carry userId; customer tokens must never authenticate here.
+    if (!decoded.userId || !decoded.email) {
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
     const user = await findUserByEmail(decoded.email);
-    if (!user) {
+    if (!user || user.id !== decoded.userId) {
       res.status(401).json({ error: 'User not found' });
       return;
     }
@@ -111,8 +119,12 @@ export const authorizeAdmin = (req: Request, res: Response, next: NextFunction):
  * Login user and set cookie
  */
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body as LoginCredentials;
-  const userRecord = await findUserByEmail(email);
+  const { email, password } = (req.body ?? {}) as Partial<LoginCredentials>;
+  if (typeof email !== 'string' || typeof password !== 'string' || !email || !password) {
+    res.status(400).json({ error: 'Email and password are required' });
+    return;
+  }
+  const userRecord = await findUserByEmail(email.trim().toLowerCase());
   if (!userRecord) {
     res.status(401).json({ error: 'Invalid credentials' });
     return;
@@ -135,13 +147,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   const token = generateToken(user);
 
   // Set HTTP-only cookie
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // HTTPS in production
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+  res.cookie(AUTH_COOKIE_NAME, token, { ...authCookieOptions, maxAge: AUTH_COOKIE_MAX_AGE });
 
   res.json({ message: 'Logged in successfully', user: { id: user.id, email: user.email, role: user.role } });
 };
@@ -150,7 +156,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
  * Logout user by clearing cookie
  */
 export const logout = (_req: Request, res: Response): void => {
-  res.clearCookie('token');
+  res.clearCookie(AUTH_COOKIE_NAME, authCookieOptions);
   res.json({ message: 'Logged out successfully' });
 };
 

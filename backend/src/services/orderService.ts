@@ -1,9 +1,14 @@
-import { query } from '../db/index';
+import pool, { query } from '../db/index';
 import { Order, OrderItem, OrderItemWithProduct } from '../models/Order';
 import { Product } from '../models/Product';
 
 // Helper to convert database row to Order object
-const mapToOrder = (row: any): Order => ({
+export interface OrderSummary extends Order {
+  customer: { id: string; name: string | null; email: string | null; phone: string | null } | null;
+  itemCount: number;
+}
+
+const mapToOrder = (row: any): OrderSummary => ({
   id: row.id,
   customerId: row.customerid ?? null,
   status: row.status as Order['status'],
@@ -11,7 +16,19 @@ const mapToOrder = (row: any): Order => ({
   whatsappMessage: row.whatsappmessage ?? null,
   createdAt: row.createdat,
   updatedAt: row.updatedat,
+  customer: row.customer_id
+    ? { id: row.customer_id, name: row.customer_name ?? null, email: row.customer_email ?? null, phone: row.customer_phone ?? null }
+    : null,
+  itemCount: row.item_count !== undefined && row.item_count !== null ? parseInt(row.item_count, 10) : 0,
 });
+
+const ORDER_SELECT = `
+  SELECT o.*,
+         c.id AS customer_id, c.name AS customer_name, c.email AS customer_email, c.phone AS customer_phone,
+         (SELECT COALESCE(SUM(oi.quantity), 0) FROM order_items oi WHERE oi.orderid = o.id) AS item_count
+  FROM orders o
+  LEFT JOIN customers c ON c.id = o.customerid
+`;
 
 // Helper to convert database row to OrderItem object
 const mapToOrderItem = (row: any): OrderItem => ({
@@ -33,118 +50,94 @@ export const createOrder = async (
     whatsappMessage?: string;
     customerId?: string;
   }
-): Promise<Order> => {
+): Promise<OrderSummary> => {
   const { items, whatsappMessage = null, customerId = null } = orderData;
 
   if (!items || items.length === 0) {
     throw new Error('Order must contain at least one item');
   }
 
-  // Validate each product exists and has sufficient inventory
+  // Merge duplicate product lines
+  const merged = new Map<string, number>();
   for (const item of items) {
-    const productResult = await query(
-      'SELECT * FROM products WHERE id = $1',
-      [item.productId]
-    );
-    if (productResult.rows.length === 0) {
-      throw new Error(`Product not found: ${item.productId}`);
+    merged.set(item.productId, (merged.get(item.productId) ?? 0) + item.quantity);
+  }
+
+  const client = await pool.connect();
+  let orderId: string;
+  try {
+    await client.query('BEGIN');
+
+    let totalAmount = 0;
+    const lines: { productId: string; quantity: number; price: number }[] = [];
+
+    for (const [productId, quantity] of merged) {
+      const productResult = await client.query(
+        `SELECT p.id, p.name, p.price, COALESCE(i.quantity, 0) AS stock
+         FROM products p
+         LEFT JOIN inventory i ON i.productid = p.id
+         WHERE p.id = $1
+         FOR UPDATE OF p`,
+        [productId]
+      );
+      if (productResult.rows.length === 0) {
+        throw Object.assign(new Error(`Product not found: ${productId}`), { statusCode: 404 });
+      }
+      const product = productResult.rows[0];
+      const stock = parseInt(product.stock, 10);
+      if (stock < quantity) {
+        throw Object.assign(new Error(`Insufficient stock for product: ${product.name}`), { statusCode: 409 });
+      }
+      const price = parseFloat(product.price);
+      lines.push({ productId, quantity, price });
+      totalAmount += price * quantity;
     }
-    const product = productResult.rows[0] as Product;
-    const inventoryResult = await query(
-      'SELECT quantity FROM inventory WHERE productid = $1',
-      [item.productId]
+
+    const orderResult = await client.query(
+      `INSERT INTO orders (customerid, status, totalamount, whatsappmessage)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id`,
+      [customerId, 'pending', totalAmount, whatsappMessage]
     );
-    const inventoryQuantity = inventoryResult.rows.length > 0
-      ? parseInt(inventoryResult.rows[0].quantity)
-      : 0;
-    if (inventoryQuantity < item.quantity) {
-      throw new Error(`Insufficient stock for product: ${product.name}`);
+    orderId = orderResult.rows[0].id;
+
+    for (const line of lines) {
+      await client.query(
+        `INSERT INTO order_items (orderid, productid, quantity, priceatpurchase)
+         VALUES ($1, $2, $3, $4)`,
+        [orderId, line.productId, line.quantity, line.price]
+      );
+      await client.query(
+        `UPDATE inventory
+         SET quantity = quantity - $1, updatedat = CURRENT_TIMESTAMP
+         WHERE productid = $2`,
+        [line.quantity, line.productId]
+      );
+      await client.query(
+        `INSERT INTO inventory_movements (productid, change, reason, referenceid)
+         VALUES ($1, $2, $3, $4)`,
+        [line.productId, -line.quantity, 'order', orderId]
+      );
     }
+
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
   }
 
-  // Calculate total amount
-  let totalAmount = 0;
-  const productPrices: { [productId: string]: number } = {};
-  for (const item of items) {
-    const productResult = await query(
-      'SELECT price FROM products WHERE id = $1',
-      [item.productId]
-    );
-    const price = parseFloat(productResult.rows[0].price);
-    productPrices[item.productId] = price;
-    totalAmount += price * item.quantity;
-  }
-
-  // Insert order
-  const orderResult = await query(
-    `INSERT INTO orders (
-      customerid, status, totalamount, whatsappmessage
-    ) VALUES ($1, $2, $3, $4)
-    RETURNING *`,
-    [
-      customerId,
-      'pending',
-      totalAmount,
-      whatsappMessage
-    ]
-  );
-
-  const order = mapToOrder(orderResult.rows[0]);
-
-  // Insert order items and update inventory
-  for (const item of items) {
-    // Insert order_item
-    await query(
-      `INSERT INTO order_items (
-        orderid, productid, quantity, priceatpurchase
-      ) VALUES ($1, $2, $3, $4)`,
-      [
-        order.id,
-        item.productId,
-        item.quantity,
-        productPrices[item.productId]
-      ]
-    );
-
-    // Update inventory: decrement quantity
-    await query(
-      `UPDATE inventory
-       SET quantity = quantity - $1, updatedat = CURRENT_TIMESTAMP
-       WHERE productid = $2`,
-      [item.quantity, item.productId]
-    );
-
-    // Record inventory movement (outgoing)
-    await query(
-      `INSERT INTO inventory_movements (
-        productid, change, reason, referenceid
-      ) VALUES ($1, $2, $3, $4)`,
-      [
-        item.productId,
-        -item.quantity,
-        'order',
-        order.id
-      ]
-    );
-  }
-
-  // Fetch the order again to ensure we have the latest data (optional)
-  const finalOrderResult = await query(
-    'SELECT * FROM orders WHERE id = $1',
-    [order.id]
-  );
+  const finalOrderResult = await query(`${ORDER_SELECT} WHERE o.id = $1`, [orderId]);
   return mapToOrder(finalOrderResult.rows[0]);
 };
 
 /**
  * Get order by ID with items and product details
  */
-export const getOrderById = async (id: string): Promise<(Order & { items: OrderItemWithProduct[] }) | null> => {
-  console.log('getOrderById called with id:', id);
-
+export const getOrderById = async (id: string): Promise<(OrderSummary & { items: OrderItemWithProduct[] }) | null> => {
   // Fetch the order
-  const orderResult = await query('SELECT * FROM orders WHERE id = $1', [id]);
-  console.log('query result rows:', orderResult.rows);
+  const orderResult = await query(`${ORDER_SELECT} WHERE o.id = $1`, [id]);
   if (orderResult.rows.length === 0) return null;
 
   const order = mapToOrder(orderResult.rows[0]);
@@ -173,7 +166,7 @@ export const getOrderById = async (id: string): Promise<(Order & { items: OrderI
       name: row.name,
       category: row.category,
       price: parseFloat(row.price),
-      images: row.images ? JSON.parse(row.images) : [],
+      images: Array.isArray(row.images) ? row.images : [],
       description: row.description,
       materials: row.materials,
       dimensions: row.dimensions,
@@ -200,25 +193,25 @@ export const getOrders = async (
     startDate?: Date;
     endDate?: Date;
   } = {}
-): Promise<Order[]> => {
-  let queryStr = 'SELECT * FROM orders';
+): Promise<OrderSummary[]> => {
+  let queryStr = ORDER_SELECT;
   const params: any[] = [];
   const conditions: string[] = [];
 
   if (filters.status !== undefined) {
-    conditions.push('status = $' + (params.length + 1));
+    conditions.push('o.status = $' + (params.length + 1));
     params.push(filters.status);
   }
   if (filters.customerId !== undefined) {
-    conditions.push('customerid = $' + (params.length + 1));
+    conditions.push('o.customerid = $' + (params.length + 1));
     params.push(filters.customerId);
   }
   if (filters.startDate !== undefined) {
-    conditions.push('createdat >= $' + (params.length + 1));
+    conditions.push('o.createdat >= $' + (params.length + 1));
     params.push(filters.startDate);
   }
   if (filters.endDate !== undefined) {
-    conditions.push('createdat <= $' + (params.length + 1));
+    conditions.push('o.createdat <= $' + (params.length + 1));
     params.push(filters.endDate);
   }
 
@@ -226,7 +219,7 @@ export const getOrders = async (
     queryStr += ' WHERE ' + conditions.join(' AND ');
   }
 
-  queryStr += ' ORDER BY createdat DESC';
+  queryStr += ' ORDER BY o.createdat DESC';
 
   const result = await query(queryStr, params);
   return result.rows.map(mapToOrder);
@@ -238,16 +231,17 @@ export const getOrders = async (
 export const updateOrderStatus = async (
   id: string,
   status: Order['status']
-): Promise<Order | null> => {
+): Promise<OrderSummary | null> => {
   const result = await query(
     `UPDATE orders
      SET status = $1, updatedat = CURRENT_TIMESTAMP
      WHERE id = $2
-     RETURNING *`,
+     RETURNING id`,
     [status, id]
   );
   if (result.rows.length === 0) return null;
-  return mapToOrder(result.rows[0]);
+  const refreshed = await query(`${ORDER_SELECT} WHERE o.id = $1`, [id]);
+  return mapToOrder(refreshed.rows[0]);
 };
 
 export { mapToOrder, mapToOrderItem };

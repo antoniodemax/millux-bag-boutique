@@ -22,6 +22,7 @@ export interface Product {
   featured?: boolean;
   newArrival?: boolean;
   bestseller?: boolean;
+  stock?: number; // Inventory quantity (from the inventory table)
   createdAt?: string;
   updatedAt?: string;
 }
@@ -32,6 +33,7 @@ export interface Category {
   image?: string; // Image URL or path
   available: boolean;
   orderNumber?: number;
+  productCount?: number; // Number of products using this category name
   createdAt?: string;
   updatedAt?: string;
 }
@@ -59,9 +61,18 @@ export interface OrderItemWithProduct extends OrderItem {
   product: Product;
 }
 
+export interface OrderCustomer {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+}
+
 export interface Order {
   id: string;
   customerId: string | null; // Reference to Customer (can be null for guest orders)
+  customer?: OrderCustomer | null; // Joined customer summary (admin endpoints)
+  itemCount?: number; // Total units in the order (admin endpoints)
   items?: (OrderItem | OrderItemWithProduct)[]; // Made optional and widened type to handle both list and detail views
   totalAmount: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';

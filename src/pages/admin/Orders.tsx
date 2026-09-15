@@ -1,377 +1,336 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getOrders, Order, getOrderById, updateOrderStatus } from '@/services/orderService';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
+import { getOrders, getOrderById, updateOrderStatus, OrderDetail, OrderStatus, ORDER_STATUSES } from '@/services/orderService';
+import { Order } from '@/types/models';
 import { Input } from '@/components/ui/input';
-import { Loader } from '@/components/ui/Loader';
-import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/sonner';
+import { formatMoney, formatDate, formatDateTime } from '@/lib/format';
+import {
+  PageHeader, Panel, OutlineButton, OrderStatusPill, LoadingRows, ErrorState, EmptyState, Thumb, errorMessage, inputClass,
+} from '@/components/admin/AdminUi';
 
-const getStatusClass = (status: string): string => {
-  switch (status) {
-    case 'pending':
-      return 'px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800';
-    case 'processing':
-      return 'px-2 py-1 text-xs rounded bg-blue-100 text-blue-800';
-    case 'shipped':
-      return 'px-2 py-1 text-xs rounded bg-indigo-100 text-indigo-800';
-    case 'delivered':
-      return 'px-2 py-1 text-xs rounded bg-green-100 text-green-800';
-    case 'cancelled':
-      return 'px-2 py-1 text-xs rounded bg-red-100 text-red-800';
-    default:
-      return 'px-2 py-1 text-xs rounded bg-gray-100 text-gray-800';
-  }
+const ALL = '__all__';
+
+const statusLabel = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const toStartOfDay = (value: string): Date | null => {
+  if (!value) return null;
+  const d = new Date(`${value}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+const toEndOfDay = (value: string): Date | null => {
+  if (!value) return null;
+  const d = new Date(`${value}T23:59:59.999`);
+  return Number.isNaN(d.getTime()) ? null : d;
 };
 
-export const AdminOrders = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
-  const [newStatus, setNewStatus] = useState<string>('');
-  const navigate = useNavigate();
-  const { toast } = useToast();
+const CustomerCell = ({ order }: { order: Order }) => {
+  if (!order.customer) return <span className="text-[#999999]">Guest</span>;
+  return (
+    <div className="min-w-0">
+      <p className="text-[#1F1F1F] truncate">{order.customer.name || 'Unnamed customer'}</p>
+      {order.customer.email && <p className="text-xs text-[#999999] truncate">{order.customer.email}</p>}
+    </div>
+  );
+};
 
-  const fetchOrders = async () => {
+const AdminOrders = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>(ALL);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [detail, setDetail] = useState<OrderDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const load = async () => {
     setLoading(true);
     setError(null);
     try {
-      const filters: any = {};
-      if (searchTerm) filters.searchTerm = searchTerm;
-      if (statusFilter) filters.status = statusFilter;
-      if (startDate) filters.startDate = startDate;
-      if (endDate) filters.endDate = endDate;
-      const data = await getOrders(filters);
+      const data = await getOrders({
+        status: statusFilter === ALL ? '' : (statusFilter as OrderStatus),
+        startDate: toStartOfDay(startDate),
+        endDate: toEndOfDay(endDate),
+      });
       setOrders(data);
     } catch (err) {
-      console.error(err);
-      setError('Failed to fetch orders');
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch orders',
-        variant: 'destructive',
-      });
+      setError(errorMessage(err, 'Failed to load orders'));
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, [searchTerm, statusFilter, startDate, endDate]);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statusFilter, startDate, endDate]);
 
-  const handleViewOrder = async (id: string) => {
-    try {
-      const order = await getOrderById(id);
-      setSelectedOrder(order);
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: 'Error',
-        description: 'Failed to load order details',
-        variant: 'destructive',
-      });
-    }
-  };
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return orders;
+    return orders.filter((o) =>
+      o.id.toLowerCase().includes(term) ||
+      (o.customer?.name ?? '').toLowerCase().includes(term) ||
+      (o.customer?.email ?? '').toLowerCase().includes(term)
+    );
+  }, [orders, search]);
 
-  const handleUpdateStatus = async (id: string, status: string) => {
-    setUpdatingOrderId(id);
-    setNewStatus(status);
+  const openDetail = async (id: string) => {
+    setDialogOpen(true);
+    setDetail(null);
+    setDetailError(null);
+    setDetailLoading(true);
     try {
-      const updatedOrder = await updateOrderStatus(id, status);
-      // Update the order in the list
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.id === id ? { ...order, status: updatedOrder.status } : order
-        )
-      );
-      // Close detail view if it's the same order
-      if (selectedOrder?.id === id) {
-        setSelectedOrder({ ...selectedOrder, status: updatedOrder.status });
-      }
-      toast({
-        title: 'Success',
-        description: 'Order status updated successfully',
-      });
+      setDetail(await getOrderById(id));
     } catch (err) {
-      console.error(err);
-      toast({
-        title: 'Error',
-        description: 'Failed to update order status',
-        variant: 'destructive',
-      });
+      setDetailError(errorMessage(err, 'Failed to load order details'));
     } finally {
-      setUpdatingOrderId(null);
-      setNewStatus('');
+      setDetailLoading(false);
     }
   };
 
-  const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'cancelled', label: 'Cancelled' },
-  ];
+  const changeStatus = async (id: string, status: OrderStatus) => {
+    setUpdatingId(id);
+    try {
+      const updated = await updateOrderStatus(id, status);
+      setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: updated.status, updatedAt: updated.updatedAt } : o)));
+      setDetail((prev) => (prev && prev.id === id ? { ...prev, status: updated.status, updatedAt: updated.updatedAt } : prev));
+      toast.success(`Order marked as ${statusLabel(updated.status)}`);
+    } catch (err) {
+      toast.error(errorMessage(err, 'Failed to update status'));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
-  if (loading) return <Loader />;
+  const StatusSelect = ({ order, size = 'sm' }: { order: Pick<Order, 'id' | 'status'>; size?: 'sm' | 'md' }) => (
+    <Select
+      value={order.status}
+      onValueChange={(v) => changeStatus(order.id, v as OrderStatus)}
+      disabled={updatingId === order.id}
+    >
+      <SelectTrigger className={`${inputClass} ${size === 'sm' ? 'h-8 w-36 text-xs' : 'w-44'}`}>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {ORDER_STATUSES.map((s) => (
+          <SelectItem key={s} value={s}>{statusLabel(s)}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const hasFilters = statusFilter !== ALL || startDate || endDate;
 
   return (
-    <Card className="mb-6">
-      <div className="flex flex-wrap items-center mb-4">
-        <h2 className="text-xl font-semibold">Orders</h2>
-        <div className="flex-1 space-x-4 mt-4 md:mt-0">
-          <Input
-            placeholder="Search orders..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-48 md:w-64"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger className="w-32">
-              <span className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
-                {statusFilter ? statusOptions.find(opt => opt.value === statusFilter)?.label : 'All Statuses'}
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-32">
-              <DropdownMenuLabel className="px-3 py-2 text-sm font-medium text-gray-500">
-                Filter by Status
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="my-1" />
-              {statusOptions.map((option) => (
-                <DropdownMenuCheckboxItem
-                  key={option.value}
-                  checked={statusFilter === option.value}
-                  onClick={() => setStatusFilter(option.value)}
-                >
-                  {option.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <div className="flex space-x-3">
-            <Input
-              type="date"
-              placeholder="Start Date"
-              value={startDate ? startDate.toISOString().split('T')[0] : ''}
-              onChange={(e) => {
-                const date = e.target.value ? new Date(e.target.value) : null;
-                setStartDate(date);
-              }}
-              className="w-32"
-            />
-            <Input
-              type="date"
-              placeholder="End Date"
-              value={endDate ? endDate.toISOString().split('T')[0] : ''}
-              onChange={(e) => {
-                const date = e.target.value ? new Date(e.target.value) : null;
-                setEndDate(date);
-              }}
-              className="w-32"
-            />
+    <div>
+      <PageHeader title="Orders" description="Review orders, customers and fulfilment status." />
+
+      <Panel>
+        <div className="grid gap-3 p-4 border-b border-[#ECE7E0] md:grid-cols-[1fr_auto_auto_auto] md:items-end">
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Search</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999999]" />
+              <Input
+                placeholder="Order id, customer name or email"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className={`pl-9 ${inputClass}`}
+              />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Status</Label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className={`w-full md:w-40 ${inputClass}`}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL}>All statuses</SelectItem>
+                {ORDER_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>{statusLabel(s)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">From</Label>
+            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`md:w-40 ${inputClass}`} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">To</Label>
+            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={`md:w-40 ${inputClass}`} />
           </div>
         </div>
-      </div>
 
-      {loading ? (
-        <Loader />
-      ) : error ? (
-        <div className="text-center py-12">
-          <p className="text-text-muted">{error}</p>
-        </div>
-      ) : (
-        <Table className="min-w-full divide-y divide-muted">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium truncate w-20">
-                  {order.id.substring(0, 8)}...
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.whatsappMessage || 'Guest Customer'}
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {order.items?.length || 0} item{
-                    order.items?.length !== 1 ? 's' : ''
-                  }
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  £{order.totalAmount.toFixed(2)}
-                </TableCell>
-                <TableCell className="flex space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="View order"
-                    onClick={() => handleViewOrder(order.id)}
-                  >
-                    <Button variant="ghost" size="icon">
-                      <Button variant="ghost" size="icon">
-                        <Button variant="ghost" size="icon">
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        </Button>
-                      </Button>
-                    </Button>
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="p-1">
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0h-3m5-7.5a4.5 4.5 0 01-7.5 7.5" />
-                      </svg>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-48 right-0">
-                      {statusOptions.map((status) => (
-                        <DropdownMenuItem
-                          key={status.value}
-                          onClick={() => handleUpdateStatus(order.id, status.value)}
-                          disabled={updatingOrderId === order.id}
-                        >
-                          {updatingOrderId === order.id ? `Updating to ${status.label}...` : status.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+        {loading ? (
+          <LoadingRows rows={6} />
+        ) : error ? (
+          <ErrorState message={error} onRetry={load} />
+        ) : orders.length === 0 ? (
+          <EmptyState
+            title={hasFilters ? 'No orders match these filters' : 'No orders yet'}
+            description={hasFilters ? 'Adjust the status or date range.' : 'Orders placed through the store will appear here.'}
+            action={hasFilters ? (
+              <OutlineButton onClick={() => { setStatusFilter(ALL); setStartDate(''); setEndDate(''); }}>Clear filters</OutlineButton>
+            ) : undefined}
+          />
+        ) : filtered.length === 0 ? (
+          <EmptyState title="No matches" description="Try a different search term." />
+        ) : (
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent border-[#ECE7E0]">
+                  <TableHead className="text-[#6B6B6B]">Order</TableHead>
+                  <TableHead className="text-[#6B6B6B]">Date</TableHead>
+                  <TableHead className="text-[#6B6B6B]">Customer</TableHead>
+                  <TableHead className="text-[#6B6B6B] text-right">Items</TableHead>
+                  <TableHead className="text-[#6B6B6B] text-right">Total</TableHead>
+                  <TableHead className="text-[#6B6B6B]">Status</TableHead>
+                  <TableHead className="text-[#6B6B6B] text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((order) => (
+                  <TableRow key={order.id} className="border-[#ECE7E0] hover:bg-[#FAF8F5]">
+                    <TableCell>
+                      <button
+                        type="button"
+                        onClick={() => openDetail(order.id)}
+                        className="font-mono text-xs text-[#1F1F1F] hover:text-[#B68D40] transition-colors"
+                        title={order.id}
+                      >
+                        #{order.id.slice(0, 8)}
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-[#6B6B6B] whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
+                    <TableCell><CustomerCell order={order} /></TableCell>
+                    <TableCell className="text-right tabular-nums text-[#1F1F1F]">{order.itemCount ?? order.items?.length ?? 0}</TableCell>
+                    <TableCell className="text-right tabular-nums text-[#1F1F1F]">{formatMoney(order.totalAmount)}</TableCell>
+                    <TableCell><OrderStatusPill status={order.status} /></TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end items-center gap-2">
+                        <StatusSelect order={order} />
+                        <OutlineButton size="sm" onClick={() => openDetail(order.id)}>View</OutlineButton>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </Panel>
 
-      {/* Order Details Dialog */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" onClick={() => {}}>View Details</Button>
-        </DialogTrigger>
-        <DialogContent className="w-[90vw] max-w-[800px]">
+      {/* Order detail dialog (controlled) */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="border-[#ECE7E0] w-[92vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              Order Details
+            <DialogTitle className="font-playfair">
+              {detail ? `Order #${detail.id.slice(0, 8)}` : 'Order details'}
             </DialogTitle>
             <DialogDescription>
-              Information for order {selectedOrder?.id}
+              {detail ? `Placed ${formatDateTime(detail.createdAt)}` : 'Loading order information'}
             </DialogDescription>
           </DialogHeader>
-          {selectedOrder ? (
-            <>
-              <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-medium">Order Information</h3>
-                    <p><strong>Order ID:</strong> {selectedOrder.id}</p>
-                    <p><strong>Date:</strong> {new Date(selectedOrder.createdAt).toLocaleString()}</p>
-                    <p><strong>Status:</strong>
-                      <span className={getStatusClass(selectedOrder.status)}>
-                        {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1)}
-                      </span>
-                    </p>
-                    {selectedOrder.whatsappMessage && (
-                      <p><strong>WhatsApp Message:</strong> {selectedOrder.whatsappMessage}</p>
-                    )}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Customer</h3>
-                    <p>{selectedOrder.whatsappMessage || 'Guest Customer'}</p>
-                  </div>
-                </div>
 
-                {selectedOrder.items && selectedOrder.items.length > 0 && (
-                  <>
-                    <h3 className="font-medium">Order Items</h3>
-                    <Table className="mt-4">
+          {detailLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10 w-full bg-[#F5F2EC]" />)}
+            </div>
+          ) : detailError ? (
+            <ErrorState message={detailError} />
+          ) : detail ? (
+            <div className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Customer</p>
+                  {detail.customer ? (
+                    <div className="text-sm">
+                      <p className="text-[#1F1F1F] font-medium">{detail.customer.name || 'Unnamed customer'}</p>
+                      {detail.customer.email && <p className="text-[#6B6B6B]">{detail.customer.email}</p>}
+                      {detail.customer.phone && <p className="text-[#6B6B6B]">{detail.customer.phone}</p>}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#999999]">Guest order</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Status</p>
+                  <div className="flex items-center gap-3">
+                    <StatusSelect order={detail} size="md" />
+                    <OrderStatusPill status={detail.status} />
+                  </div>
+                  <p className="text-xs text-[#999999]">Full id: <span className="font-mono">{detail.id}</span></p>
+                </div>
+              </div>
+
+              {detail.whatsappMessage && (
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">WhatsApp message</p>
+                  <p className="text-sm text-[#1F1F1F] whitespace-pre-wrap bg-[#FAF8F5] border border-[#ECE7E0] rounded-md p-3">
+                    {detail.whatsappMessage}
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Items</p>
+                {detail.items.length === 0 ? (
+                  <p className="text-sm text-[#999999]">This order has no line items.</p>
+                ) : (
+                  <div className="border border-[#ECE7E0] rounded-md overflow-hidden">
+                    <Table>
                       <TableHeader>
-                        <TableRow>
-                          <TableHead>Product</TableHead>
-                          <TableHead>Price</TableHead>
-                          <TableHead>Quantity</TableHead>
-                          <TableHead>Total</TableHead>
+                        <TableRow className="hover:bg-transparent border-[#ECE7E0]">
+                          <TableHead className="text-[#6B6B6B]">Product</TableHead>
+                          <TableHead className="text-[#6B6B6B] text-right">Qty</TableHead>
+                          <TableHead className="text-[#6B6B6B] text-right">Price</TableHead>
+                          <TableHead className="text-[#6B6B6B] text-right">Total</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {selectedOrder.items.map((item) => (
-                          <TableRow key={item.id}>
+                        {detail.items.map((item) => (
+                          <TableRow key={item.id} className="border-[#ECE7E0]">
                             <TableCell>
-                              <div className="flex items-center space-x-3">
-                                <img
-                                  src={item.product.images[0] || '/images/handbags-category.png'}
-                                  alt={item.product.name}
-                                  className="h-12 w-12 object-cover rounded"
-                                />
-                                <div>
-                                  <p className="font-medium">{item.product.name}</p>
-                                  <p className="text-xs text-muted-foreground">{item.product.slug}</p>
+                              <div className="flex items-center gap-3">
+                                <Thumb src={item.product?.images?.[0]} alt={item.product?.name ?? 'Product'} size="h-10 w-10" />
+                                <div className="min-w-0">
+                                  <p className="text-sm text-[#1F1F1F] truncate">{item.product?.name ?? 'Product unavailable'}</p>
+                                  {item.product?.category && <p className="text-xs text-[#999999]">{item.product.category}</p>}
                                 </div>
                               </div>
                             </TableCell>
-                            <TableCell>${item.priceAtPurchase.toFixed(2)}</TableCell>
-                            <TableCell>{item.quantity}</TableCell>
-                            <TableCell>${(item.priceAtPurchase * item.quantity).toFixed(2)}</TableCell>
+                            <TableCell className="text-right tabular-nums">{item.quantity}</TableCell>
+                            <TableCell className="text-right tabular-nums">{formatMoney(item.priceAtPurchase)}</TableCell>
+                            <TableCell className="text-right tabular-nums">{formatMoney(item.priceAtPurchase * item.quantity)}</TableCell>
                           </TableRow>
                         ))}
-                        <TableRow className="border-t">
-                          <TableCell colSpan={3} className="text-right font-bold">
-                            Total:
-                          </TableCell>
-                          <TableCell className="font-bold">${selectedOrder.totalAmount.toFixed(2)}</TableCell>
+                        <TableRow className="hover:bg-transparent border-[#ECE7E0] bg-[#FAF8F5]">
+                          <TableCell colSpan={3} className="text-right text-sm text-[#6B6B6B]">Order total</TableCell>
+                          <TableCell className="text-right font-playfair text-lg text-[#1F1F1F]">{formatMoney(detail.totalAmount)}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
-                  </>
+                  </div>
                 )}
-
-                <div className="flex justify-end space-x-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setSelectedOrder(null)}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      // Navigate to edit order page (if implemented)
-                      navigate(`/admin/orders/edit/${selectedOrder?.id}`);
-                    }}
-                  >
-                    Edit Order
-                  </Button>
-                </div>
               </div>
-            </>
-          ) : (
-            <p>Loading order details...</p>
-          )}
+            </div>
+          ) : null}
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 };
 

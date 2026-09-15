@@ -20,6 +20,9 @@ const createOrderSchema = z.object({
   customerId: z.string().optional(),
 });
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const;
+
 /**
  * GET /api/orders
  * Get orders with optional filtering (admin only in practice)
@@ -36,6 +39,10 @@ export const getOrders = async (
     const endDate = (req.query.endDate as string | string[]);
 
     const statusValue = Array.isArray(status) ? status[0] : status;
+    if (statusValue !== undefined && !ORDER_STATUSES.includes(statusValue as any)) {
+      res.status(400).json({ error: 'Invalid status filter' });
+      return;
+    }
     const customerIdValue = Array.isArray(customerId) ? customerId[0] : customerId;
     const startDateValue = startDate
       ? new Date(Array.isArray(startDate) ? startDate[0] : startDate)
@@ -69,6 +76,10 @@ export const getOrderById = async (
   try {
     const idParam = req.params.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Order not found' });
+      return;
+    }
     const order = await getOrderByIdService(id);
     if (!order) {
       res.status(404).json({ error: 'Order not found' });
@@ -93,16 +104,25 @@ export const createOrder = async (
     // Validate request body
     const validatedData = createOrderSchema.parse(req.body);
 
+    // The order always belongs to the authenticated customer; a client-supplied customerId is ignored.
     const order = await createOrderService({
       items: validatedData.items,
       whatsappMessage: validatedData.whatsappMessage,
-      customerId: (req as any).customer?.id ?? validatedData.customerId,
+      customerId: (req as any).customer?.id,
     });
 
     res.status(201).json(order);
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       res.status(400).json({ error: 'Validation failed', details: error.issues });
+      return;
+    }
+    if (error?.statusCode === 404 || error?.statusCode === 409) {
+      res.status(error.statusCode).json({ error: error.message });
+      return;
+    }
+    if (error?.code === '22P02') {
+      res.status(400).json({ error: 'Invalid product id' });
       return;
     }
     next(error);
@@ -121,7 +141,11 @@ export const updateOrderStatus = async (
   try {
     const idParam = req.params.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
-    const { status } = req.body;
+    if (!UUID_RE.test(id)) {
+      res.status(404).json({ error: 'Order not found' });
+      return;
+    }
+    const { status } = req.body ?? {};
 
     // Validate status
     const validStatuses = [

@@ -5,7 +5,7 @@ import {
   getOrders,
   updateOrderStatus,
 } from '../controllers/orders';
-import { requireAdmin } from '../middleware/auth';
+import { requireAuth, requireAdmin } from '../middleware/auth';
 import { requireAuth as requireCustomerAuth } from '../middleware/customerAuth';
 
 const router = Router();
@@ -14,8 +14,8 @@ const router = Router();
 router.post('/', requireCustomerAuth, createOrder);
 
 // Admin routes
-router.get('/', requireAdmin, getOrders);
-router.get('/:id', requireAdmin, getOrderById);
-router.patch('/:id/status', requireAdmin, updateOrderStatus);
+router.get('/', requireAuth, requireAdmin, getOrders);
+router.get('/:id', requireAuth, requireAdmin, getOrderById);
+router.patch('/:id/status', requireAuth, requireAdmin, updateOrderStatus);
 
 export default router;

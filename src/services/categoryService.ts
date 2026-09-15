@@ -1,9 +1,18 @@
 import apiClient from '@/lib/api/client';
 import { Category } from '@/types/models';
 
+export type { Category };
+
+/** Fields accepted by the create/update category endpoints */
+export interface CategoryPayload {
+  name: string;
+  image?: string;
+  available?: boolean;
+  orderNumber?: number;
+}
+
 /**
  * Get all categories from backend API
- * @returns Promise resolving to array of categories
  */
 export const getCategories = async (): Promise<Category[]> => {
   const response = await apiClient.get('/api/categories');
@@ -12,7 +21,6 @@ export const getCategories = async (): Promise<Category[]> => {
 
 /**
  * Get only available categories
- * @returns Promise resolving to array of available categories
  */
 export const getAvailableCategories = async (): Promise<Category[]> => {
   const response = await apiClient.get('/api/categories?available=true');
@@ -20,30 +28,23 @@ export const getAvailableCategories = async (): Promise<Category[]> => {
 };
 
 /**
- * Create a new category
- * @param categoryData - Category data (without id)
- * @returns Promise resolving to created category
+ * Create a new category (admin)
  */
-export const createCategory = async (categoryData: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>): Promise<Category> => {
+export const createCategory = async (categoryData: CategoryPayload): Promise<Category> => {
   const response = await apiClient.post('/api/categories', categoryData);
   return response.data;
 };
 
 /**
- * Update an existing category
- * @param id - Category id
- * @param categoryData - Partial category data to update
- * @returns Promise resolving to updated category
+ * Update an existing category (admin)
  */
-export const updateCategory = async (id: string, categoryData: Partial<Omit<Category, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Category> => {
+export const updateCategory = async (id: string, categoryData: Partial<CategoryPayload>): Promise<Category> => {
   const response = await apiClient.put(`/api/categories/${id}`, categoryData);
   return response.data;
 };
 
 /**
- * Delete a category
- * @param id - Category id
- * @returns Promise resolving to void
+ * Delete a category (admin)
  */
 export const deleteCategory = async (id: string): Promise<void> => {
   await apiClient.delete(`/api/categories/${id}`);

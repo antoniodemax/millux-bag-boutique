@@ -3,6 +3,7 @@ import { sign } from 'jsonwebtoken';
 import googleOAuthService from '../../services/googleOAuth/service';
 import { User } from '../../services/authService';
 import { config } from '../../config';
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_MAX_AGE, authCookieOptions } from '../../utils/cookies';
 
 /**
  * Initiate Google OAuth flow
@@ -47,7 +48,7 @@ export const googleAuthCallback = async (req: Request, res: Response): Promise<v
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencode',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID!,
@@ -59,12 +60,12 @@ export const googleAuthCallback = async (req: Request, res: Response): Promise<v
     });
 
     if (!tokenResponse.ok) {
-      const errorData = await tokenResponse.json();
-      throw new Error(`Failed to exchange code for token: ${errorData.error_description || errorData.error}`);
+      const errorData: any = await tokenResponse.json().catch(() => ({}));
+      throw new Error(`Failed to exchange code for token: ${errorData.error_description || errorData.error || tokenResponse.status}`);
     }
 
-    const tokenData = await tokenResponse.json();
-    const idToken = tokenData.id_token;
+    const tokenData: any = await tokenResponse.json();
+    const idToken = tokenData.id_token as string | undefined;
 
     if (!idToken) {
       throw new Error('No ID token received from Google');
@@ -84,13 +85,7 @@ export const googleAuthCallback = async (req: Request, res: Response): Promise<v
     );
 
     // Set HTTP-only cookie with JWT token
-    res.cookie('token', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+    res.cookie(AUTH_COOKIE_NAME, jwtToken, { ...authCookieOptions, maxAge: AUTH_COOKIE_MAX_AGE });
 
     // Redirect to admin dashboard on frontend
     const frontendUrl = config.frontendUrl.endsWith('/')

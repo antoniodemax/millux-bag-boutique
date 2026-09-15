@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { customerLogin } from '@/services/authService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const CustomerLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -42,7 +44,7 @@ const CustomerLogin = () => {
       });
       toast.success('Login successful');
       // Redirect to home page or customer profile
-      navigate('/');
+      navigate(redirectTo, { replace: true });
     } catch (err: any) {
       const message = err.response?.data?.error || 'Login failed';
       toast.error(message);
