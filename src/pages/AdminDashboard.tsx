@@ -175,7 +175,7 @@ export const AdminDashboard = () => {
                 <ul className="divide-y divide-[#E4E0D7]">
                   {bestSellers.map((p, i) => (
                     <li key={p.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                      <span className="font-display text-sm text-[#8C887F] w-4">{i + 1}</span>
+                      <span className="font-sans tabular-nums text-sm text-[#8C887F] w-4">{i + 1}</span>
                       {p.image ? (
                         <img src={p.image} alt={p.name} className="h-10 w-10 rounded object-cover bg-[#F5F2EC]" />
                       ) : (

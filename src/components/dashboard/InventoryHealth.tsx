@@ -38,7 +38,7 @@ export const InventoryHealth = ({ data }: InventoryHealthProps) => {
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: seg.color }} />
               {seg.label}
             </span>
-            <span className="font-display text-base text-[#0A0A0A]">{data[seg.key]}</span>
+            <span className="font-sans font-semibold tabular-nums text-base text-[#0A0A0A]">{data[seg.key]}</span>
           </li>
         ))}
         <li className="flex items-center justify-between text-xs text-[#8C887F] pt-2 border-t border-[#E4E0D7]">

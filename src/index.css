@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -64,12 +64,16 @@
 
   body {
     @apply bg-paper text-body font-sans text-base antialiased;
-    font-feature-settings: 'ss01', 'cv11';
+    font-optical-sizing: auto;
   }
 
-  /* Headings default to the display face; sizes are set per component */
+  /* Headings default to the display face (single weight; never synthesise bold) */
   h1, h2, h3, h4 {
     @apply font-display font-normal text-ink;
+    font-synthesis: none;
+  }
+  .font-display {
+    font-synthesis: none;
   }
 
   ::selection {

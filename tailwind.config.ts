@@ -62,14 +62,14 @@ export default {
 				card: { DEFAULT: 'hsl(var(--card))', foreground: 'hsl(var(--card-foreground))' },
 			},
 			fontFamily: {
-				display: ['"Bodoni Moda"', 'Didot', '"Playfair Display"', 'Georgia', 'serif'],
-				sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				display: ['"DM Serif Display"', 'Georgia', '"Times New Roman"', 'serif'],
+				sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
 			},
 			fontSize: {
-				'display-xl': ['clamp(2.75rem, 6vw, 5.5rem)', { lineHeight: '1', letterSpacing: '-0.01em' }],
-				'display-lg': ['clamp(2.25rem, 4.5vw, 4rem)', { lineHeight: '1.05', letterSpacing: '-0.01em' }],
-				'display-md': ['clamp(1.75rem, 3vw, 2.75rem)', { lineHeight: '1.1' }],
-				'display-sm': ['clamp(1.375rem, 2.2vw, 1.875rem)', { lineHeight: '1.2' }],
+				'display-xl': ['clamp(2.5rem, 5.5vw, 5rem)', { lineHeight: '1.02', letterSpacing: '-0.015em' }],
+				'display-lg': ['clamp(2rem, 4vw, 3.5rem)', { lineHeight: '1.06', letterSpacing: '-0.01em' }],
+				'display-md': ['clamp(1.625rem, 2.6vw, 2.5rem)', { lineHeight: '1.12' }],
+				'display-sm': ['clamp(1.25rem, 2vw, 1.75rem)', { lineHeight: '1.2' }],
 				label: ['0.6875rem', { lineHeight: '1rem', letterSpacing: '0.18em' }],
 			},
 			letterSpacing: {

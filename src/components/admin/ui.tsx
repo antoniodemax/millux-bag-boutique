@@ -44,7 +44,7 @@ export const PageHeader = ({
 }) => (
   <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-8">
     <div>
-      <h1 className="font-display text-3xl md:text-4xl font-semibold text-[#0A0A0A] leading-tight">
+      <h1 className="font-display text-3xl md:text-4xl text-[#0A0A0A] leading-tight">
         {title}
       </h1>
       {description && (
@@ -76,7 +76,7 @@ export const Panel = ({
       <header className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-[#E4E0D7]">
         <div>
           {title && (
-            <h2 className="font-display text-lg font-semibold text-[#0A0A0A] leading-snug">{title}</h2>
+            <h2 className="font-display text-lg text-[#0A0A0A] leading-snug">{title}</h2>
           )}
           {description && (
             <p className="text-xs text-[#8C887F] mt-0.5 !leading-normal md:!text-xs">{description}</p>
@@ -103,7 +103,7 @@ export const StatTile = ({
     <p className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F] !leading-normal md:!text-[11px]">
       {label}
     </p>
-    <p className="font-display text-3xl font-semibold text-[#0A0A0A] mt-2 !leading-tight md:!text-3xl">
+    <p className="font-sans text-3xl font-semibold tabular-nums text-[#0A0A0A] mt-2 !leading-tight md:!text-3xl">
       {typeof value === 'number' ? value.toLocaleString('en-GB') : value}
     </p>
     {caption && (

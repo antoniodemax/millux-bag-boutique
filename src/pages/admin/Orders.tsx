@@ -319,7 +319,7 @@ const AdminOrders = () => {
                         ))}
                         <TableRow className="hover:bg-transparent border-[#E4E0D7] bg-[#F5F2EC]">
                           <TableCell colSpan={3} className="text-right text-sm text-[#5B5852]">Order total</TableCell>
-                          <TableCell className="text-right font-display text-lg text-[#0A0A0A]">{formatMoney(detail.totalAmount)}</TableCell>
+                          <TableCell className="text-right font-sans font-semibold tabular-nums text-lg text-[#0A0A0A]">{formatMoney(detail.totalAmount)}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

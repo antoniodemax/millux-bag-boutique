@@ -19,7 +19,7 @@ export const PageHeader = ({
 }) => (
   <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-8">
     <div>
-      <h1 className="font-display text-3xl md:text-4xl font-semibold text-[#0A0A0A] tracking-tight">{title}</h1>
+      <h1 className="font-display text-3xl md:text-4xl text-[#0A0A0A] tracking-tight">{title}</h1>
       {description && <p className="text-sm text-[#5B5852] mt-1">{description}</p>}
     </div>
     {action && <div className="flex items-center gap-3">{action}</div>}

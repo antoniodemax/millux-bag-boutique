@@ -114,7 +114,7 @@ const AdminAnalytics = () => {
                       <li key={status}>
                         <div className="flex items-center justify-between mb-1.5">
                           <StatusPill status={status} />
-                          <span className="font-display text-base text-[#0A0A0A]">{count}</span>
+                          <span className="font-sans font-semibold tabular-nums text-base text-[#0A0A0A]">{count}</span>
                         </div>
                         <div className="h-1.5 w-full rounded-full bg-[#F5F2EC]">
                           <div className="h-1.5 rounded-full bg-[#A27627]" style={{ width: `${pct}%` }} />
@@ -175,15 +175,15 @@ const AdminAnalytics = () => {
                 <dl className="space-y-4">
                   <div className="flex items-baseline justify-between">
                     <dt className="text-sm text-[#5B5852]">Products</dt>
-                    <dd className="font-display text-xl text-[#0A0A0A]">{data.inventory.productCount}</dd>
+                    <dd className="font-sans font-semibold tabular-nums text-xl text-[#0A0A0A]">{data.inventory.productCount}</dd>
                   </div>
                   <div className="flex items-baseline justify-between">
                     <dt className="text-sm text-[#5B5852]">Units in stock</dt>
-                    <dd className="font-display text-xl text-[#0A0A0A]">{data.inventory.unitsInStock.toLocaleString('en-GB')}</dd>
+                    <dd className="font-sans font-semibold tabular-nums text-xl text-[#0A0A0A]">{data.inventory.unitsInStock.toLocaleString('en-GB')}</dd>
                   </div>
                   <div className="flex items-baseline justify-between">
                     <dt className="text-sm text-[#5B5852]">Stock value</dt>
-                    <dd className="font-display text-xl text-[#0A0A0A]">{formatMoney(data.inventory.stockValue)}</dd>
+                    <dd className="font-sans font-semibold tabular-nums text-xl text-[#0A0A0A]">{formatMoney(data.inventory.stockValue)}</dd>
                   </div>
                 </dl>
               )}
@@ -220,7 +220,7 @@ const AdminAnalytics = () => {
                             {p.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-right font-display text-base text-[#0A0A0A]">{p.stock}</TableCell>
+                        <TableCell className="text-right font-sans font-semibold tabular-nums text-base text-[#0A0A0A]">{p.stock}</TableCell>
                         <TableCell className="text-right">
                           <StatusPill status={p.stock === 0 ? 'out_of_stock' : 'low_stock'} />
                         </TableCell>
