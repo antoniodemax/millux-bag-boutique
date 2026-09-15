@@ -6,5 +6,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatPrice = (price: number): string => {
-  return `£${price.toFixed(0)}`;
+  const isWhole = Number.isInteger(price);
+  return `£${price.toLocaleString('en-GB', { minimumFractionDigits: isWhole ? 0 : 2, maximumFractionDigits: 2 })}`;
 }

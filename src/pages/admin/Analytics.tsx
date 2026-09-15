@@ -50,7 +50,7 @@ const AdminAnalytics = () => {
   }, [fetchData]);
 
   const periodSelector = (
-    <div className="inline-flex rounded-md border border-[#ECE7E0] bg-white p-0.5">
+    <div className="inline-flex rounded-md border border-[#E4E0D7] bg-white p-0.5">
       {PERIODS.map((p, i) => (
         <button
           key={p.label}
@@ -58,7 +58,7 @@ const AdminAnalytics = () => {
           onClick={() => setPeriodIndex(i)}
           className={cn(
             'px-3 py-1.5 text-xs uppercase tracking-[0.1em] rounded transition-colors',
-            i === periodIndex ? 'bg-[#1F1F1F] text-[#FAF8F5]' : 'text-[#6B6B6B] hover:text-[#1F1F1F]'
+            i === periodIndex ? 'bg-[#0A0A0A] text-[#F5F2EC]' : 'text-[#5B5852] hover:text-[#0A0A0A]'
           )}
         >
           {p.label}
@@ -114,10 +114,10 @@ const AdminAnalytics = () => {
                       <li key={status}>
                         <div className="flex items-center justify-between mb-1.5">
                           <StatusPill status={status} />
-                          <span className="font-playfair text-base text-[#1F1F1F]">{count}</span>
+                          <span className="font-display text-base text-[#0A0A0A]">{count}</span>
                         </div>
-                        <div className="h-1.5 w-full rounded-full bg-[#F3F0EB]">
-                          <div className="h-1.5 rounded-full bg-[#B68D40]" style={{ width: `${pct}%` }} />
+                        <div className="h-1.5 w-full rounded-full bg-[#F5F2EC]">
+                          <div className="h-1.5 rounded-full bg-[#A27627]" style={{ width: `${pct}%` }} />
                         </div>
                       </li>
                     );
@@ -134,31 +134,31 @@ const AdminAnalytics = () => {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#ECE7E0]">
-                      <TableHead className="text-[#999999]">Product</TableHead>
-                      <TableHead className="text-[#999999]">Category</TableHead>
-                      <TableHead className="text-[#999999] text-right">Units</TableHead>
-                      <TableHead className="text-[#999999] text-right">Revenue</TableHead>
+                    <TableRow className="border-[#E4E0D7]">
+                      <TableHead className="text-[#8C887F]">Product</TableHead>
+                      <TableHead className="text-[#8C887F]">Category</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Units</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Revenue</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {data.bestSellers.map((p) => (
-                      <TableRow key={p.id} className="border-[#ECE7E0]">
+                      <TableRow key={p.id} className="border-[#E4E0D7]">
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {p.image ? (
-                              <img src={p.image} alt={p.name} className="h-9 w-9 rounded object-cover bg-[#F3F0EB]" />
+                              <img src={p.image} alt={p.name} className="h-9 w-9 rounded object-cover bg-[#F5F2EC]" />
                             ) : (
-                              <div className="h-9 w-9 rounded bg-[#F3F0EB]" />
+                              <div className="h-9 w-9 rounded bg-[#F5F2EC]" />
                             )}
-                            <Link to={`/admin/products/${p.slug}/edit`} className="text-[#1F1F1F] hover:text-[#B68D40]">
+                            <Link to={`/admin/products/${p.slug}/edit`} className="text-[#0A0A0A] hover:text-[#A27627]">
                               {p.name}
                             </Link>
                           </div>
                         </TableCell>
-                        <TableCell className="text-[#6B6B6B]">{p.category}</TableCell>
-                        <TableCell className="text-right text-[#1F1F1F]">{p.unitsSold}</TableCell>
-                        <TableCell className="text-right text-[#1F1F1F]">{formatMoney(p.revenue)}</TableCell>
+                        <TableCell className="text-[#5B5852]">{p.category}</TableCell>
+                        <TableCell className="text-right text-[#0A0A0A]">{p.unitsSold}</TableCell>
+                        <TableCell className="text-right text-[#0A0A0A]">{formatMoney(p.revenue)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -174,16 +174,16 @@ const AdminAnalytics = () => {
               ) : (
                 <dl className="space-y-4">
                   <div className="flex items-baseline justify-between">
-                    <dt className="text-sm text-[#6B6B6B]">Products</dt>
-                    <dd className="font-playfair text-xl text-[#1F1F1F]">{data.inventory.productCount}</dd>
+                    <dt className="text-sm text-[#5B5852]">Products</dt>
+                    <dd className="font-display text-xl text-[#0A0A0A]">{data.inventory.productCount}</dd>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <dt className="text-sm text-[#6B6B6B]">Units in stock</dt>
-                    <dd className="font-playfair text-xl text-[#1F1F1F]">{data.inventory.unitsInStock.toLocaleString('en-GB')}</dd>
+                    <dt className="text-sm text-[#5B5852]">Units in stock</dt>
+                    <dd className="font-display text-xl text-[#0A0A0A]">{data.inventory.unitsInStock.toLocaleString('en-GB')}</dd>
                   </div>
                   <div className="flex items-baseline justify-between">
-                    <dt className="text-sm text-[#6B6B6B]">Stock value</dt>
-                    <dd className="font-playfair text-xl text-[#1F1F1F]">{formatMoney(data.inventory.stockValue)}</dd>
+                    <dt className="text-sm text-[#5B5852]">Stock value</dt>
+                    <dd className="font-display text-xl text-[#0A0A0A]">{formatMoney(data.inventory.stockValue)}</dd>
                   </div>
                 </dl>
               )}
@@ -194,7 +194,7 @@ const AdminAnalytics = () => {
               description="Products with 5 or fewer units"
               className="lg:col-span-2"
               action={
-                <Link to="/admin/products" className="text-xs uppercase tracking-[0.12em] text-[#B68D40] hover:underline">
+                <Link to="/admin/products" className="text-xs uppercase tracking-[0.12em] text-[#A27627] hover:underline">
                   Manage products
                 </Link>
               }
@@ -206,21 +206,21 @@ const AdminAnalytics = () => {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#ECE7E0]">
-                      <TableHead className="text-[#999999]">Product</TableHead>
-                      <TableHead className="text-[#999999] text-right">Stock</TableHead>
-                      <TableHead className="text-[#999999] text-right">Status</TableHead>
+                    <TableRow className="border-[#E4E0D7]">
+                      <TableHead className="text-[#8C887F]">Product</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Stock</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {data.inventory.lowStock.map((p) => (
-                      <TableRow key={p.id} className="border-[#ECE7E0]">
+                      <TableRow key={p.id} className="border-[#E4E0D7]">
                         <TableCell>
-                          <Link to={`/admin/products/${p.slug}/edit`} className="text-[#1F1F1F] hover:text-[#B68D40]">
+                          <Link to={`/admin/products/${p.slug}/edit`} className="text-[#0A0A0A] hover:text-[#A27627]">
                             {p.name}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-right font-playfair text-base text-[#1F1F1F]">{p.stock}</TableCell>
+                        <TableCell className="text-right font-display text-base text-[#0A0A0A]">{p.stock}</TableCell>
                         <TableCell className="text-right">
                           <StatusPill status={p.stock === 0 ? 'out_of_stock' : 'low_stock'} />
                         </TableCell>

@@ -22,8 +22,8 @@ type NewUserValues = z.infer<typeof newUserSchema>;
 
 const Field = ({ label, value }: { label: string; value: string }) => (
   <div>
-    <dt className="text-[11px] uppercase tracking-[0.14em] text-[#999999]">{label}</dt>
-    <dd className="text-sm text-[#1F1F1F] mt-1 break-all">{value}</dd>
+    <dt className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F]">{label}</dt>
+    <dd className="text-sm text-[#0A0A0A] mt-1 break-all">{value}</dd>
   </div>
 );
 
@@ -90,34 +90,34 @@ const AdminSettings = () => {
         >
           <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl">
             <div>
-              <Label htmlFor="new-email" className="text-xs text-[#6B6B6B]">Email</Label>
+              <Label htmlFor="new-email" className="text-xs text-[#5B5852]">Email</Label>
               <Input
                 id="new-email"
                 type="email"
                 autoComplete="off"
                 placeholder="name@millux.com"
-                className="mt-1.5 bg-white border-[#ECE7E0]"
+                className="mt-1.5 bg-white border-[#E4E0D7]"
                 {...register('email')}
               />
               {errors.email && <p className="text-xs text-destructive mt-1 !leading-normal md:!text-xs">{errors.email.message}</p>}
             </div>
             <div>
-              <Label htmlFor="new-password" className="text-xs text-[#6B6B6B]">Password</Label>
+              <Label htmlFor="new-password" className="text-xs text-[#5B5852]">Password</Label>
               <Input
                 id="new-password"
                 type="password"
                 autoComplete="new-password"
                 placeholder="At least 8 characters"
-                className="mt-1.5 bg-white border-[#ECE7E0]"
+                className="mt-1.5 bg-white border-[#E4E0D7]"
                 {...register('password')}
               />
               {errors.password && <p className="text-xs text-destructive mt-1 !leading-normal md:!text-xs">{errors.password.message}</p>}
             </div>
             <div>
-              <Label htmlFor="new-role" className="text-xs text-[#6B6B6B]">Role</Label>
+              <Label htmlFor="new-role" className="text-xs text-[#5B5852]">Role</Label>
               <select
                 id="new-role"
-                className="mt-1.5 flex h-10 w-full rounded-md border border-[#ECE7E0] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#B68D40]/40"
+                className="mt-1.5 flex h-10 w-full rounded-md border border-[#E4E0D7] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#A27627]/40"
                 {...register('role')}
               >
                 <option value="admin">Admin</option>
@@ -128,7 +128,7 @@ const AdminSettings = () => {
               <Button
                 type="submit"
                 disabled={submitting}
-                className="bg-[#1F1F1F] hover:bg-[#B68D40] text-[#FAF8F5]"
+                className="bg-[#0A0A0A] hover:bg-[#A27627] text-[#F5F2EC]"
               >
                 {submitting ? 'Creating…' : 'Create account'}
               </Button>

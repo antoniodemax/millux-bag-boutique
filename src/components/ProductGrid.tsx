@@ -1,31 +1,33 @@
-import { ProductCard } from "./ProductCard";
+import { ProductCard, type ProductCardProduct } from './ProductCard';
+import { cn } from '@/lib/utils';
 
-interface ProductGridProps {
-  products: {
-    id: string;
-    name: string;
-    slug: string;
-    category: string;
-    price: number;
-    images: string[];
-  }[];
+/**
+ * Responsive catalogue grid: 2 columns on phones, 3 on tablets, 4 on wide
+ * screens. Gutters stay tight so the imagery reads as one composed page.
+ */
+export const ProductGrid = ({
+  products,
+  className,
+  columns = 4,
+}: {
+  products: ProductCardProduct[];
   className?: string;
-}
-
-export const ProductGrid = ({ products, className = "" }: ProductGridProps) => {
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No products found.</p>
-      </div>
-    );
-  }
-
+  columns?: 3 | 4;
+}) => {
+  if (products.length === 0) return null;
   return (
-    <div className={`${className} grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
+    <div
+      className={cn(
+        'grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3',
+        columns === 4 && 'xl:grid-cols-4',
+        className
+      )}
+    >
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );
 };
+
+export default ProductGrid;

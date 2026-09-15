@@ -59,7 +59,7 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-[#1F1F1F] text-[#FAF8F5] transition-transform duration-300',
+          'fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-[#0A0A0A] text-[#F5F2EC] transition-transform duration-300',
           mobileOpen ? 'translate-x-0' : '-translate-x-full',
           'lg:translate-x-0'
         )}
@@ -70,14 +70,16 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
             <img
               src="/images/milluxlogo-removebg-preview.png"
               alt="Millux Collections"
-              className="h-8 w-auto"
+              width={763}
+              height={327}
+              className="h-12 w-auto"
             />
-            <span className="text-[10px] uppercase tracking-[0.22em] text-[#B68D40]">Admin</span>
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#A27627]">Admin</span>
           </Link>
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden text-[#FAF8F5]/70 hover:text-[#FAF8F5]"
+            className="lg:hidden text-[#F5F2EC]/70 hover:text-[#F5F2EC]"
             aria-label="Close menu"
           >
             <X size={18} />
@@ -97,8 +99,8 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
                     cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm tracking-wide transition-colors border-l-2',
                       isActive
-                        ? 'border-[#B68D40] bg-white/[0.06] text-[#FAF8F5]'
-                        : 'border-transparent text-[#FAF8F5]/60 hover:text-[#FAF8F5] hover:bg-white/[0.04]'
+                        ? 'border-[#A27627] bg-white/[0.06] text-[#F5F2EC]'
+                        : 'border-transparent text-[#F5F2EC]/60 hover:text-[#F5F2EC] hover:bg-white/[0.04]'
                     )
                   }
                 >
@@ -107,7 +109,7 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
                       <item.icon
                         size={17}
                         strokeWidth={1.6}
-                        className={isActive ? 'text-[#B68D40]' : 'text-current'}
+                        className={isActive ? 'text-[#A27627]' : 'text-current'}
                       />
                       <span>{item.name}</span>
                     </>
@@ -122,19 +124,19 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
         <div className="px-4 py-5 border-t border-white/10 space-y-3">
           <Link
             to="/"
-            className="flex items-center gap-2 text-xs text-[#FAF8F5]/60 hover:text-[#B68D40] transition-colors"
+            className="flex items-center gap-2 text-xs text-[#F5F2EC]/60 hover:text-[#A27627] transition-colors"
           >
             <Store size={14} strokeWidth={1.6} />
             View store
           </Link>
           <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-[#FAF8F5]/70 truncate" title={email}>
+            <p className="text-xs text-[#F5F2EC]/70 truncate" title={email}>
               {email ?? 'Signed in'}
             </p>
             <button
               type="button"
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-xs text-[#FAF8F5]/60 hover:text-[#B68D40] transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 text-xs text-[#F5F2EC]/60 hover:text-[#A27627] transition-colors flex-shrink-0"
             >
               <LogOut size={14} strokeWidth={1.6} />
               Sign out

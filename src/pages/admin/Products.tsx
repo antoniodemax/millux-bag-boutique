@@ -108,9 +108,9 @@ const AdminProducts = () => {
       />
 
       <Panel>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 border-b border-[#ECE7E0]">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 border-b border-[#E4E0D7]">
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999999]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C887F]" />
             <Input
               placeholder="Search by name, slug or category"
               value={search}
@@ -130,7 +130,7 @@ const AdminProducts = () => {
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-xs text-[#999999] whitespace-nowrap">
+            <span className="text-xs text-[#8C887F] whitespace-nowrap">
               {filtered.length} of {products.length}
             </span>
           </div>
@@ -152,45 +152,45 @@ const AdminProducts = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent border-[#ECE7E0]">
-                  <TableHead className="text-[#6B6B6B]">Product</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Category</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Price</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Stock</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Availability</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Flags</TableHead>
-                  <TableHead className="text-right text-[#6B6B6B]">Actions</TableHead>
+                <TableRow className="hover:bg-transparent border-[#E4E0D7]">
+                  <TableHead className="text-[#5B5852]">Product</TableHead>
+                  <TableHead className="text-[#5B5852]">Category</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Price</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Stock</TableHead>
+                  <TableHead className="text-[#5B5852]">Availability</TableHead>
+                  <TableHead className="text-[#5B5852]">Flags</TableHead>
+                  <TableHead className="text-right text-[#5B5852]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((product) => {
                   const stock = product.stock ?? 0;
                   return (
-                    <TableRow key={product.id} className="border-[#ECE7E0] hover:bg-[#FAF8F5]">
+                    <TableRow key={product.id} className="border-[#E4E0D7] hover:bg-[#F5F2EC]">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Thumb src={product.images?.[0]} alt={product.name} />
                           <div className="min-w-0">
                             <Link
                               to={`/admin/products/${encodeURIComponent(product.slug)}/edit`}
-                              className="font-medium text-[#1F1F1F] hover:text-[#B68D40] transition-colors"
+                              className="font-medium text-[#0A0A0A] hover:text-[#A27627] transition-colors"
                             >
                               {product.name}
                             </Link>
-                            <p className="text-xs text-[#999999] truncate">{product.slug}</p>
+                            <p className="text-xs text-[#8C887F] truncate">{product.slug}</p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-[#6B6B6B]">{product.category}</TableCell>
-                      <TableCell className="text-right text-[#1F1F1F] tabular-nums">{formatMoney(product.price)}</TableCell>
+                      <TableCell className="text-[#5B5852]">{product.category}</TableCell>
+                      <TableCell className="text-right text-[#0A0A0A] tabular-nums">{formatMoney(product.price)}</TableCell>
                       <TableCell className="text-right tabular-nums">
                         {stock <= 5 ? (
-                          <span className="inline-flex items-center gap-1.5 text-[#8A6420]">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#C9A14A]" />
+                          <span className="inline-flex items-center gap-1.5 text-[#85601F]">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#D0A848]" />
                             {stock}
                           </span>
                         ) : (
-                          <span className="text-[#1F1F1F]">{stock}</span>
+                          <span className="text-[#0A0A0A]">{stock}</span>
                         )}
                       </TableCell>
                       <TableCell><AvailabilityPill availability={product.availability} /></TableCell>
@@ -208,7 +208,7 @@ const AdminProducts = () => {
                           </OutlineButton>
                           <OutlineButton
                             size="sm"
-                            className="text-[#8A3A34] hover:text-[#8A3A34]"
+                            className="text-[#A4302A] hover:text-[#A4302A]"
                             onClick={() => setPendingDelete(product)}
                           >
                             Delete
@@ -225,20 +225,20 @@ const AdminProducts = () => {
       </Panel>
 
       <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && !deleting && setPendingDelete(null)}>
-        <AlertDialogContent className="border-[#ECE7E0]">
+        <AlertDialogContent className="border-[#E4E0D7]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-playfair">Delete product?</AlertDialogTitle>
+            <AlertDialogTitle className="font-display">Delete product?</AlertDialogTitle>
             <AlertDialogDescription>
               "{pendingDelete?.name}" will be removed from the store permanently. Products that have been ordered
               cannot be deleted; set them to out of stock instead.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting} className="border-[#ECE7E0]">Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting} className="border-[#E4E0D7]">Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={deleting}
               onClick={(e) => { e.preventDefault(); confirmDelete(); }}
-              className="bg-[#1F1F1F] hover:bg-[#333333] text-white"
+              className="bg-[#0A0A0A] hover:bg-[#2A2926] text-white"
             >
               {deleting ? 'Deleting…' : 'Delete'}
             </AlertDialogAction>

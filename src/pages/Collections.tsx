@@ -1,224 +1,251 @@
-import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
-import { ProductCard } from "@/components/ProductCard";
-import { ProductGrid } from "@/components/ProductGrid";
-import SEO from "@/components/SEO";
-import { getProducts } from "@/services/productService";
-import { getCategories } from "@/services/categoryService";
-import type { Product, Category } from "@/types/models";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search } from 'lucide-react';
+import SEO from '@/components/SEO';
+import { ProductGrid } from '@/components/ProductGrid';
+import {
+  Container,
+  PageHeading,
+  ProductGridSkeleton,
+  ErrorState,
+  EmptyState,
+  inputClass,
+  selectClass,
+  selectChevron,
+} from '@/components/store/Primitives';
+import { getProducts } from '@/services/productService';
+import { getCategories } from '@/services/categoryService';
+import type { Product, Category } from '@/types/models';
+import { cn } from '@/lib/utils';
+
+type SortKey = 'featured' | 'newest' | 'bestseller' | 'price-low' | 'price-high' | 'name';
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'newest', label: 'New arrivals' },
+  { value: 'bestseller', label: 'Best sellers' },
+  { value: 'price-low', label: 'Price: low to high' },
+  { value: 'price-high', label: 'Price: high to low' },
+  { value: 'name', label: 'Name: A to Z' },
+];
+
+const WHATSAPP_URL = 'https://wa.me/254723425778';
 
 const Collections = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState("featured"); // featured, new-arrival, bestseller, price-low, price-high, name
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategory = searchParams.get('category') ?? '';
+
   const [products, setProducts] = useState<Product[]>([]);
-  const [categoriesList, setCategoriesList] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<SortKey>('featured');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [productsData, categoriesData] = await Promise.all([getProducts(), getCategories()]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+    } catch {
+      setError('We could not load the collection right now.');
+      setProducts([]);
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        // Fetch products and categories concurrently
-        const [productsData, categoriesData] = await Promise.all([
-          getProducts(),
-          getCategories()
-        ]);
-        setProducts(productsData);
-        setCategoriesList(categoriesData);
-      } catch (err) {
-        console.error('Failed to fetch collections data:', err);
-        setError('Failed to load collections. Please try again later.');
-        setProducts([]);
-        setCategoriesList([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+    load();
+  }, [load]);
 
-    fetchData();
-  }, []); // Empty deps means run once on mount
+  const setCategory = (name: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (name) next.set('category', name);
+    else next.delete('category');
+    setSearchParams(next, { replace: true });
+  };
 
-  // Get unique categories from products (for the filter dropdown we already have categoriesList, but we also need to compute from products for the filter? Actually we use categoriesList for the dropdown.
-  // The filter dropdown uses categoriesList, which comes from the PostgreSQL backend via the category service.
-  // We also need to compute the categories from products for the case where we want to show only categories that have products? But the original code used all categories from products.
-  // We'll keep the categoriesList as the source for the dropdown, but we can also filter it to only those that have products if desired.
-  // For now, we'll use categoriesList as is.
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSortBy('featured');
+    setCategory('');
+  };
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
+  // Categories to offer: every API category plus any category a product uses that the API list lacks
+  const categoryNames = useMemo(() => {
+    const names = new Set<string>(categories.map((c) => c.name));
+    products.forEach((p) => names.add(p.category));
+    return Array.from(names);
+  }, [categories, products]);
+
+  const filtered = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
     return products
-      .filter(product => {
-        // Search filter
-        if (searchTerm &&
-            !product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            !product.category.toLowerCase().includes(searchTerm.toLowerCase())) {
-          return false;
-        }
-
-        // Category filter
-        if (selectedCategory && product.category !== selectedCategory) {
-          return false;
-        }
-
+      .filter((p) => {
+        if (selectedCategory && p.category !== selectedCategory) return false;
+        if (term && !p.name.toLowerCase().includes(term) && !p.category.toLowerCase().includes(term)) return false;
         return true;
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case "featured":
-            return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
-          case "new-arrival":
-            return (b.newArrival ? 1 : 0) - (a.newArrival ? 1 : 0);
-          case "bestseller":
-            return (b.bestseller ? 1 : 0) - (a.bestseller ? 1 : 0);
-          case "price-low":
+          case 'featured':
+            return Number(b.featured ?? false) - Number(a.featured ?? false);
+          case 'newest':
+            return Number(b.newArrival ?? false) - Number(a.newArrival ?? false);
+          case 'bestseller':
+            return Number(b.bestseller ?? false) - Number(a.bestseller ?? false);
+          case 'price-low':
             return a.price - b.price;
-          case "price-high":
+          case 'price-high':
             return b.price - a.price;
-          case "name":
+          case 'name':
             return a.name.localeCompare(b.name);
           default:
             return 0;
         }
       });
-  }, [products, searchTerm, selectedCategory, sortBy]);
+  }, [products, selectedCategory, searchTerm, sortBy]);
 
-  if (loading) {
-    return (
-      <>
-        <SEO
-          title="Millux Collections"
-          description="Discover the Millux Collections - premium luxury bags crafted with intention."
-          keywords="Millux Collections, luxury bags, premium handbags, Millux bags"
-        />
-        <div className="min-h-[calc(100vh-88px)] bg-background">
-          <div className="flex items-center justify-center min-h-[calc(100vh-88px)]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <SEO
-          title="Millux Collections"
-          description="Discover the Millux Collections - premium luxury bags crafted with intention."
-          keywords="Millux Collections, luxury bags, premium handbags, Millux bags"
-        />
-        <div className="min-h-[calc(100vh-88px)] bg-background">
-          <div className="flex items-center justify-center min-h-[calc(100vh-88px)] text-center px-6">
-            <p className="text-text-muted">Unable to load the collection right now. Please try again.</p>
-          </div>
-        </div>
-      </>
-    );
-  }
+  const hasActiveFilter = Boolean(selectedCategory || searchTerm.trim());
 
   return (
     <>
       <SEO
-        title="Millux Collections"
-        description="Discover the Millux Collections - premium luxury bags crafted with intention."
-        keywords="Millux Collections, luxury bags, premium handbags, Millux bags"
+        title="Shop all bags - Millux Collections"
+        description="Browse the full Millux Collections range of luxury bags and accessories."
+        keywords="Millux Collections, luxury bags, handbags, totes, crossbody, clutches"
       />
-      <div className="min-h-[calc(100vh-88px)] bg-background py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-12">
-            <h1 className="font-playfair text-3xl md:text-4xl text-primary mb-4">
-              Collections
-            </h1>
-            <p className="text-text-secondary max-w-md">
-              Discover our curated selection of luxury bags, each piece designed to
-              accompany you through life's most meaningful moments.
-            </p>
-          </div>
+      <Container className="pb-20 lg:pb-28">
+        <PageHeading
+          eyebrow="The collection"
+          title="All bags"
+          description="Every piece in the Millux range, from structured totes to evening clutches."
+        />
 
-          {/* Controls */}
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-10">
-            {/* Search */}
-            <div className="flex-1 md:w-64">
+        {/* Filters */}
+        <div className="border-y border-line py-4 sm:py-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {/* Category chips: horizontal scroll on phones, no page overflow */}
+            <div
+              role="group"
+              aria-label="Filter by category"
+              className="-mx-4 flex gap-6 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:flex-wrap"
+              style={{ scrollbarWidth: 'none' }}
+            >
+              <CategoryChip active={!selectedCategory} onClick={() => setCategory('')}>
+                All
+              </CategoryChip>
+              {categoryNames.map((name) => (
+                <CategoryChip key={name} active={selectedCategory === name} onClick={() => setCategory(name)}>
+                  {name}
+                </CategoryChip>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 lg:flex lg:shrink-0 lg:gap-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-muted" />
-                <label htmlFor="search-input" className="sr-only">
-                  Search collections
+                <label htmlFor="shop-search" className="sr-only">
+                  Search the collection
                 </label>
+                <Search
+                  className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-faint"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
                 <input
-                  id="search-input"
-                  type="text"
+                  id="shop-search"
+                  type="search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search collections..."
-                  className="pl-10 pr-4 py-3 bg-transparent border border-border/30 rounded-lg focus:border-accent focus:outline-none text-sm text-primary"
+                  placeholder="Search"
+                  className={cn(inputClass, 'pl-11 lg:w-56')}
                 />
               </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex-1 md:w-64">
-              <label htmlFor="category-filter" className="sr-only">
-                Filter by category
-              </label>
-              <select
-                id="category-filter"
-                value={selectedCategory || ""}
-                onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="w-full py-3 bg-transparent border border-border/30 rounded-lg focus:border-accent focus:outline-none text-sm text-primary"
-              >
-                <option value="">All Categories</option>
-                {categoriesList.map(category => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sort By */}
-            <div className="flex-1 md:w-64">
-              <label htmlFor="sort-select" className="sr-only">
-                Sort products
-              </label>
-              <select
-                id="sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full py-3 bg-transparent border border-border/30 rounded-lg focus:border-accent focus:outline-none text-sm text-primary"
-              >
-                <option value="featured">Featured First</option>
-                <option value="new-arrival">New Arrivals</option>
-                <option value="bestseller">Best Sellers</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="name">Name: A to Z</option>
-              </select>
+              <div>
+                <label htmlFor="shop-sort" className="sr-only">
+                  Sort products
+                </label>
+                <select
+                  id="shop-sort"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortKey)}
+                  className={cn(selectClass, 'lg:w-52')}
+                  style={selectChevron}
+                >
+                  {SORT_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
-
-          {/* Products Count */}
-          <div className="mb-8 text-sm text-text-muted">
-            {filteredProducts.length} products found
-          </div>
-
-          {/* Empty State */}
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-text-muted">No products match your current filters.</p>
-            </div>
-          )}
-
-          {/* Product Grid */}
-          <ProductGrid products={filteredProducts} />
         </div>
-      </div>
+
+        <div className="mt-8 sm:mt-10">
+          {loading ? (
+            <ProductGridSkeleton count={8} />
+          ) : error ? (
+            <ErrorState title="The collection is unavailable" message={error} onRetry={load} />
+          ) : products.length === 0 ? (
+            <EmptyState
+              title="Nothing here yet"
+              message="New pieces are on their way. Ask us on WhatsApp about what is coming."
+              action={{ onClick: () => window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer'), label: 'WhatsApp us' }}
+            />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              title="No pieces match"
+              message="Try another category or clear your search."
+              action={{ onClick: clearFilters, label: 'Clear filters' }}
+            />
+          ) : (
+            <>
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <p className="brand-label text-faint" aria-live="polite">
+                  {filtered.length} {filtered.length === 1 ? 'piece' : 'pieces'}
+                  {selectedCategory ? ` in ${selectedCategory}` : ''}
+                </p>
+                {hasActiveFilter && (
+                  <button type="button" onClick={clearFilters} className="brand-link">
+                    Clear
+                  </button>
+                )}
+              </div>
+              <ProductGrid products={filtered} columns={4} />
+            </>
+          )}
+        </div>
+      </Container>
     </>
   );
 };
+
+const CategoryChip = ({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-pressed={active}
+    className={cn(
+      'brand-label shrink-0 whitespace-nowrap border-b py-3 transition-colors focus-ring',
+      active ? 'border-gold text-ink' : 'border-transparent text-soft hover:text-ink'
+    )}
+  >
+    {children}
+  </button>
+);
 
 export default Collections;

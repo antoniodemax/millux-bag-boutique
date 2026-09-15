@@ -116,3 +116,11 @@ export const getCustomerOrders = async (): Promise<Array<any>> => {
   const response = await apiClient.get('/api/customers/orders');
   return response.data;
 };
+
+/**
+ * Update the signed-in customer's name and/or phone
+ */
+export const updateCustomerProfile = async (data: { name?: string; phone?: string }): Promise<Customer> => {
+  const response = await apiClient.put('/api/customers/profile', data);
+  return response.data.customer;
+};

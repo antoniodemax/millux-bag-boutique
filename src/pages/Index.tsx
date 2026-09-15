@@ -1,586 +1,237 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import SEO from '@/components/SEO';
+import { Logo } from '@/components/brand/Logo';
+import { StoreButton } from '@/components/store/Button';
+import { Container, SectionHeading, ProductGridSkeleton, ErrorState, EmptyState, Skeleton } from '@/components/store/Primitives';
+import { ProductGrid } from '@/components/ProductGrid';
+import { getProducts } from '@/services/productService';
+import { getAvailableCategories } from '@/services/categoryService';
+import type { Product, Category } from '@/types/models';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 15 },
-  visible: { opacity: 1, y: 0 },
-};
+const WHATSAPP_URL = `https://wa.me/254723425778?text=${encodeURIComponent("Hi! I'm interested in your bags from Millux Collections")}`;
+const HERO_IMAGE = '/images/handbags-category.png';
 
-const sectionReveal = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
-};
+type LoadState = 'loading' | 'ready' | 'error';
 
-function Reveal({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={fadeUp}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-const newArrivals = [
-  {
-    title: 'Obsidian Structured Tote',
-    price: '£480',
-    category: 'Tote',
-    badge: 'New',
-    gradient: 'linear-gradient(160deg,#2E2E2E,#0A0A0A)',
-  },
-  {
-    title: 'Cognac Shoulder Bag',
-    price: '£360',
-    category: 'Shoulder',
-    badge: null,
-    gradient: 'linear-gradient(150deg,#C88A4F,#8C5A2A)',
-  },
-  {
-    title: 'Scarlet Mini Crossbody',
-    price: '£295',
-    category: 'Crossbody',
-    badge: 'Bestseller',
-    gradient: 'linear-gradient(150deg,#A33B34,#6E211D)',
-  },
-  {
-    title: 'Onyx Leather Duffel',
-    price: '£620',
-    category: 'Travel',
-    badge: 'Last 3',
-    gradient: 'linear-gradient(150deg,#3A3A3A,#141414)',
-  },
-];
-
-const pillars = [
-  {
-    n: '01',
-    title: 'Master Leather-Work',
-    body: 'Every bag is hand-stitched in limited runs by artisans with decades of craft — no shortcuts, no compromise.',
-  },
-  {
-    n: '02',
-    title: 'Ethically Sourced',
-    body: 'We use only certified full-grain and vegetable-tanned leathers — because true luxury leaves no debt to the planet.',
-  },
-  {
-    n: '03',
-    title: 'Lifetime Repair',
-    body: 'Every Millux bag comes with free lifetime repair and re-conditioning. Buy once, carry always.',
-  },
-];
-
+/**
+ * Homepage. Every product shown comes from the catalogue API; sections that
+ * have nothing to show are omitted rather than padded with placeholders.
+ */
 const HomePage = () => {
-  const [email, setEmail] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [state, setState] = useState<LoadState>('loading');
+
+  const load = useCallback(async () => {
+    setState('loading');
+    try {
+      const [productList, categoryList] = await Promise.all([getProducts(), getAvailableCategories()]);
+      setProducts(productList);
+      setCategories(categoryList);
+      setState('ready');
+    } catch {
+      setState('error');
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const featured = useMemo(() => {
+    const flagged = products.filter((p) => p.featured);
+    return (flagged.length > 0 ? flagged : products).slice(0, 4);
+  }, [products]);
+  const newArrivals = useMemo(() => products.filter((p) => p.newArrival).slice(0, 4), [products]);
+  const bestsellers = useMemo(() => products.filter((p) => p.bestseller).slice(0, 4), [products]);
+
+  // A representative image for each category: the category's own image, else its first product's
+  const categoryTiles = useMemo(
+    () =>
+      categories
+        .map((c) => {
+          const sample = products.find((p) => p.category === c.name);
+          return { ...c, image: c.image || sample?.images?.[0] || '', count: products.filter((p) => p.category === c.name).length };
+        })
+        .filter((c) => c.count > 0),
+    [categories, products]
+  );
 
   return (
-    <div className="overflow-hidden">
+    <>
+      <SEO
+        title="Millux Collections | Luxury Bags & Accessories"
+        description="Millux Collections: luxury handbags and accessories from Nairobi. Browse the collection and order personally over WhatsApp."
+        image="/images/millux.png"
+      />
+
       {/* ---------------- HERO ---------------- */}
-      <section className="relative min-h-[100vh] w-full">
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1597633125184-9fd7e54f0ff7?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt="Premium bags background"
-            className="w-full h-full object-cover"
-          />
-          {/* Enhanced overlay for better text readability */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.35)_0%,rgba(0,0,0,0.45)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.4)_50%)]" />
-        </div>
-
-        <div className="relative z-10 flex min-h-[100vh] items-center px-6 md:px-16 pt-[88px]">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: 'easeOut' }}
-            className="max-w-xl"
-          >
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#FAF8F5]/90 mb-6">
-              Summer / Autumn 2026
-            </p>
-            <h1 className="font-playfair font-light text-5xl md:text-6xl lg:text-7xl leading-tight text-[#FAF8F5] mb-6">
-              <span className="block">Carried</span>
-              <span className="block mt-2">
-                <span className="font-bold text-[#B68D40]">with</span> {' '}
-                <span className="font-normal">Intent.</span>
-              </span>
+      <section className="border-b border-line">
+        <Container className="grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
+          <div className="order-2 lg:order-1">
+            <p className="brand-label text-gold-deep">Nairobi · Luxury bags &amp; accessories</p>
+            <h1 className="mt-5 text-display-xl">
+              Carried with <em className="not-italic text-gold">intent</em>.
             </h1>
-            <p className="text-base leading-relaxed text-[#FAF8F5]/90 max-w-lg mb-8">
-              Bags that speak before you say a word — crafted in the world's
-              finest leathers for the woman who never needs to announce
-              herself.
+            <p className="mt-6 max-w-md text-base leading-relaxed text-soft sm:text-lg">
+              Structured totes, shoulder bags and clutches chosen for the way you move through the day. Browse the collection and order personally over WhatsApp.
             </p>
-            <div className="flex items-center gap-6 flex-wrap">
-              <Link
-                to="/shop"
-                className="inline-flex items-center gap-3 bg-[#B68D40] text-white uppercase text-xs tracking-wider px-8 py-5 hover:bg-[#1F1F1F] hover:text-[#B68D40] transition-all duration-300"
-              >
-                Explore Collection <ArrowRight size={16} />
-              </Link>
-              <Link
-                to="/shop"
-                className="uppercase text-xs tracking-wider text-[#FAF8F5]/90 hover:text-[#B68D40] border-b-[1px] border-[#FAF8F5]/30 pb-1 transition-colors duration-300"
-              >
-                View Lookbook
+            <div className="mt-8 flex flex-col gap-4 xs:flex-row xs:items-center xs:gap-6">
+              <StoreButton asChild variant="gold" size="lg" className="xs:min-w-[220px]">
+                <Link to="/shop">Shop the collection</Link>
+              </StoreButton>
+              <Link to="/new-arrivals" className="brand-link self-start xs:self-auto">
+                New arrivals
               </Link>
             </div>
-          </motion.div>
-
-          <div className="hidden md:flex absolute right-6 top-1/2 -translate-y-1/2 z-10">
-            <span
-              className="text-[10px] uppercase tracking-[0.3em] text-[#FAF8F5]/60 font-light"
-              style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-            >
-              Scroll to discover
-            </span>
           </div>
-        </div>
+
+          <div className="order-1 lg:order-2">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-stone lg:max-w-none">
+              <img
+                src={HERO_IMAGE}
+                alt="A structured Millux handbag with quilted leather and gold clasp"
+                width={1024}
+                height={1024}
+                loading="eager"
+                decoding="async"
+                className="absolute left-1/2 top-0 h-[125%] w-auto max-w-none -translate-x-1/2"
+              />
+            </div>
+          </div>
+        </Container>
       </section>
 
-      {/* ---------------- COLLECTION SECTION ---------------- */}
-      <section className="bg-[#FAF8F5] py-20 md:py-28 px-6 md:px-12">
-        <div className="flex flex-col md:flex-row items-end justify-between mb-16">
-          <div className="md:mb-0">
-            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
-              THE COLLECTION
-            </p>
-            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
-              Pieces selected for the way modern women move.
-            </h2>
+      {state === 'error' && (
+        <Container>
+          <ErrorState title="The collection is unavailable" message="We could not reach the catalogue. Please try again in a moment." onRetry={load} />
+        </Container>
+      )}
+
+      {state === 'loading' && (
+        <Container className="py-16 sm:py-20">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="mt-4 h-8 w-64" />
+          <div className="mt-10">
+            <ProductGridSkeleton count={4} />
           </div>
-          <Link
-            to="/shop"
-            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300 md:ml-12"
-          >
-            View All ›
-          </Link>
-        </div>
+        </Container>
+      )}
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Reveal className="col-span-2 md:col-span-1">
-            <Link to="/shop" className="group block">
-              <div
-                data-placeholder="featured-image"
-                className="aspect-[4/5] w-full bg-[linear-gradient(160deg,#2E2E2E_0%,#0A0A0A_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <h3 className="font-playfair text-2xl text-[#1F1F1F] mt-6">
-                Noir Éclat Tote
-              </h3>
-              <p className="text-sm text-[#666666] mt-2">
-                Structured black leather — minimal hardware, maximum presence.
-              </p>
-              <p className="text-xs text-[#B68D40] mt-4 uppercase tracking-wider">
-                £480
-              </p>
-            </Link>
-          </Reveal>
-
-          <Reveal>
-            <Link to="/shop" className="group block">
-              <div
-                data-placeholder="featured-image-2"
-                className="aspect-[4/5] w-full bg-[linear-gradient(150deg,#C88A4F_0%,#8C5A2A_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <h3 className="font-playfair text-2xl text-[#1F1F1F] mt-6">
-                Cognac Shoulder Bag
-              </h3>
-              <p className="text-sm text-[#666666] mt-2">
-                Soft pebble grain leather with elegant top handle and detachable strap.
-              </p>
-              <p className="text-xs text-[#B68D40] mt-4 uppercase tracking-wider">
-                £360
-              </p>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- SHOP BY CATEGORY ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-12">
-        <Reveal className="flex items-end justify-between mb-16 flex-wrap gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
-              SHOP BY CATEGORY
-            </p>
-            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
-              Discover Our Collections
-            </h2>
-          </div>
-          <Link
-            to="/shop"
-            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
-          >
-            Explore All ›
-          </Link>
-        </Reveal>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Totes */}
-          <Reveal>
-            <Link to="/shop?category=totes" className="group block">
-              <div
-                data-placeholder="totes"
-                className="aspect-[3/4] w-full bg-[linear-gradient(160deg,#2E2E2E_0%,#0A0A0A_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                Totes
-              </p>
-              <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-                Everyday Essentials
-              </h3>
-            </Link>
-          </Reveal>
-
-          {/* Shoulder Bags */}
-          <Reveal>
-            <Link to="/shop?category=shoulder" className="group block">
-              <div
-                data-placeholder="shoulder"
-                className="aspect-[3/4] w-full bg-[linear-gradient(150deg,#C88A4F_0%,#8C5A2A_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                Shoulder
-              </p>
-              <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-                Effortless Elegance
-              </h3>
-            </Link>
-          </Reveal>
-
-          {/* Crossbody */}
-          <Reveal>
-            <Link to="/shop?category=crossbody" className="group block">
-              <div
-                data-placeholder="crossbody"
-                className="aspect-[3/4] w-full bg-[linear-gradient(150deg,#A33B34_0%,#6E211D_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                Crossbody
-              </p>
-              <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-                Hands-Free Luxury
-              </h3>
-            </Link>
-          </Reveal>
-
-          {/* Clutches */}
-          <Reveal>
-            <Link to="/shop?category=clutches" className="group block">
-              <div
-                data-placeholder="clutches"
-                className="aspect-[3/4] w-full bg-[linear-gradient(150deg,#8B4513_0%,#5D300A_100%)] overflow-hidden rounded-xl"
-              >
-                <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_70%)]" />
-              </div>
-              <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                Clutches
-              </p>
-              <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-                Evening Refinement
-              </h3>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- NEW ARRIVALS ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-8">
-        <Reveal className="flex items-end justify-between mb-16 flex-wrap gap-4 px-2">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
-              NEW ARRIVALS
-            </p>
-            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
-              Latest Additions
-            </h2>
-          </div>
-          <Link
-            to="/shop"
-            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
-          >
-            Shop All ›
-          </Link>
-        </Reveal>
-
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={sectionReveal}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2"
-        >
-          {newArrivals.map((p) => (
-            <motion.div
-              variants={fadeUp}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              key={p.title}
-            >
-              <Link to="/shop" className="group block">
-                <div
-                  data-placeholder={p.title}
-                  className="relative aspect-[3/4] w-full overflow-hidden rounded-xl"
-                  style={{ background: p.gradient }}
-                >
-                  <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
-                  {p.badge && (
-                    <span className="absolute top-4 left-4 bg-[#B68D40] text-white text-[9px] uppercase tracking-wider px-2.5 py-1">
-                      {p.badge}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                  {p.category}
-                </p>
-                <h3 className="font-playfair text-sm text-[#1F1F1F] mt-1">
-                  {p.title}
-                </h3>
-                <p className="text-xs text-[#666666] mt-1">{p.price}</p>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* ---------------- EDITORIAL BRAND STORY ---------------- */}
-      <section className="flex flex-col md:flex-row min-h-[600px]">
-        <div className="w-full md:w-1/2 min-h-[420px] md:min-h-0 overflow-hidden">
-          <img
-            src="/images/handbags-category.png"
-            alt="Millux Collections craftsmanship"
-            className="w-full h-full object-cover"
+      {state === 'ready' && products.length === 0 && (
+        <Container>
+          <EmptyState
+            title="The collection is being prepared"
+            message="New pieces are on their way. Message us on WhatsApp and we will let you know the moment they arrive."
+            action={{ onClick: () => window.open(WHATSAPP_URL, '_blank', 'noopener'), label: 'WhatsApp us' }}
           />
-        </div>
-        <div className="w-full md:w-1/2 bg-[#FAF8F5] p-10 md:p-16 lg:p-24 flex flex-col justify-center">
-          <Reveal>
-            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-4">
-              CARRIED WITH INTENT.
-            </p>
-            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F] mb-6 leading-snug">
-              Our Philosophy
-            </h2>
-            <p className="text-sm leading-relaxed text-[#666666] max-w-md mb-10">
-              Millux Collections believes that true luxury lies in the details
-              that go unseen. Each bag is conceived as a companion for life's
-              journey — designed to hold not just your essentials, but your
-              intentions, your memories, and your quiet confidence.
-            </p>
-            <div className="flex items-center gap-8 flex-wrap">
-              <Link
-                to="/about"
-                className="border border-[#1F1F1F]/40 uppercase text-xs tracking-wider px-8 py-4 hover:border-[#B68D40] hover:text-[#B68D40] transition-colors duration-300"
-              >
-                Our Story
-              </Link>
-              <Link
-                to="/about"
-                className="uppercase text-xs tracking-wider text-[#1F1F1F] border-b border-[#1F1F1F]/40 pb-1 hover:border-[#B68D40] hover:text-[#B68D40] transition-colors duration-300"
-              >
-                Meet the Artisans
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+        </Container>
+      )}
 
-      {/* ---------------- THE MILLUX STANDARD ---------------- */}
-      <section className="grid grid-cols-1 md:grid-cols-3 border-y border-[#EAE5DF] divide-y md:divide-y-0 md:divide-x divide-[#EAE5DF] bg-white">
-        {pillars.map((pillar) => (
-          <Reveal key={pillar.n} className="p-10 md:p-14">
-            <span className="font-playfair font-light text-3xl text-[#B68D40]/70">
-              {pillar.n}
-            </span>
-            <h3 className="text-xs uppercase tracking-widest text-[#1F1F1F] mt-4 mb-3">
-              {pillar.title}
-            </h3>
-            <p className="text-sm text-[#666666] leading-relaxed">
-              {pillar.body}
-            </p>
-          </Reveal>
-        ))}
-      </section>
+      {state === 'ready' && products.length > 0 && (
+        <>
+          {/* ---------------- FEATURED ---------------- */}
+          <section className="py-16 sm:py-20 lg:py-24">
+            <Container>
+              <SectionHeading eyebrow="Featured" title="Pieces of the season" link={{ to: '/shop', label: 'View all' }} />
+              <div className="mt-10 lg:mt-14">
+                <ProductGrid products={featured} columns={4} />
+              </div>
+            </Container>
+          </section>
 
-      {/* ---------------- BESTSELLERS ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-8">
-        <Reveal className="flex items-end justify-between mb-16 flex-wrap gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
-              BESTSELLERS
-            </p>
-            <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
-              Customer Favorites
-            </h2>
-          </div>
-          <Link
-            to="/shop"
-            className="text-xs uppercase tracking-wider text-[#1F1F1F]/70 hover:text-[#B68D40] transition-colors duration-300"
-          >
-            View All ›
-          </Link>
-        </Reveal>
+          {/* ---------------- CATEGORIES ---------------- */}
+          {categoryTiles.length > 1 && (
+            <section className="border-y border-line bg-stone py-16 sm:py-20 lg:py-24">
+              <Container>
+                <SectionHeading eyebrow="Browse" title="By silhouette" />
+                <ul className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:mt-14 xl:grid-cols-5">
+                  {categoryTiles.map((c) => (
+                    <li key={c.id}>
+                      <Link to={`/shop?category=${encodeURIComponent(c.name)}`} className="group block focus-ring">
+                        <div className="aspect-[3/4] w-full overflow-hidden bg-paper">
+                          {c.image && (
+                            <img
+                              src={c.image}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-cover object-[center_20%] transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]"
+                            />
+                          )}
+                        </div>
+                        <div className="mt-3 flex items-baseline justify-between gap-2">
+                          <span className="font-display text-base text-ink group-hover:text-gold-deep transition-colors sm:text-lg">{c.name}</span>
+                          <span className="brand-label text-faint">{c.count}</span>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Container>
+            </section>
+          )}
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={sectionReveal}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-2"
-        >
-          {/* Using same data as new arrivals for now, but marked as bestsellers */}
-          {newArrivals.slice(0, 4).map((p, index) => (
-            <motion.div
-              key={p.title + index}
-              variants={fadeUp}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            >
-              <Link to="/shop" className="group block">
-                <div
-                  data-placeholder={p.title}
-                  className="relative aspect-[3/4] w-full overflow-hidden rounded-xl"
-                  style={{ background: p.gradient }}
-                >
-                  <div className="w-full h-full transition-transform duration-500 ease-in-out group-hover:scale-105" />
-                  <span className="absolute top-4 left-4 bg-[#B68D40] text-white text-[9px] uppercase tracking-wider px-2.5 py-1">
-                    Bestseller
-                  </span>
+          {/* ---------------- NEW ARRIVALS ---------------- */}
+          {newArrivals.length > 0 && (
+            <section className="py-16 sm:py-20 lg:py-24">
+              <Container>
+                <SectionHeading eyebrow="Just in" title="New arrivals" link={{ to: '/new-arrivals', label: 'See all new arrivals' }} />
+                <div className="mt-10 lg:mt-14">
+                  <ProductGrid products={newArrivals} columns={4} />
                 </div>
-                <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-                  {p.category}
-                </p>
-                <h3 className="font-playfair text-sm text-[#1F1F1F] mt-1">
-                  {p.title}
-                </h3>
-                <p className="text-xs text-[#666666] mt-1">{p.price}</p>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
+              </Container>
+            </section>
+          )}
 
-      
-      {/* ---------------- SOCIAL / INSTAGRAM-STYLE SECTION ---------------- */}
-      <section className="py-20 md:py-28 px-6 md:px-12">
-        <Reveal className="mb-16 text-center">
-          <p className="text-xs uppercase tracking-widest text-[#B68D40] mb-3">
-            FROM OUR JOURNAL
-          </p>
-          <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F]">
-            The Millux Diary
-          </h2>
-        </Reveal>
+          {/* ---------------- HOUSE ---------------- */}
+          <section className="bg-ink text-paper">
+            <Container className="grid gap-10 py-16 sm:py-20 lg:grid-cols-[1fr_1.2fr] lg:items-center lg:gap-20 lg:py-28">
+              <div>
+                <Logo on="dark" className="h-16 sm:h-20 lg:h-24" linked={false} />
+              </div>
+              <div>
+                <p className="brand-label text-gold-bright">From the founder</p>
+                <blockquote className="mt-5 font-display text-2xl leading-snug sm:text-3xl lg:text-[2.25rem]">
+                  “I believe the right bag can transform your entire day. That's why we're dedicated to offering pieces that are as beautiful as they are functional.”
+                </blockquote>
+                <p className="mt-6 text-sm text-paper/70">Milkah Adhiambo, founder</p>
+                <Link to="/about" className="brand-link mt-8 inline-block !text-paper !border-paper/60 hover:!text-gold-bright hover:!border-gold-bright">
+                  About the house
+                </Link>
+              </div>
+            </Container>
+          </section>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Social Post 1 */}
-          <Reveal>
-            <div className="aspect-[4/5] w-full bg-[linear-gradient(160deg,#2E2E2E_0%,#0A0A0A_100%)] overflow-hidden rounded-xl">
-              <div className="w-full h-full transition-transform duration-500 ease-in-out hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.03),transparent_70%)]" />
-            </div>
-            <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-              Journal Entry
-            </p>
-            <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-              The Art of Leather Care
-            </h3>
-            <p className="text-sm text-[#666666] mt-2">
-              How to maintain your Millux bag for years of timeless elegance.
-            </p>
-          </Reveal>
+          {/* ---------------- BESTSELLERS ---------------- */}
+          {bestsellers.length > 0 && (
+            <section className="py-16 sm:py-20 lg:py-24">
+              <Container>
+                <SectionHeading eyebrow="Most loved" title="Bestsellers" link={{ to: '/shop', label: 'Shop all' }} />
+                <div className="mt-10 lg:mt-14">
+                  <ProductGrid products={bestsellers} columns={4} />
+                </div>
+              </Container>
+            </section>
+          )}
+        </>
+      )}
 
-          {/* Social Post 2 */}
-          <Reveal>
-            <div className="aspect-[4/5] w-full bg-[linear-gradient(150deg,#C88A4F_0%,#8C5A2A_100%)] overflow-hidden rounded-xl">
-              <div className="w-full h-full transition-transform duration-500 ease-in-out hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.03),transparent_70%)]" />
-            </div>
-            <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-              Journal Entry
+      {/* ---------------- ASSISTANCE ---------------- */}
+      <section className="border-t border-line bg-stone">
+        <Container className="flex flex-col gap-6 py-12 sm:py-16 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-xl">
+            <p className="brand-label text-gold-deep">Personal service</p>
+            <h2 className="mt-3 text-display-sm">Orders are confirmed over WhatsApp.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-soft sm:text-base">
+              Add pieces to your bag, then send your order to us. We confirm availability, delivery and payment with you personally.
             </p>
-            <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-              Seasonal Styling Guide
-            </h3>
-            <p className="text-sm text-[#666666] mt-2">
-              Transitioning your wardrobe from summer to autumn with Millux.
-            </p>
-          </Reveal>
-
-          {/* Social Post 3 */}
-          <Reveal>
-            <div className="aspect-[4/5] w-full bg-[linear-gradient(150deg,#A33B34_0%,#6E211D_100%)] overflow-hidden rounded-xl">
-              <div className="w-full h-full transition-transform duration-500 ease-in-out hover:scale-105 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.03),transparent_70%)]" />
-            </div>
-            <p className="text-[10px] uppercase tracking-widest text-[#666666] mt-4">
-              Journal Entry
-            </p>
-            <h3 className="font-playfair text-lg text-[#1F1F1F] mt-1">
-              Craftsmanship Spotlight
-            </h3>
-            <p className="text-sm text-[#666666] mt-2">
-              Meet the hands behind our most iconic designs.
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- NEWSLETTER ---------------- */}
-      <section className="py-20 md:py-28 px-6">
-        <Reveal className="max-w-xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-4 mb-5">
-            <span className="h-px w-8 bg-[#EAE5DF]" />
-            <p className="text-xs uppercase tracking-widest text-[#666666]">
-              THE INNER CIRCLE
-            </p>
-            <span className="h-px w-8 bg-[#EAE5DF]" />
           </div>
-          <h2 className="font-playfair text-3xl md:text-4xl text-[#1F1F1F] mb-4">
-            First Access. Always.
-          </h2>
-          <p className="text-sm text-[#666666] leading-relaxed mb-10">
-            Join our private list for early collection drops, exclusive
-            events, and invitations to our seasonal presentations.
-          </p>
-
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex items-stretch border border-[#EAE5DF] max-w-md mx-auto"
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Your email address"
-              className="flex-1 bg-transparent px-5 py-4 text-sm text-[#1F1F1F] placeholder:text-[#666666]/70 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="bg-[#B68D40] text-white uppercase text-xs tracking-wider px-6 hover:bg-[#1F1F1F] transition-colors duration-300 whitespace-nowrap"
-            >
-              Join the Circle
-            </button>
-          </form>
-        </Reveal>
+          <StoreButton asChild variant="secondary" size="lg" className="self-start lg:self-auto">
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>
+          </StoreButton>
+        </Container>
       </section>
-    </div>
+    </>
   );
 };
 

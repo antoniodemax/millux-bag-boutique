@@ -26,10 +26,11 @@ import CustomerProfile from "./pages/CustomerProfile";
 import CustomerOrderHistory from "./pages/CustomerOrderHistory";
 import CartPage from "./pages/CartPage";
 import CustomerProtectedRoute from "./components/CustomerProtectedRoute";
-import PremiumNavbar from "./components/PremiumNavbar";
-import Footer from "./components/Footer";
+import SiteHeader from "./components/SiteHeader";
+import SiteFooter from "./components/SiteFooter";
 import WhatsAppFloat from "./components/WhatsAppFloat";
-import BackToTop from "./components/BackToTop";
+import ScrollToTop from "./components/ScrollToTop";
+import AccountLayout from "./components/account/AccountLayout";
 import { me, User } from "@/services/authService";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 
@@ -56,8 +57,8 @@ const AdminProtectedRoute = ({ children }: { children: (user: User) => React.Rea
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#FAF8F5]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B68D40]"></div>
+      <div className="flex items-center justify-center min-h-screen bg-stone">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold"></div>
       </div>
     );
   }
@@ -67,9 +68,9 @@ const AdminProtectedRoute = ({ children }: { children: (user: User) => React.Rea
 
 const AdminNotFound = () => (
   <div className="text-center py-20">
-    <p className="font-playfair text-2xl text-[#1F1F1F]">Page not found</p>
-    <p className="text-sm text-[#6B6B6B] mt-2">This admin page does not exist.</p>
-    <Link to="/admin" className="inline-block mt-6 text-xs uppercase tracking-[0.12em] text-[#B68D40] hover:underline">
+    <p className="font-display text-2xl text-ink">Page not found</p>
+    <p className="text-sm text-soft mt-2">This admin page does not exist.</p>
+    <Link to="/admin" className="inline-block mt-6 text-xs uppercase tracking-[0.12em] text-gold-deep hover:underline">
       Back to dashboard
     </Link>
   </div>
@@ -81,8 +82,10 @@ const Shell = () => {
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    <div className="min-h-screen bg-light">
-      {!isAdmin && <PremiumNavbar />}
+    <div className="flex min-h-screen flex-col bg-paper">
+      <ScrollToTop />
+      {!isAdmin && <SiteHeader />}
+      <div className="flex-1">
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/shop" element={<Collections />} />
@@ -117,43 +120,19 @@ const Shell = () => {
           </AdminProtectedRoute>}/>
         <Route path="/customer/*" element={
           <CustomerProtectedRoute>
-            <div className="flex min-h-[calc(100vh-88px)]">
-              {/* Sidebar - simplified for customer area */}
-              <aside className="w-64 bg-white border-r shadow-sm">
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-primary">My Account</h2>
-                  <nav className="mt-6 space-y-2">
-                    <Link
-                      to="/customer/profile"
-                      className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      to="/customer/orders"
-                      className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Order History
-                    </Link>
-                  </nav>
-                </div>
-              </aside>
-
-              {/* Main Content */}
-              <main className="flex-1 p-6">
-                <Routes>
-                  <Route path="profile" element={<CustomerProfile />} />
-                  <Route path="orders" element={<CustomerOrderHistory />} />
-                  <Route index element={<CustomerProfile />} />
-                </Routes>
-              </main>
-            </div>
+            <AccountLayout>
+              <Routes>
+                <Route path="profile" element={<CustomerProfile />} />
+                <Route path="orders" element={<CustomerOrderHistory />} />
+                <Route index element={<CustomerProfile />} />
+              </Routes>
+            </AccountLayout>
           </CustomerProtectedRoute>}/>
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {!isAdmin && <Footer />}
+      </div>
+      {!isAdmin && <SiteFooter />}
       {!isAdmin && <WhatsAppFloat />}
-      {!isAdmin && <BackToTop />}
     </div>
   );
 };

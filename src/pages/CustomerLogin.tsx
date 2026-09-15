@@ -2,15 +2,17 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 import { customerLogin } from '@/services/authService';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Logo } from '@/components/brand/Logo';
+import { StoreButton } from '@/components/store/Button';
+import { Field, inputClass } from '@/components/store/Primitives';
+import { cn } from '@/lib/utils';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.string().email('Enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
@@ -21,32 +23,27 @@ const CustomerLogin = () => {
   const location = useLocation();
   const redirectTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/';
   const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
+    defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    setServerError(null);
     try {
-      await customerLogin({
-        email: data.email,
-        password: data.password,
-      });
-      toast.success('Login successful');
-      // Redirect to home page or customer profile
+      await customerLogin({ email: data.email, password: data.password });
+      toast.success('Welcome back');
       navigate(redirectTo, { replace: true });
-    } catch (err: any) {
-      const message = err.response?.data?.error || 'Login failed';
+    } catch (err) {
+      const message = isAxiosError(err) && typeof err.response?.data?.error === 'string' ? err.response.data.error : 'Login failed';
+      setServerError(message);
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -54,56 +51,54 @@ const CustomerLogin = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-88px)] bg-background flex items-center justify-center">
-      <div className="w-full max-w-md space-y-6 p-6 bg-card/80 backdrop-blur rounded-xl shadow-md">
-        <h2 className="text-2xl font-bold text-center text-primary">Customer Login</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
+    <div className="site-container flex flex-col items-center py-14 sm:py-20">
+      <Logo on="light" className="h-12 sm:h-14" />
+      <div className="mt-10 w-full max-w-[420px]">
+        <p className="brand-label text-gold-deep">Account</p>
+        <h1 className="mt-2 text-display-sm">Sign in</h1>
+        <p className="mt-2 text-sm text-soft">Sign in to place orders and follow their progress.</p>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="mt-8 space-y-6">
+          <Field id="email" label="Email" error={errors.email?.message}>
+            <input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              aria-invalid={errors.email ? 'true' : undefined}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+              className={cn(inputClass)}
               {...register('email')}
-              className={errors.email ? 'border-destructive' : ''}
             />
-            {errors.email && (
-              <p className="text-text-sm text-destructive mt-1">{errors.email.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
+          </Field>
+          <Field id="password" label="Password" error={errors.password?.message}>
+            <input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              autoComplete="current-password"
+              placeholder="Your password"
+              aria-invalid={errors.password ? 'true' : undefined}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              className={cn(inputClass)}
               {...register('password')}
-              className={errors.password ? 'border-destructive' : ''}
             />
-            {errors.password && (
-              <p className="text-text-sm text-destructive mt-1">{errors.password.message}</p>
-            )}
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </Button>
+          </Field>
+
+          {serverError && (
+            <p role="alert" className="border border-danger/30 bg-danger-tint px-4 py-3 text-sm text-danger">
+              {serverError}
+            </p>
+          )}
+
+          <StoreButton type="submit" full size="lg" loading={isLoading}>
+            Sign in
+          </StoreButton>
         </form>
 
-        <div className="text-center mt-6">
-          <p className="text-text-sm">
-            Don't have an account?{' '}
-            <span
-              className="text-primary font-medium cursor-pointer"
-              onClick={() => navigate('/customer/register')}
-            >
-              Create account
-            </span>
-          </p>
-        </div>
+        <p className="mt-8 text-center text-sm text-soft">
+          New to Millux?{' '}
+          <Link to="/customer/register" className="brand-link">Create an account</Link>
+        </p>
       </div>
     </div>
   );

@@ -125,7 +125,7 @@ export const AdminDashboard = () => {
               title="Recent orders"
               className="lg:col-span-2"
               action={
-                <Link to="/admin/orders" className="text-xs uppercase tracking-[0.12em] text-[#B68D40] hover:underline">
+                <Link to="/admin/orders" className="text-xs uppercase tracking-[0.12em] text-[#A27627] hover:underline">
                   View all
                 </Link>
               }
@@ -137,28 +137,28 @@ export const AdminDashboard = () => {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#ECE7E0]">
-                      <TableHead className="text-[#999999]">Order</TableHead>
-                      <TableHead className="text-[#999999]">Customer</TableHead>
-                      <TableHead className="text-[#999999] text-right">Items</TableHead>
-                      <TableHead className="text-[#999999] text-right">Total</TableHead>
-                      <TableHead className="text-[#999999]">Status</TableHead>
-                      <TableHead className="text-[#999999]">Date</TableHead>
+                    <TableRow className="border-[#E4E0D7]">
+                      <TableHead className="text-[#8C887F]">Order</TableHead>
+                      <TableHead className="text-[#8C887F]">Customer</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Items</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Total</TableHead>
+                      <TableHead className="text-[#8C887F]">Status</TableHead>
+                      <TableHead className="text-[#8C887F]">Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {recentOrders.map((order) => (
-                      <TableRow key={order.id} className="border-[#ECE7E0]">
+                      <TableRow key={order.id} className="border-[#E4E0D7]">
                         <TableCell>
-                          <Link to="/admin/orders" className="font-mono text-xs text-[#1F1F1F] hover:text-[#B68D40]">
+                          <Link to="/admin/orders" className="font-mono text-xs text-[#0A0A0A] hover:text-[#A27627]">
                             #{shortId(order.id)}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-[#1F1F1F]">{order.customerName || 'Guest'}</TableCell>
-                        <TableCell className="text-right text-[#6B6B6B]">{order.itemCount}</TableCell>
-                        <TableCell className="text-right text-[#1F1F1F]">{formatMoney(order.totalAmount)}</TableCell>
+                        <TableCell className="text-[#0A0A0A]">{order.customerName || 'Guest'}</TableCell>
+                        <TableCell className="text-right text-[#5B5852]">{order.itemCount}</TableCell>
+                        <TableCell className="text-right text-[#0A0A0A]">{formatMoney(order.totalAmount)}</TableCell>
                         <TableCell><StatusPill status={order.status} /></TableCell>
-                        <TableCell className="text-[#6B6B6B] whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
+                        <TableCell className="text-[#5B5852] whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -172,24 +172,24 @@ export const AdminDashboard = () => {
               ) : bestSellers.length === 0 ? (
                 <EmptyState title="No sales yet" description="Best sellers appear once orders are placed." />
               ) : (
-                <ul className="divide-y divide-[#ECE7E0]">
+                <ul className="divide-y divide-[#E4E0D7]">
                   {bestSellers.map((p, i) => (
                     <li key={p.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                      <span className="font-playfair text-sm text-[#999999] w-4">{i + 1}</span>
+                      <span className="font-display text-sm text-[#8C887F] w-4">{i + 1}</span>
                       {p.image ? (
-                        <img src={p.image} alt={p.name} className="h-10 w-10 rounded object-cover bg-[#F3F0EB]" />
+                        <img src={p.image} alt={p.name} className="h-10 w-10 rounded object-cover bg-[#F5F2EC]" />
                       ) : (
-                        <div className="h-10 w-10 rounded bg-[#F3F0EB]" />
+                        <div className="h-10 w-10 rounded bg-[#F5F2EC]" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <Link to={`/admin/products/${p.slug}/edit`} className="block text-sm text-[#1F1F1F] truncate hover:text-[#B68D40]">
+                        <Link to={`/admin/products/${p.slug}/edit`} className="block text-sm text-[#0A0A0A] truncate hover:text-[#A27627]">
                           {p.name}
                         </Link>
-                        <p className="text-xs text-[#999999] !leading-normal md:!text-xs">{p.category}</p>
+                        <p className="text-xs text-[#8C887F] !leading-normal md:!text-xs">{p.category}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm text-[#1F1F1F] !leading-normal md:!text-sm">{p.unitsSold} sold</p>
-                        <p className="text-xs text-[#999999] !leading-normal md:!text-xs">{formatMoney(p.revenue)}</p>
+                        <p className="text-sm text-[#0A0A0A] !leading-normal md:!text-sm">{p.unitsSold} sold</p>
+                        <p className="text-xs text-[#8C887F] !leading-normal md:!text-xs">{formatMoney(p.revenue)}</p>
                       </div>
                     </li>
                   ))}

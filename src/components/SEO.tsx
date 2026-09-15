@@ -16,19 +16,19 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = "MilluxCollection - Premium Bags & Handbags in Kenya",
-  description = "Discover premium quality bags and handbags at MilluxCollection. From stylish handbags to travel bags, laptop bags, and more. Free delivery in Nairobi & Mombasa.",
-  keywords = "bags Kenya, handbags Kenya, travel bags, laptop bags, women bags, premium bags Nairobi, bags Mombasa",
-  image = "/placeholder.svg",
+  title = "Millux Collections | Luxury Bags & Accessories",
+  description = "Millux Collections: luxury handbags and accessories from Nairobi. Browse the collection and order personally over WhatsApp.",
+  keywords = "Millux Collections, luxury bags Kenya, handbags Nairobi, designer bags Kenya",
+  image = "/images/millux.png",
   url = window.location.href,
   type = "website",
   price,
-  currency = "KES",
+  currency = "GBP",
   availability,
-  brand = "MilluxCollection",
+  brand = "Millux Collections",
   category
 }: SEOProps) => {
-  const fullTitle = title.includes("MilluxCollections") ? title : `${title} | MilluxCollections`;
+  const fullTitle = title.includes("Millux") ? title : `${title} | Millux Collections`;
   
   const structuredData = {
     "@context": "https://schema.org",
@@ -71,7 +71,7 @@ const SEO = ({
       <meta property="og:image" content={image} />
       <meta property="og:url" content={url} />
       <meta property="og:type" content={type === "product" ? "product" : "website"} />
-      <meta property="og:site_name" content="MilluxCollection" />
+      <meta property="og:site_name" content="Millux Collections" />
 
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -99,18 +99,17 @@ const SEO = ({
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "MilluxCollection",
-            "description": "Premium bags and handbags store in Kenya",
-            "url": "https://milluxcollection.com",
+            "name": "Millux Collections",
+            "description": "Luxury handbags and accessories, Nairobi",
+            "url": "https://milluxcollections.vercel.app",
             "telephone": "+254723425778",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "KE",
               "addressRegion": "Kenya"
             },
-            "openingHours": "Mo-Sa 08:00-18:00",
-            "priceRange": "$$",
-            "areaServed": ["Nairobi", "Mombasa", "Kenya"]
+            "openingHours": ["Mo-Fr 09:00-18:00", "Sa 10:00-16:00"],
+            "areaServed": ["Nairobi", "Kenya"]
           })}
         </script>
       )}

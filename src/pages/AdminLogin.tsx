@@ -3,11 +3,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { isAxiosError } from 'axios';
 import { login, googleLogin, me } from '@/services/authService';
 import { toast } from '@/components/ui/sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Logo } from '@/components/brand/Logo';
+import { StoreButton } from '@/components/store/Button';
+import { Field, inputClass } from '@/components/store/Primitives';
 import { Loader } from '@/components/ui/Loader';
 
 const loginSchema = z.object({
@@ -67,9 +68,11 @@ const AdminLogin = () => {
       }
       toast.success('Welcome back');
       navigate('/admin', { replace: true });
-    } catch (err: any) {
-      const message = err?.response?.data?.error || err?.message || 'Login failed';
-      toast.error(typeof message === 'string' ? message : 'Login failed');
+    } catch (err) {
+      const message = isAxiosError(err) && typeof err.response?.data?.error === 'string'
+        ? err.response.data.error
+        : err instanceof Error && err.message ? err.message : 'Login failed';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -82,99 +85,88 @@ const AdminLogin = () => {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-stone">
         <Loader />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block">
-            <span className="font-playfair text-3xl tracking-[0.3em] text-[#1F1F1F]">MILLUX</span>
-            <span className="block text-[9px] uppercase tracking-[0.36em] text-[#B68D40] mt-1">Collections</span>
-          </Link>
-          <p className="text-[10px] uppercase tracking-[0.24em] text-[#B68D40] mt-4">Admin</p>
-          <h1 className="font-playfair text-3xl font-semibold text-[#1F1F1F] mt-2 !text-3xl">Sign in</h1>
+    <div className="flex min-h-screen items-center justify-center bg-stone px-4 py-16">
+      <div className="w-full max-w-[420px]">
+        <div className="flex flex-col items-center text-center">
+          <Logo on="light" className="h-12" />
+          <p className="brand-label mt-8 text-gold-deep">Admin</p>
+          <h1 className="mt-2 text-display-sm">Sign in</h1>
         </div>
 
-        <div className="bg-white border border-[#ECE7E0] rounded-xl shadow-sm p-8 space-y-6">
+        <div className="mt-8 space-y-6 border border-line bg-paper p-6 sm:p-8">
           {oauthMessage && (
-            <p className="text-sm text-[#7A3B3B] bg-[#F6ECEC] rounded-md px-3 py-2 !leading-normal md:!text-sm">
+            <p role="alert" className="border border-danger/30 bg-danger-tint px-4 py-3 text-sm text-danger">
               {oauthMessage}
             </p>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <Label htmlFor="email" className="text-xs text-[#6B6B6B]">Email</Label>
-              <Input
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+            <Field id="email" label="Email" error={errors.email?.message}>
+              <input
                 id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@millux.com"
-                className="mt-1.5 bg-white border-[#ECE7E0]"
+                aria-invalid={errors.email ? 'true' : undefined}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                className={inputClass}
                 {...register('email')}
               />
-              {errors.email && <p className="text-xs text-destructive mt-1 !leading-normal md:!text-xs">{errors.email.message}</p>}
-            </div>
-            <div>
-              <Label htmlFor="password" className="text-xs text-[#6B6B6B]">Password</Label>
-              <Input
+            </Field>
+            <Field id="password" label="Password" error={errors.password?.message}>
+              <input
                 id="password"
                 type="password"
                 autoComplete="current-password"
                 placeholder="Your password"
-                className="mt-1.5 bg-white border-[#ECE7E0]"
+                aria-invalid={errors.password ? 'true' : undefined}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                className={inputClass}
                 {...register('password')}
               />
-              {errors.password && <p className="text-xs text-destructive mt-1 !leading-normal md:!text-xs">{errors.password.message}</p>}
-            </div>
-            <Button
-              type="submit"
-              disabled={isLoading || googleLoading}
-              className="w-full bg-[#1F1F1F] hover:bg-[#B68D40] text-[#FAF8F5] tracking-wide"
-            >
-              {isLoading ? 'Signing in…' : 'Sign in'}
-            </Button>
+            </Field>
+            <StoreButton type="submit" full size="lg" loading={isLoading} disabled={googleLoading}>
+              Sign in
+            </StoreButton>
           </form>
 
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-[#ECE7E0]" />
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#999999]">or</span>
-            <div className="flex-1 h-px bg-[#ECE7E0]" />
+          <div className="flex items-center gap-3" aria-hidden="true">
+            <div className="h-px flex-1 bg-line" />
+            <span className="brand-label text-faint">or</span>
+            <div className="h-px flex-1 bg-line" />
           </div>
 
-          <Button
+          <StoreButton
             type="button"
-            variant="outline"
+            variant="secondary"
+            full
+            size="lg"
             onClick={handleGoogleLogin}
-            disabled={isLoading || googleLoading}
-            className="w-full border-[#ECE7E0] text-[#1F1F1F] hover:bg-[#FAF8F5]"
+            loading={googleLoading}
+            disabled={isLoading}
           >
-            {googleLoading ? (
-              <Loader />
-            ) : (
-              <>
-                <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
-                  <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.3 6.6 2.3 12S6.6 21.8 12 21.8c5.6 0 9.3-3.9 9.3-9.5 0-.6-.1-1.1-.2-1.6H12z" />
-                </svg>
-                Continue with Google
-              </>
+            {!googleLoading && (
+              <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.6 3.8-5.5 3.8-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.2 14.6 2.2 12 2.2 6.6 2.2 2.3 6.6 2.3 12S6.6 21.8 12 21.8c5.6 0 9.3-3.9 9.3-9.5 0-.6-.1-1.1-.2-1.6H12z" />
+              </svg>
             )}
-          </Button>
+            Continue with Google
+          </StoreButton>
 
-          <p className="text-xs text-center text-[#999999] !leading-normal md:!text-xs">
+          <p className="text-center text-xs leading-relaxed text-faint">
             Access is restricted to Millux staff. Contact the store owner for an account.
           </p>
         </div>
 
-        <p className="text-center mt-6">
-          <Link to="/" className="text-xs uppercase tracking-[0.12em] text-[#6B6B6B] hover:text-[#B68D40]">
-            ← Back to store
-          </Link>
+        <p className="mt-8 text-center">
+          <Link to="/" className="brand-link">Back to store</Link>
         </p>
       </div>
     </div>

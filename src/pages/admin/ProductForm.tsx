@@ -65,10 +65,10 @@ const defaultValues: FormValues = {
 
 const Field = ({ label, error, children, hint }: { label: string; error?: string; hint?: string; children: React.ReactNode }) => (
   <div className="space-y-1.5">
-    <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">{label}</Label>
+    <Label className="text-xs uppercase tracking-wide text-[#5B5852]">{label}</Label>
     {children}
-    {hint && !error && <p className="text-xs text-[#999999]">{hint}</p>}
-    {error && <p className="text-xs text-[#8A3A34]">{error}</p>}
+    {hint && !error && <p className="text-xs text-[#8C887F]">{hint}</p>}
+    {error && <p className="text-xs text-[#A4302A]">{error}</p>}
   </div>
 );
 
@@ -260,7 +260,7 @@ const AdminProductForm = () => {
           {/* Left column: details */}
           <div className="lg:col-span-2 space-y-6">
             <Panel className="p-6 space-y-5">
-              <h2 className="font-playfair text-lg text-[#1F1F1F]">Details</h2>
+              <h2 className="font-display text-lg text-[#0A0A0A]">Details</h2>
               <div className="grid gap-5 md:grid-cols-2">
                 <Field label="Name" error={errors.name?.message}>
                   <Input {...register('name')} placeholder="Obsidian Structured Tote" className={inputClass} />
@@ -325,9 +325,9 @@ const AdminProductForm = () => {
             </Panel>
 
             <Panel className="p-6 space-y-4">
-              <h2 className="font-playfair text-lg text-[#1F1F1F]">Images</h2>
+              <h2 className="font-display text-lg text-[#0A0A0A]">Images</h2>
               {images.length === 0 ? (
-                <p className="text-sm text-[#999999]">No images yet. Upload a file or add an image URL.</p>
+                <p className="text-sm text-[#8C887F]">No images yet. Upload a file or add an image URL.</p>
               ) : (
                 <div className="flex flex-wrap gap-3">
                   {images.map((src, i) => (
@@ -337,12 +337,12 @@ const AdminProductForm = () => {
                         type="button"
                         aria-label="Remove image"
                         onClick={() => setImages((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border border-[#ECE7E0] text-[#6B6B6B] hover:text-[#8A3A34] flex items-center justify-center shadow-sm"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-white border border-[#E4E0D7] text-[#5B5852] hover:text-[#A4302A] flex items-center justify-center shadow-sm"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
                       {i === 0 && (
-                        <span className="absolute bottom-1 left-1 text-[10px] uppercase tracking-wide bg-white/90 text-[#6B5A2E] px-1.5 rounded">
+                        <span className="absolute bottom-1 left-1 text-[10px] uppercase tracking-wide bg-white/90 text-[#85601F] px-1.5 rounded">
                           Cover
                         </span>
                       )}
@@ -380,7 +380,7 @@ const AdminProductForm = () => {
           {/* Right column: visibility + actions */}
           <div className="space-y-6">
             <Panel className="p-6 space-y-4">
-              <h2 className="font-playfair text-lg text-[#1F1F1F]">Visibility</h2>
+              <h2 className="font-display text-lg text-[#0A0A0A]">Visibility</h2>
               {([
                 ['featured', 'Featured', 'Shown in featured collections'],
                 ['newArrival', 'New arrival', 'Listed on the New Arrivals page'],
@@ -393,10 +393,10 @@ const AdminProductForm = () => {
                   render={({ field }) => (
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-sm text-[#1F1F1F]">{label}</p>
-                        <p className="text-xs text-[#999999]">{hint}</p>
+                        <p className="text-sm text-[#0A0A0A]">{label}</p>
+                        <p className="text-xs text-[#8C887F]">{hint}</p>
                       </div>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-[#B68D40]" />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} className="data-[state=checked]:bg-[#A27627]" />
                     </div>
                   )}
                 />
@@ -407,7 +407,7 @@ const AdminProductForm = () => {
               <GoldButton type="submit" className="w-full" disabled={submitting || uploading}>
                 {submitting ? 'Saving…' : isEdit ? 'Save changes' : 'Create product'}
               </GoldButton>
-              <Link to="/admin/products" className="block text-center text-sm text-[#6B6B6B] hover:text-[#B68D40] transition-colors">
+              <Link to="/admin/products" className="block text-center text-sm text-[#5B5852] hover:text-[#A27627] transition-colors">
                 Cancel
               </Link>
             </Panel>

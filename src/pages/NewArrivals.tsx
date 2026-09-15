@@ -1,78 +1,65 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ProductGrid } from "@/components/ProductGrid";
-import SEO from "@/components/SEO";
-import { getNewArrivals } from "@/services/productService";
-import type { Product } from "@/types/models";
+import { useCallback, useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
+import { ProductGrid } from '@/components/ProductGrid';
+import { Container, PageHeading, ProductGridSkeleton, ErrorState, EmptyState } from '@/components/store/Primitives';
+import { getNewArrivals } from '@/services/productService';
+import type { Product } from '@/types/models';
 
 const NewArrivals = () => {
-  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchNewArrivals = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getNewArrivals();
-        setNewArrivals(data);
-      } catch (err) {
-        console.error('Failed to fetch new arrivals:', err);
-        setError('Failed to load new arrivals. Please try again later.');
-        setNewArrivals([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setProducts(await getNewArrivals());
+    } catch {
+      setError('We could not load the new arrivals right now.');
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchNewArrivals();
-  }, []); // Empty deps means run once on mount
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return (
     <>
       <SEO
-        title="New Arrivals - Millux Collections"
-        description="Discover the latest additions to the Millux Collections."
+        title="New arrivals - Millux Collections"
+        description="The latest additions to the Millux Collections range of luxury bags."
         keywords="Millux Collections, new arrivals, luxury bags, latest bags"
       />
-      {loading && (
-        <div className="min-h-[calc(100vh-88px)] bg-background">
-          <div className="flex items-center justify-center min-h-[calc(100vh-88px)]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      )}
-      {error && (
-        <div className="min-h-[calc(100vh-88px)] bg-background">
-          <div className="flex items-center justify-center min-h-[calc(100vh-88px)] text-center px-6">
-            <p className="text-text-muted">Unable to load new arrivals right now. Please try again.</p>
-          </div>
-        </div>
-      )}
-      {!loading && !error && (
-        <div className="min-h-[calc(100vh-88px)] bg-background py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-12">
-              <h1 className="font-playfair text-3xl md:text-4xl text-primary mb-4">
-                New Arrivals
-              </h1>
-              <p className="text-text-secondary max-w-md">
-                Explore our latest arrivals, each piece meticulously crafted to
-                embody the Millux philosophy of carried intention.
-              </p>
-            </div>
+      <Container className="pb-20 lg:pb-28">
+        <PageHeading
+          eyebrow="Just in"
+          title="New arrivals"
+          description="The newest pieces to join the collection."
+        />
 
-            {newArrivals.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-text-muted">No new arrivals at the moment.</p>
-              </div>
-            )}
-
-            <ProductGrid products={newArrivals} />
-          </div>
-        </div>
-      )}
+        {loading ? (
+          <ProductGridSkeleton count={8} />
+        ) : error ? (
+          <ErrorState title="New arrivals are unavailable" message={error} onRetry={load} />
+        ) : products.length === 0 ? (
+          <EmptyState
+            title="Nothing new just yet"
+            message="Browse the full collection while the next pieces arrive."
+            action={{ to: '/shop', label: 'Shop all bags' }}
+          />
+        ) : (
+          <>
+            <p className="brand-label mb-6 text-faint">
+              {products.length} {products.length === 1 ? 'piece' : 'pieces'}
+            </p>
+            <ProductGrid products={products} columns={4} />
+          </>
+        )}
+      </Container>
     </>
   );
 };

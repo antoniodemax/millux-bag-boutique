@@ -1,298 +1,316 @@
-import { useState, useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { formatPrice } from "@/lib/utils";
-import { ProductCard } from "@/components/ProductCard";
-import { ProductGrid } from "@/components/ProductGrid";
-import { toast } from "@/components/ui/sonner";
-import type { Product } from "@/types/models";
-import { useCart } from "@/context/CartContext";
-import SEO from "@/components/SEO";
-import { getProductBySlug, getProductsByCategory } from "@/services/productService";
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Minus, Plus } from 'lucide-react';
+import SEO from '@/components/SEO';
+import { ProductGrid } from '@/components/ProductGrid';
+import { StoreButton } from '@/components/store/Button';
+import {
+  Container,
+  SectionHeading,
+  Skeleton,
+  ErrorState,
+  EmptyState,
+  AvailabilityPill,
+} from '@/components/store/Primitives';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { toast } from '@/components/ui/sonner';
+import { useCart } from '@/context/CartContext';
+import { getProductBySlug, getProductsByCategory } from '@/services/productService';
+import type { Product } from '@/types/models';
+import { formatPrice, cn } from '@/lib/utils';
+
+const FALLBACK_IMAGE = '/images/handbags-category.png';
+const WHATSAPP_NUMBER = '254723425778';
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { addItem } = useCart();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { addItem } = useCart();
+  const [notFound, setNotFound] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
+  const [related, setRelated] = useState<Product[]>([]);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const fetchedProduct = await getProductBySlug(slug);
-        if (fetchedProduct) {
-          setProduct(fetchedProduct);
-        } else {
-          setError('Product not found');
-        }
-      } catch (err) {
-        setError('Failed to load product');
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const load = useCallback(async () => {
+    if (!slug) return;
+    setLoading(true);
+    setError(null);
+    setNotFound(false);
+    setActiveImage(0);
+    setQuantity(1);
+    try {
+      const data = await getProductBySlug(slug);
+      if (!data) {
+        setNotFound(true);
+        setProduct(null);
+      } else {
+        setProduct(data);
       }
-    };
-
-    if (slug) {
-      fetchProduct();
+    } catch {
+      setError('We could not load this piece right now.');
+      setProduct(null);
+    } finally {
+      setLoading(false);
     }
   }, [slug]);
 
-  // Related products: same category, exclude current, limit to 4
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const [relatedLoading, setRelatedLoading] = useState(false);
-  const [relatedError, setRelatedError] = useState<string | null>(null);
-
   useEffect(() => {
-    const fetchRelatedProducts = async () => {
-      if (!product) {
-        setRelatedProducts([]);
-        return;
-      }
+    load();
+  }, [load]);
 
-      try {
-        setRelatedLoading(true);
-        setRelatedError(null);
-        // Get products in the same category, excluding the current product
-        const categoryProducts = await getProductsByCategory(product.category);
-        const filtered = categoryProducts
-          .filter(p => p.id !== product.id)
-          .slice(0, 4);
-        setRelatedProducts(filtered);
-      } catch (err) {
-        console.error('Failed to fetch related products:', err);
-        setRelatedError('Failed to load related products');
-        setRelatedProducts([]);
-      } finally {
-        setRelatedLoading(false);
-      }
+  // Related pieces are a secondary section: fail quietly
+  useEffect(() => {
+    let active = true;
+    if (!product) {
+      setRelated([]);
+      return;
+    }
+    getProductsByCategory(product.category)
+      .then((items) => {
+        if (active) setRelated(items.filter((p) => p.id !== product.id).slice(0, 4));
+      })
+      .catch(() => {
+        if (active) setRelated([]);
+      });
+    return () => {
+      active = false;
     };
-
-    fetchRelatedProducts();
   }, [product]);
 
-  if (loading) {
+  if (loading) return <DetailSkeleton />;
+
+  if (notFound) {
     return (
-      <div className="min-h-[calc(100vh-88px)] bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <Container className="pb-20">
+        <EmptyState
+          title="This piece is no longer available"
+          message="It may have sold out or been retired from the collection."
+          action={{ to: '/shop', label: 'Shop all bags' }}
+          className="py-24"
+        />
+      </Container>
     );
   }
 
-  if (!product) {
+  if (error || !product) {
     return (
-      <div className="min-h-[calc(100vh-88px)] bg-background flex items-center justify-center">
-        <p className="text-text-muted">Product not found</p>
-      </div>
+      <Container className="pb-20">
+        <ErrorState title="This piece is unavailable" message={error ?? undefined} onRetry={load} className="py-24" />
+      </Container>
     );
   }
+
+  const images = product.images && product.images.length > 0 ? product.images : [FALLBACK_IMAGE];
+  const mainImage = images[Math.min(activeImage, images.length - 1)];
+  const stock = typeof product.stock === 'number' ? product.stock : undefined;
+  const soldOut = product.availability === 'out_of_stock' || stock === 0;
+  const maxQty = stock && stock > 0 ? stock : 99;
+
+  const changeQuantity = (delta: number) => {
+    setQuantity((q) => Math.min(maxQty, Math.max(1, q + delta)));
+  };
+
+  const handleAddToBag = () => {
+    if (soldOut) return;
+    addItem(product, quantity);
+    toast.success(`${product.name} added to your bag`);
+  };
+
+  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `Hello Millux, I have a question about the ${product.name}.`
+  )}`;
+
+  const details = [
+    { key: 'materials', label: 'Materials', value: product.materials },
+    { key: 'dimensions', label: 'Dimensions', value: product.dimensions },
+    { key: 'care', label: 'Care', value: product.care },
+  ].filter((d) => d.value && d.value.trim().length > 0);
 
   return (
     <>
       <SEO
         title={`${product.name} - Millux Collections`}
-        description={product.description}
+        description={product.description || `${product.name} from Millux Collections.`}
         keywords={`Millux, ${product.name}, luxury bag, ${product.category}`}
+        type="product"
+        price={product.price}
+        currency="GBP"
+        availability={soldOut ? 'out_of_stock' : 'in_stock'}
+        image={mainImage}
+        category={product.category}
       />
-      <div className="min-h-[calc(100vh-88px)] bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Product Gallery and Information */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Product Gallery */}
-            <div className="space-y-6">
-              {/* Main Image */}
-              <div className="aspect-[4/5] w-full bg-gray-100 overflow-hidden rounded-xl">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
 
-              {/* Thumbnails */}
-              {product.images.length > 1 && (
-                <div className="flex flex-wrap gap-4 -mb-4">
-                  {product.images.map((image, index) => (
-                    <div key={index} className="w-16 h-16 shrink-0">
-                      <img
-                        src={image}
-                        alt={`${product.name} view ${index + 1}`}
-                        className="w-full h-full object-cover rounded border border-border/30 hover:border-primary transition-all duration-200 group-hover:scale-105"
-                      />
-                    </div>
-                  ))}
+      <Container className="pb-20 lg:pb-28">
+        {/* Breadcrumb */}
+        <nav aria-label="Breadcrumb" className="py-6 sm:py-8">
+          <ol className="flex flex-wrap items-center gap-x-3 gap-y-1 brand-label text-faint">
+            <li>
+              <Link to="/shop" className="transition-colors hover:text-ink focus-ring">
+                Shop
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link
+                to={`/shop?category=${encodeURIComponent(product.category)}`}
+                className="transition-colors hover:text-ink focus-ring"
+              >
+                {product.category}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-ink truncate max-w-[60vw] sm:max-w-none">
+              {product.name}
+            </li>
+          </ol>
+        </nav>
+
+        <div className="grid gap-10 lg:grid-cols-[11fr_9fr] lg:gap-16">
+          {/* Gallery */}
+          <div>
+            <div className="aspect-[4/5] w-full overflow-hidden bg-stone">
+              <img
+                src={mainImage}
+                alt={product.name}
+                decoding="async"
+                className={cn('h-full w-full object-cover', soldOut && 'opacity-70')}
+              />
+            </div>
+
+            {images.length > 1 && (
+              <div className="mt-4 flex gap-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }} role="group" aria-label="Product images">
+                {images.map((src, index) => (
+                  <button
+                    key={`${src}-${index}`}
+                    type="button"
+                    onClick={() => setActiveImage(index)}
+                    aria-pressed={activeImage === index}
+                    aria-label={`View image ${index + 1} of ${images.length}`}
+                    className={cn(
+                      'h-20 w-20 shrink-0 overflow-hidden border bg-stone transition-colors focus-ring',
+                      activeImage === index ? 'border-ink' : 'border-transparent hover:border-line-strong'
+                    )}
+                  >
+                    <img src={src} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="brand-label text-faint">{product.category}</p>
+            <h1 className="mt-3 text-display-md">{product.name}</h1>
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+              <p className="font-sans text-xl text-ink">{formatPrice(product.price)}</p>
+              <AvailabilityPill availability={product.availability} stock={stock} />
+            </div>
+
+            {product.description && product.description.trim().length > 0 && (
+              <p className="mt-6 text-sm leading-relaxed text-soft sm:text-base">{product.description}</p>
+            )}
+
+            {/* Quantity + actions */}
+            <div className="mt-8 space-y-4">
+              {!soldOut && (
+                <div className="flex items-center gap-4">
+                  <span id="quantity-label" className="brand-label text-ink">
+                    Quantity
+                  </span>
+                  <div className="inline-flex items-center border border-line" role="group" aria-labelledby="quantity-label">
+                    <button
+                      type="button"
+                      onClick={() => changeQuantity(-1)}
+                      disabled={quantity <= 1}
+                      aria-label="Decrease quantity"
+                      className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-stone disabled:opacity-30 focus-ring"
+                    >
+                      <Minus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+                    </button>
+                    <span className="w-10 text-center font-sans text-sm text-ink" aria-live="polite">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => changeQuantity(1)}
+                      disabled={quantity >= maxQty}
+                      aria-label="Increase quantity"
+                      className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-stone disabled:opacity-30 focus-ring"
+                    >
+                      <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
               )}
+
+              <StoreButton size="lg" full onClick={handleAddToBag} disabled={soldOut}>
+                {soldOut ? 'Sold out' : 'Add to bag'}
+              </StoreButton>
+              <StoreButton asChild variant="secondary" full>
+                <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                  Ask on WhatsApp
+                </a>
+              </StoreButton>
             </div>
 
-            {/* Product Information */}
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <p className="text-xs uppercase tracking-widest text-text-muted">
-                  {product.category}
-                </p>
-                <h1 className="font-playfair text-3xl md:text-4xl text-primary mb-2">
-                  {product.name}
-                </h1>
-                <p className="font-medium text-2xl text-accent">
-                  {formatPrice(product.price)}
-                </p>
+            {details.length > 0 && (
+              <Accordion type="multiple" className="mt-10 border-t border-line">
+                {details.map((d) => (
+                  <AccordionItem key={d.key} value={d.key} className="border-line">
+                    <AccordionTrigger className="brand-label py-4 text-ink hover:no-underline hover:text-gold-deep">
+                      {d.label}
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-5 text-sm leading-relaxed text-soft">{d.value}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
 
-                {/* Short Description */}
-                <p className="text-text-muted leading-relaxed mb-4">
-                  {product.description}
-                </p>
-
-                {/* Availability */}
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="h-2 w-2 rounded-full
-                    {product.availability === 'in_stock' && 'bg-green-500'}
-                    {product.availability === 'low_stock' && 'bg-yellow-500'}
-                    {product.availability === 'out_of_stock' && 'bg-red-500'}
-                  ">
-                  </span>
-                  <span className="text-text-muted">
-                    {product.availability === 'in_stock' && 'In Stock'}
-                    {product.availability === 'low_stock' && 'Low Stock'}
-                    {product.availability === 'out_of_stock' && 'Out of Stock'}
-                  </span>
-                </div>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={() => {
-                    addItem(product);
-                    toast.success(`${product.name} added to your bag`);
-                  }}
-                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary/90 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-                >
-                  Add to Bag
-                </button>
-
-                <button
-                  onClick={() => {
-                    // General assistance via WhatsApp
-                    const msg = `Hi! I have a question about the ${product.name}. Could you please provide more details?`;
-                    window.open(`https://wa.me/254723425778?text=${encodeURIComponent(msg)}`, '_blank');
-                  }}
-                  className="w-full sm:w-auto flex items-center justify-center px-8 py-4 border border-primary/20 text-primary text-sm font-medium rounded-lg hover:border-primary/30 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-                >
-                  WhatsApp Assistance
-                </button>
-              </div>
-            </div>
+            <p className={cn('text-xs text-faint', details.length > 0 ? 'mt-6' : 'mt-10 border-t border-line pt-6')}>
+              Orders are confirmed personally over WhatsApp.
+            </p>
           </div>
-
-          {/* Product Details */}
-          <div className="mt-12">
-            <h2 className="font-playfair text-xl text-primary mb-6">
-              Product Details
-            </h2>
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Description
-                </h3>
-                <p className="text-text-muted leading-relaxed">
-                  {product.description}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Materials
-                </h3>
-                <p className="text-text-muted">
-                  {product.materials}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Dimensions
-                </h3>
-                <p className="text-text-muted">
-                  {product.dimensions}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Care Instructions
-                </h3>
-                <p className="text-text-muted">
-                  {product.care}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Client Services */}
-          <div className="mt-16">
-            <h2 className="font-playfair text-xl text-primary mb-6">
-              Client Services
-            </h2>
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Delivery
-                </h3>
-                <p className="text-text-muted">
-                  We offer insured delivery within 3-5 business days for all Millux Collections items. Shipping costs are calculated at checkout.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Returns & Exchanges
-                </h3>
-                <p className="text-text-muted">
-                  We accept returns within 14 days of delivery for items in their original condition. Please contact us via WhatsApp to initiate a return.
-                </p>
-              </div>
-              <div>
-                <h3 className="font-playfair text-lg text-primary mb-2">
-                  Customer Assistance
-                </h3>
-                <p className="text-text-muted">
-                  Our team is available via WhatsApp for any inquiries, styling advice, or after-sales support. We strive to respond within 24 hours.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Related Products */}
-          {relatedLoading && (
-            <div className="mt-16">
-              <h2 className="font-playfair text-xl text-primary mb-6">
-                You May Also Like
-              </h2>
-              <div className="min-h-[200px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              </div>
-            </div>
-          )}
-          {relatedError && (
-            <div className="mt-16">
-              <h2 className="font-playfair text-xl text-primary mb-6">
-                You May Also Like
-              </h2>
-              <p className="text-text-muted">Unable to load related products right now.</p>
-            </div>
-          )}
-          {!relatedLoading && !relatedError && relatedProducts.length > 0 && (
-            <div className="mt-16">
-              <h2 className="font-playfair text-xl text-primary mb-6">
-                You May Also Like
-              </h2>
-              <ProductGrid products={relatedProducts} />
-            </div>
-          )}
         </div>
-      </div>
+
+        {related.length > 0 && (
+          <section className="mt-20 lg:mt-28" aria-labelledby="related-heading">
+            <SectionHeading
+              eyebrow="Complete the look"
+              title={<span id="related-heading">You may also like</span>}
+              link={{ to: `/shop?category=${encodeURIComponent(product.category)}`, label: `More ${product.category}` }}
+              className="mb-8 sm:mb-10"
+            />
+            <ProductGrid products={related} columns={4} />
+          </section>
+        )}
+      </Container>
     </>
   );
 };
+
+const DetailSkeleton = () => (
+  <Container className="pb-20" aria-busy="true" aria-label="Loading product">
+    <div className="py-6 sm:py-8">
+      <Skeleton className="h-3 w-48" />
+    </div>
+    <div className="grid gap-10 lg:grid-cols-[11fr_9fr] lg:gap-16">
+      <Skeleton className="aspect-[4/5] w-full" />
+      <div>
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="mt-4 h-9 w-3/4" />
+        <Skeleton className="mt-4 h-5 w-24" />
+        <Skeleton className="mt-8 h-4 w-full" />
+        <Skeleton className="mt-2 h-4 w-11/12" />
+        <Skeleton className="mt-2 h-4 w-2/3" />
+        <Skeleton className="mt-10 h-14 w-full" />
+        <Skeleton className="mt-4 h-12 w-full" />
+      </div>
+    </div>
+  </Container>
+);
 
 export default ProductDetail;

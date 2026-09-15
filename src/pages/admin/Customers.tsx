@@ -68,12 +68,12 @@ const CustomerList = () => {
         description="Registered customer accounts and their order history."
         actions={
           <div className="relative w-full sm:w-72">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999999]" />
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8C887F]" />
             <Input
               placeholder="Search by name, email or phone"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-white border-[#ECE7E0]"
+              className="pl-9 bg-white border-[#E4E0D7]"
             />
           </div>
         }
@@ -92,29 +92,29 @@ const CustomerList = () => {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-[#ECE7E0]">
-                  <TableHead className="text-[#999999] pl-6">Customer</TableHead>
-                  <TableHead className="text-[#999999]">Phone</TableHead>
-                  <TableHead className="text-[#999999] text-right">Orders</TableHead>
-                  <TableHead className="text-[#999999] text-right">Total spent</TableHead>
-                  <TableHead className="text-[#999999]">Last order</TableHead>
-                  <TableHead className="text-[#999999] pr-6">Joined</TableHead>
+                <TableRow className="border-[#E4E0D7]">
+                  <TableHead className="text-[#8C887F] pl-6">Customer</TableHead>
+                  <TableHead className="text-[#8C887F]">Phone</TableHead>
+                  <TableHead className="text-[#8C887F] text-right">Orders</TableHead>
+                  <TableHead className="text-[#8C887F] text-right">Total spent</TableHead>
+                  <TableHead className="text-[#8C887F]">Last order</TableHead>
+                  <TableHead className="text-[#8C887F] pr-6">Joined</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((c) => (
-                  <TableRow key={c.id} className="border-[#ECE7E0]">
+                  <TableRow key={c.id} className="border-[#E4E0D7]">
                     <TableCell className="pl-6">
                       <Link to={`/admin/customers/${c.id}`} className="block group">
-                        <span className="block text-[#1F1F1F] group-hover:text-[#B68D40]">{c.name || 'Unnamed'}</span>
-                        <span className="block text-xs text-[#999999]">{c.email || '—'}</span>
+                        <span className="block text-[#0A0A0A] group-hover:text-[#A27627]">{c.name || 'Unnamed'}</span>
+                        <span className="block text-xs text-[#8C887F]">{c.email || '—'}</span>
                       </Link>
                     </TableCell>
-                    <TableCell className="text-[#6B6B6B]">{c.phone || '—'}</TableCell>
-                    <TableCell className="text-right text-[#1F1F1F]">{c.orderCount}</TableCell>
-                    <TableCell className="text-right text-[#1F1F1F]">{formatMoney(c.totalSpent)}</TableCell>
-                    <TableCell className="text-[#6B6B6B] whitespace-nowrap">{formatDate(c.lastOrderAt)}</TableCell>
-                    <TableCell className="text-[#6B6B6B] whitespace-nowrap pr-6">{formatDate(c.createdAt)}</TableCell>
+                    <TableCell className="text-[#5B5852]">{c.phone || '—'}</TableCell>
+                    <TableCell className="text-right text-[#0A0A0A]">{c.orderCount}</TableCell>
+                    <TableCell className="text-right text-[#0A0A0A]">{formatMoney(c.totalSpent)}</TableCell>
+                    <TableCell className="text-[#5B5852] whitespace-nowrap">{formatDate(c.lastOrderAt)}</TableCell>
+                    <TableCell className="text-[#5B5852] whitespace-nowrap pr-6">{formatDate(c.createdAt)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -181,20 +181,20 @@ const CustomerDetail = ({ id }: { id: string }) => {
             <Panel title="Profile">
               <dl className="space-y-4 text-sm">
                 <div>
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#999999]">Email</dt>
-                  <dd className="text-[#1F1F1F] mt-1 break-all">{customer.email || '—'}</dd>
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F]">Email</dt>
+                  <dd className="text-[#0A0A0A] mt-1 break-all">{customer.email || '—'}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#999999]">Phone</dt>
-                  <dd className="text-[#1F1F1F] mt-1">{customer.phone || '—'}</dd>
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F]">Phone</dt>
+                  <dd className="text-[#0A0A0A] mt-1">{customer.phone || '—'}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#999999]">Joined</dt>
-                  <dd className="text-[#1F1F1F] mt-1">{formatDateTime(customer.createdAt)}</dd>
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F]">Joined</dt>
+                  <dd className="text-[#0A0A0A] mt-1">{formatDateTime(customer.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#999999]">Customer ID</dt>
-                  <dd className="font-mono text-xs text-[#6B6B6B] mt-1 break-all">{customer.id}</dd>
+                  <dt className="text-[11px] uppercase tracking-[0.14em] text-[#8C887F]">Customer ID</dt>
+                  <dd className="font-mono text-xs text-[#5B5852] mt-1 break-all">{customer.id}</dd>
                 </div>
               </dl>
             </Panel>
@@ -203,7 +203,7 @@ const CustomerDetail = ({ id }: { id: string }) => {
               title="Order history"
               className="lg:col-span-2"
               action={
-                <Link to="/admin/orders" className="text-xs uppercase tracking-[0.12em] text-[#B68D40] hover:underline">
+                <Link to="/admin/orders" className="text-xs uppercase tracking-[0.12em] text-[#A27627] hover:underline">
                   All orders
                 </Link>
               }
@@ -213,25 +213,25 @@ const CustomerDetail = ({ id }: { id: string }) => {
               ) : (
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-[#ECE7E0]">
-                      <TableHead className="text-[#999999]">Order</TableHead>
-                      <TableHead className="text-[#999999]">Date</TableHead>
-                      <TableHead className="text-[#999999] text-right">Items</TableHead>
-                      <TableHead className="text-[#999999] text-right">Total</TableHead>
-                      <TableHead className="text-[#999999]">Status</TableHead>
+                    <TableRow className="border-[#E4E0D7]">
+                      <TableHead className="text-[#8C887F]">Order</TableHead>
+                      <TableHead className="text-[#8C887F]">Date</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Items</TableHead>
+                      <TableHead className="text-[#8C887F] text-right">Total</TableHead>
+                      <TableHead className="text-[#8C887F]">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {customer.orders.map((o) => (
-                      <TableRow key={o.id} className="border-[#ECE7E0]">
+                      <TableRow key={o.id} className="border-[#E4E0D7]">
                         <TableCell>
-                          <Link to="/admin/orders" className="font-mono text-xs text-[#1F1F1F] hover:text-[#B68D40]">
+                          <Link to="/admin/orders" className="font-mono text-xs text-[#0A0A0A] hover:text-[#A27627]">
                             #{shortId(o.id)}
                           </Link>
                         </TableCell>
-                        <TableCell className="text-[#6B6B6B] whitespace-nowrap">{formatDateTime(o.createdAt)}</TableCell>
-                        <TableCell className="text-right text-[#6B6B6B]">{o.itemCount}</TableCell>
-                        <TableCell className="text-right text-[#1F1F1F]">{formatMoney(o.totalAmount)}</TableCell>
+                        <TableCell className="text-[#5B5852] whitespace-nowrap">{formatDateTime(o.createdAt)}</TableCell>
+                        <TableCell className="text-right text-[#5B5852]">{o.itemCount}</TableCell>
+                        <TableCell className="text-right text-[#0A0A0A]">{formatMoney(o.totalAmount)}</TableCell>
                         <TableCell><StatusPill status={o.status} /></TableCell>
                       </TableRow>
                     ))}

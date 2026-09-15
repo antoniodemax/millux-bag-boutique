@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { isAxiosError } from 'axios';
+import { Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { getCustomerProfile } from '@/services/authService';
 import { createOrderFromCart } from '@/services/orderService';
 import { toast } from '@/components/ui/sonner';
+import { StoreButton } from '@/components/store/Button';
+import { Container, EmptyState, PageHeading } from '@/components/store/Primitives';
+import type { Order } from '@/types/models';
+
+const WHATSAPP_NUMBER = '254723425778';
+const FALLBACK_IMAGE = '/images/handbags-category.png';
+
+const errorMessage = (err: unknown, fallback: string) =>
+  isAxiosError(err) && typeof err.response?.data?.error === 'string' ? err.response.data.error : fallback;
 
 const CartPage = () => {
   const { cart, updateQuantity, removeItem, clearCart, cartTotal, cartCount } = useCart();
@@ -14,7 +23,7 @@ const CartPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [customerName, setCustomerName] = useState<string | null>(null);
 
-  // Fetch customer name on load (guests are fine; they can still send a WhatsApp inquiry)
+  // Guests can still send a WhatsApp inquiry, so a failed profile load is not an error
   useEffect(() => {
     let active = true;
     getCustomerProfile()
@@ -23,252 +32,167 @@ const CartPage = () => {
     return () => { active = false; };
   }, []);
 
-  // Handle placing order
+  const itemLines = () =>
+    cart.map((item, index) => `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}`).join('\n');
+
+  const generateWhatsAppMessage = (order: Order): string => {
+    let message = `*New Order from Millux Collections*\n\n`;
+    message += `*Order ID:* ${order.id.substring(0, 8)}...\n`;
+    message += `*Customer:* ${customerName || 'Valued Customer'}\n`;
+    message += `*Date:* ${new Date(order.createdAt ?? Date.now()).toLocaleString()}\n\n`;
+    message += `*Items:*\n${itemLines()}\n`;
+    message += `\n*Total:* ${formatPrice(order.totalAmount)}\n\n`;
+    message += `*Status:* ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n`;
+    message += `Thank you for shopping with Millux Collections!`;
+    return message;
+  };
+
   const handlePlaceOrder = async () => {
     if (cart.length === 0) {
-      toast.error('Your cart is empty');
+      toast.error('Your bag is empty');
       return;
     }
-
     setIsLoading(true);
     try {
-      // Create the order via backend API using cart items
       const order = await createOrderFromCart(cart);
-
-      // Generate WhatsApp message
       const whatsappMessage = generateWhatsAppMessage(order);
-
-      // Clear cart
       clearCart();
-
-      // Show success
-      toast.success('Order placed successfully! Opening WhatsApp...');
-
-      // Open WhatsApp
-      const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(whatsappMessage)}`;
-      window.open(whatsappUrl, '_blank');
-
-      // Redirect to order history
+      toast.success('Order placed. Opening WhatsApp…');
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
       navigate('/customer/orders');
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        toast.info('Please sign in to place an order, or continue as a guest via WhatsApp.');
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 401) {
+        toast.info('Please sign in to place an order, or send your bag as a WhatsApp inquiry.');
         navigate('/customer/login', { state: { from: { pathname: '/cart' } } });
         return;
       }
-      const message = err.response?.data?.error || 'Failed to place order';
-      toast.error(message);
+      toast.error(errorMessage(err, 'Failed to place order'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Generate WhatsApp message for order confirmation
-  const generateWhatsAppMessage = (order: any): string => {
-    const customerInfo = customerName || 'Valued Customer';
-    let message = `*New Order from Millux Collections*\n\n`;
-    message += `*Order ID:* ${order.id.substring(0, 8)}...\n`;
-    message += `*Customer:* ${customerInfo}\n`;
-    message += `*Date:* ${new Date(order.createdAt).toLocaleString()}\n\n`;
-    message += `*Items:*\n`;
-
-    // Note: The order object from createOrder doesn't include items by default
-    // We'll use the cart data instead since we have it
-    cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}\n`;
-    });
-
-    message += `\n*Total:* ${formatPrice(order.totalAmount)}\n\n`;
-    message += `*Status:* ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n`;
-    message += `Thank you for shopping with Millux Collections!`;
-
-    return message;
-  };
-
-  // Handle continuing as guest (WhatsApp only)
   const handleGuestOrder = () => {
     if (cart.length === 0) {
-      toast.error('Your cart is empty');
+      toast.error('Your bag is empty');
       return;
     }
-
-    // Generate WhatsApp message for guest order
     let message = `*New Order Inquiry from Millux Collections*\n\n`;
-    message += `*Customer:* Guest Customer\n`;
+    message += `*Customer:* ${customerName || 'Guest Customer'}\n`;
     message += `*Date:* ${new Date().toLocaleString()}\n\n`;
-    message += `*Items:*\n`;
-
-    cart.forEach((item, index) => {
-      message += `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}\n`;
-    });
-
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    message += `\n*Total:* ${formatPrice(total)}\n\n`;
+    message += `*Items:*\n${itemLines()}\n`;
+    message += `\n*Total:* ${formatPrice(cartTotal)}\n\n`;
     message += `Please confirm availability and proceed with order.`;
-
-    const whatsappUrl = `https://wa.me/254723425778?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-
-    // Clear cart after guest order too
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     clearCart();
-    toast.success('Your inquiry has been sent via WhatsApp!');
+    toast.success('Your inquiry has been sent via WhatsApp');
   };
 
-  if (isLoading && cart.length === 0) {
-    return <div className="flex items-center justify-center min-h-[calc(100vh-88px)]">Loading...</div>;
-  }
-
   return (
-    <div className="min-h-[calc(100vh-88px)] bg-background">
-      {/* Load customer info on mount */}
-      {/* We'll use useEffect in a real implementation, but for simplicity we'll call it conditionally */}
+    <Container className="pb-20">
+      <PageHeading eyebrow="Your selection" title="Shopping bag" />
 
-      <div className="flex min-h-[calc(100vh-88px)]">
-        {/* Sidebar - simplified for customer area */}
-        <aside className="w-64 bg-white border-r shadow-sm">
-          <div className="p-6">
-            <h2 className="text-xl font-bold text-primary">My Account</h2>
-            <nav className="mt-6 space-y-2">
-              <a
-                href="#"
-                className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/customer/profile');
-                }}
-              >
-                Profile
-              </a>
-              <a
-                href="#"
-                className="flex items-center px-3 py-2 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 active"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/customer/orders');
-                }}
-              >
-                Order History
-              </a>
-            </nav>
-          </div>
-        </aside>
+      {cart.length === 0 ? (
+        <EmptyState
+          title="Your bag is empty"
+          message="Pieces you add will appear here."
+          action={{ to: '/shop', label: 'Shop the collection' }}
+          className="pt-4"
+        />
+      ) : (
+        <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-16">
+          {/* Items */}
+          <ul className="divide-y divide-line border-y border-line" aria-label="Items in your bag">
+            {cart.map((item) => {
+              const lineTotal = item.price * item.quantity;
+              return (
+                <li key={item.id} className="flex gap-4 py-6 sm:gap-6">
+                  <Link to={`/products/${item.slug}`} className="block w-20 shrink-0 sm:w-24 focus-ring">
+                    <div className="aspect-[4/5] overflow-hidden bg-stone">
+                      <img src={item.images?.[0] || FALLBACK_IMAGE} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
+                    </div>
+                  </Link>
 
-        {/* Main Content */}
-        <main className="flex-1 p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-primary">Your Shopping Cart</h1>
-            <p className="text-text-sm mt-2">Review and edit your items before placing your order</p>
-          </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="brand-label text-faint">{item.category}</p>
+                        <h2 className="mt-1 font-display text-lg leading-snug text-ink">
+                          <Link to={`/products/${item.slug}`} className="focus-ring hover:text-gold-deep transition-colors">
+                            {item.name}
+                          </Link>
+                        </h2>
+                        <p className="mt-1 text-sm text-soft">{formatPrice(item.price)}</p>
+                      </div>
+                      <p className="shrink-0 font-sans text-sm text-ink sm:text-base">{formatPrice(lineTotal)}</p>
+                    </div>
 
-          {cart.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-text-muted">Your cart is empty.</p>
-              <Link to="/" className="btn-primary mt-4 inline-block px-6 py-2">
-                Continue Shopping
-              </Link>
-            </div>
-          ) : (
-            <>
-              <div className="mb-6">
-                <Table className="min-w-full divide-y divide-muted">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-1/2">Product</TableHead>
-                      <TableHead className="w-1/6 text-center">Price</TableHead>
-                      <TableHead className="w-1/6 text-center">Quantity</TableHead>
-                      <TableHead className="w-1/6 text-center">Total</TableHead>
-                      <TableHead className="w-1/6">Action</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cart.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="flex items-center space-x-4">
-                          <div className="flex-shrink-0 h-16 w-16 bg-gray-100 rounded">
-                            <img src={item.images[0]} alt={item.name} className="h-full w-full object-cover" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-text-xs text-muted-foreground">{item.category}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center whitespace-nowrap">{formatPrice(item.price)}</TableCell>
-                        <TableCell className="text-center whitespace-nowrap">
-                          <div className="flex items-center justify-center space-x-2">
-                            <button
-                              onClick={() => {
-                                const newQty = item.quantity - 1;
-                                if (newQty >= 1) {
-                                  updateQuantity(item.id, newQty);
-                                } else {
-                                  removeItem(item.id);
-                                }
-                              }}
-                              className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
-                            >
-                              −
-                            </button>
-                            <span className="w-4 text-center">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-8 h-8 flex items-center justify-center rounded border border-gray-300 hover:bg-gray-100 transition-colors duration-200"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center whitespace-nowrap">{formatPrice(item.price * item.quantity)}</TableCell>
-                        <TableCell className="text-center">
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-text-xs text-muted-foreground hover:text-danger underline"
-                          >
-                            Remove
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-
-                <div className="mt-6 pt-4 border-t border-muted">
-                  <div className="flex justify-between text-lg font-medium">
-                    <span>Subtotal:</span>
-                    <span>{formatPrice(cartTotal)}</span>
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="inline-flex items-center border border-line" role="group" aria-label={`Quantity for ${item.name}`}>
+                        <button
+                          type="button"
+                          onClick={() => (item.quantity > 1 ? updateQuantity(item.id, item.quantity - 1) : removeItem(item.id))}
+                          aria-label={item.quantity > 1 ? `Decrease quantity of ${item.name}` : `Remove ${item.name}`}
+                          className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-stone focus-ring"
+                        >
+                          <Minus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+                        </button>
+                        <span className="w-10 text-center font-sans text-sm tabular-nums text-ink" aria-live="polite">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          aria-label={`Increase quantity of ${item.name}`}
+                          className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:bg-stone focus-ring"
+                        >
+                          <Plus className="h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+                        </button>
+                      </div>
+                      <StoreButton variant="tertiary" size="sm" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.name} from bag`}>
+                        Remove
+                      </StoreButton>
+                    </div>
                   </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Summary */}
+          <aside className="lg:sticky lg:top-28 lg:self-start" aria-label="Order summary">
+            <div className="bg-stone p-6 sm:p-8">
+              <h2 className="font-display text-xl text-ink">Summary</h2>
+              <dl className="mt-6 space-y-3 text-sm">
+                <div className="flex justify-between text-soft">
+                  <dt>{cartCount} item{cartCount === 1 ? '' : 's'}</dt>
+                  <dd>{formatPrice(cartTotal)}</dd>
                 </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleGuestOrder}
-                    disabled={isLoading}
-                  >
-                    Continue as Guest (WhatsApp)
-                  </Button>
-
-                  <Button
-                    onClick={handlePlaceOrder}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Placing order…' : customerName ? 'Place Order' : 'Sign in & Place Order'}
-                  </Button>
+                <div className="flex justify-between border-t border-line-strong pt-3 text-base text-ink">
+                  <dt className="font-medium">Subtotal</dt>
+                  <dd className="font-medium">{formatPrice(cartTotal)}</dd>
                 </div>
+              </dl>
+              <p className="mt-4 text-xs leading-relaxed text-soft">
+                Delivery and payment are arranged over WhatsApp after you place your order.
+              </p>
 
-                <p className="mt-4 text-text-sm text-center">
-                  <small>
-                    By placing an order, you agree to our <a href="#" className="underline">Terms of Service</a> and
-                    <a href="#" className="underline">Privacy Policy</a>.
-                  </small>
-                </p>
+              <div className="mt-8 space-y-3">
+                <StoreButton full size="lg" onClick={handlePlaceOrder} loading={isLoading}>
+                  {customerName ? 'Place order' : 'Sign in to place order'}
+                </StoreButton>
+                <StoreButton full variant="secondary" onClick={handleGuestOrder} disabled={isLoading}>
+                  Send as WhatsApp inquiry
+                </StoreButton>
               </div>
-            </>
-          )}
-        </main>
-      </div>
-    </div>
+              <div className="mt-6 text-center">
+                <Link to="/shop" className="brand-link">Continue shopping</Link>
+              </div>
+            </div>
+          </aside>
+        </div>
+      )}
+    </Container>
   );
 };
 

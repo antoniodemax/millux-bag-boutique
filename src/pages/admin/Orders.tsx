@@ -30,11 +30,11 @@ const toEndOfDay = (value: string): Date | null => {
 };
 
 const CustomerCell = ({ order }: { order: Order }) => {
-  if (!order.customer) return <span className="text-[#999999]">Guest</span>;
+  if (!order.customer) return <span className="text-[#8C887F]">Guest</span>;
   return (
     <div className="min-w-0">
-      <p className="text-[#1F1F1F] truncate">{order.customer.name || 'Unnamed customer'}</p>
-      {order.customer.email && <p className="text-xs text-[#999999] truncate">{order.customer.email}</p>}
+      <p className="text-[#0A0A0A] truncate">{order.customer.name || 'Unnamed customer'}</p>
+      {order.customer.email && <p className="text-xs text-[#8C887F] truncate">{order.customer.email}</p>}
     </div>
   );
 };
@@ -138,11 +138,11 @@ const AdminOrders = () => {
       <PageHeader title="Orders" description="Review orders, customers and fulfilment status." />
 
       <Panel>
-        <div className="grid gap-3 p-4 border-b border-[#ECE7E0] md:grid-cols-[1fr_auto_auto_auto] md:items-end">
+        <div className="grid gap-3 p-4 border-b border-[#E4E0D7] md:grid-cols-[1fr_auto_auto_auto] md:items-end">
           <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Search</Label>
+            <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Search</Label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999999]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C887F]" />
               <Input
                 placeholder="Order id, customer name or email"
                 value={search}
@@ -152,7 +152,7 @@ const AdminOrders = () => {
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Status</Label>
+            <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Status</Label>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className={`w-full md:w-40 ${inputClass}`}><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -164,11 +164,11 @@ const AdminOrders = () => {
             </Select>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">From</Label>
+            <Label className="text-xs uppercase tracking-wide text-[#5B5852]">From</Label>
             <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`md:w-40 ${inputClass}`} />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">To</Label>
+            <Label className="text-xs uppercase tracking-wide text-[#5B5852]">To</Label>
             <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={`md:w-40 ${inputClass}`} />
           </div>
         </div>
@@ -191,33 +191,33 @@ const AdminOrders = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent border-[#ECE7E0]">
-                  <TableHead className="text-[#6B6B6B]">Order</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Date</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Customer</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Items</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Total</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Status</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Actions</TableHead>
+                <TableRow className="hover:bg-transparent border-[#E4E0D7]">
+                  <TableHead className="text-[#5B5852]">Order</TableHead>
+                  <TableHead className="text-[#5B5852]">Date</TableHead>
+                  <TableHead className="text-[#5B5852]">Customer</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Items</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Total</TableHead>
+                  <TableHead className="text-[#5B5852]">Status</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((order) => (
-                  <TableRow key={order.id} className="border-[#ECE7E0] hover:bg-[#FAF8F5]">
+                  <TableRow key={order.id} className="border-[#E4E0D7] hover:bg-[#F5F2EC]">
                     <TableCell>
                       <button
                         type="button"
                         onClick={() => openDetail(order.id)}
-                        className="font-mono text-xs text-[#1F1F1F] hover:text-[#B68D40] transition-colors"
+                        className="font-mono text-xs text-[#0A0A0A] hover:text-[#A27627] transition-colors"
                         title={order.id}
                       >
                         #{order.id.slice(0, 8)}
                       </button>
                     </TableCell>
-                    <TableCell className="text-[#6B6B6B] whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
+                    <TableCell className="text-[#5B5852] whitespace-nowrap">{formatDate(order.createdAt)}</TableCell>
                     <TableCell><CustomerCell order={order} /></TableCell>
-                    <TableCell className="text-right tabular-nums text-[#1F1F1F]">{order.itemCount ?? order.items?.length ?? 0}</TableCell>
-                    <TableCell className="text-right tabular-nums text-[#1F1F1F]">{formatMoney(order.totalAmount)}</TableCell>
+                    <TableCell className="text-right tabular-nums text-[#0A0A0A]">{order.itemCount ?? order.items?.length ?? 0}</TableCell>
+                    <TableCell className="text-right tabular-nums text-[#0A0A0A]">{formatMoney(order.totalAmount)}</TableCell>
                     <TableCell><OrderStatusPill status={order.status} /></TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end items-center gap-2">
@@ -235,9 +235,9 @@ const AdminOrders = () => {
 
       {/* Order detail dialog (controlled) */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="border-[#ECE7E0] w-[92vw] max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="border-[#E4E0D7] w-[92vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="font-playfair">
+            <DialogTitle className="font-display">
               {detail ? `Order #${detail.id.slice(0, 8)}` : 'Order details'}
             </DialogTitle>
             <DialogDescription>
@@ -255,60 +255,60 @@ const AdminOrders = () => {
             <div className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Customer</p>
+                  <p className="text-xs uppercase tracking-wide text-[#5B5852]">Customer</p>
                   {detail.customer ? (
                     <div className="text-sm">
-                      <p className="text-[#1F1F1F] font-medium">{detail.customer.name || 'Unnamed customer'}</p>
-                      {detail.customer.email && <p className="text-[#6B6B6B]">{detail.customer.email}</p>}
-                      {detail.customer.phone && <p className="text-[#6B6B6B]">{detail.customer.phone}</p>}
+                      <p className="text-[#0A0A0A] font-medium">{detail.customer.name || 'Unnamed customer'}</p>
+                      {detail.customer.email && <p className="text-[#5B5852]">{detail.customer.email}</p>}
+                      {detail.customer.phone && <p className="text-[#5B5852]">{detail.customer.phone}</p>}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#999999]">Guest order</p>
+                    <p className="text-sm text-[#8C887F]">Guest order</p>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Status</p>
+                  <p className="text-xs uppercase tracking-wide text-[#5B5852]">Status</p>
                   <div className="flex items-center gap-3">
                     <StatusSelect order={detail} size="md" />
                     <OrderStatusPill status={detail.status} />
                   </div>
-                  <p className="text-xs text-[#999999]">Full id: <span className="font-mono">{detail.id}</span></p>
+                  <p className="text-xs text-[#8C887F]">Full id: <span className="font-mono">{detail.id}</span></p>
                 </div>
               </div>
 
               {detail.whatsappMessage && (
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">WhatsApp message</p>
-                  <p className="text-sm text-[#1F1F1F] whitespace-pre-wrap bg-[#FAF8F5] border border-[#ECE7E0] rounded-md p-3">
+                  <p className="text-xs uppercase tracking-wide text-[#5B5852]">WhatsApp message</p>
+                  <p className="text-sm text-[#0A0A0A] whitespace-pre-wrap bg-[#F5F2EC] border border-[#E4E0D7] rounded-md p-3">
                     {detail.whatsappMessage}
                   </p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-[#6B6B6B]">Items</p>
+                <p className="text-xs uppercase tracking-wide text-[#5B5852]">Items</p>
                 {detail.items.length === 0 ? (
-                  <p className="text-sm text-[#999999]">This order has no line items.</p>
+                  <p className="text-sm text-[#8C887F]">This order has no line items.</p>
                 ) : (
-                  <div className="border border-[#ECE7E0] rounded-md overflow-hidden">
+                  <div className="border border-[#E4E0D7] rounded-md overflow-hidden">
                     <Table>
                       <TableHeader>
-                        <TableRow className="hover:bg-transparent border-[#ECE7E0]">
-                          <TableHead className="text-[#6B6B6B]">Product</TableHead>
-                          <TableHead className="text-[#6B6B6B] text-right">Qty</TableHead>
-                          <TableHead className="text-[#6B6B6B] text-right">Price</TableHead>
-                          <TableHead className="text-[#6B6B6B] text-right">Total</TableHead>
+                        <TableRow className="hover:bg-transparent border-[#E4E0D7]">
+                          <TableHead className="text-[#5B5852]">Product</TableHead>
+                          <TableHead className="text-[#5B5852] text-right">Qty</TableHead>
+                          <TableHead className="text-[#5B5852] text-right">Price</TableHead>
+                          <TableHead className="text-[#5B5852] text-right">Total</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {detail.items.map((item) => (
-                          <TableRow key={item.id} className="border-[#ECE7E0]">
+                          <TableRow key={item.id} className="border-[#E4E0D7]">
                             <TableCell>
                               <div className="flex items-center gap-3">
                                 <Thumb src={item.product?.images?.[0]} alt={item.product?.name ?? 'Product'} size="h-10 w-10" />
                                 <div className="min-w-0">
-                                  <p className="text-sm text-[#1F1F1F] truncate">{item.product?.name ?? 'Product unavailable'}</p>
-                                  {item.product?.category && <p className="text-xs text-[#999999]">{item.product.category}</p>}
+                                  <p className="text-sm text-[#0A0A0A] truncate">{item.product?.name ?? 'Product unavailable'}</p>
+                                  {item.product?.category && <p className="text-xs text-[#8C887F]">{item.product.category}</p>}
                                 </div>
                               </div>
                             </TableCell>
@@ -317,9 +317,9 @@ const AdminOrders = () => {
                             <TableCell className="text-right tabular-nums">{formatMoney(item.priceAtPurchase * item.quantity)}</TableCell>
                           </TableRow>
                         ))}
-                        <TableRow className="hover:bg-transparent border-[#ECE7E0] bg-[#FAF8F5]">
-                          <TableCell colSpan={3} className="text-right text-sm text-[#6B6B6B]">Order total</TableCell>
-                          <TableCell className="text-right font-playfair text-lg text-[#1F1F1F]">{formatMoney(detail.totalAmount)}</TableCell>
+                        <TableRow className="hover:bg-transparent border-[#E4E0D7] bg-[#F5F2EC]">
+                          <TableCell colSpan={3} className="text-right text-sm text-[#5B5852]">Order total</TableCell>
+                          <TableCell className="text-right font-display text-lg text-[#0A0A0A]">{formatMoney(detail.totalAmount)}</TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>

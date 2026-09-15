@@ -161,9 +161,9 @@ const AdminCategories = () => {
       />
 
       <Panel>
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 border-b border-[#ECE7E0]">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between p-4 border-b border-[#E4E0D7]">
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#999999]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8C887F]" />
             <Input
               placeholder="Search categories"
               value={search}
@@ -171,7 +171,7 @@ const AdminCategories = () => {
               className={`pl-9 ${inputClass}`}
             />
           </div>
-          <span className="text-xs text-[#999999]">{filtered.length} of {categories.length}</span>
+          <span className="text-xs text-[#8C887F]">{filtered.length} of {categories.length}</span>
         </div>
 
         {loading ? (
@@ -186,38 +186,38 @@ const AdminCategories = () => {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="hover:bg-transparent border-[#ECE7E0]">
-                  <TableHead className="text-[#6B6B6B]">Category</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Products</TableHead>
-                  <TableHead className="text-[#6B6B6B]">Status</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Order</TableHead>
-                  <TableHead className="text-[#6B6B6B] text-right">Actions</TableHead>
+                <TableRow className="hover:bg-transparent border-[#E4E0D7]">
+                  <TableHead className="text-[#5B5852]">Category</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Products</TableHead>
+                  <TableHead className="text-[#5B5852]">Status</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Order</TableHead>
+                  <TableHead className="text-[#5B5852] text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((category) => (
-                  <TableRow key={category.id} className="border-[#ECE7E0] hover:bg-[#FAF8F5]">
+                  <TableRow key={category.id} className="border-[#E4E0D7] hover:bg-[#F5F2EC]">
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Thumb src={category.image || null} alt={category.name} />
                         <button
                           type="button"
                           onClick={() => openEdit(category)}
-                          className="font-medium text-[#1F1F1F] hover:text-[#B68D40] transition-colors text-left"
+                          className="font-medium text-[#0A0A0A] hover:text-[#A27627] transition-colors text-left"
                         >
                           {category.name}
                         </button>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-[#1F1F1F]">{category.productCount ?? 0}</TableCell>
+                    <TableCell className="text-right tabular-nums text-[#0A0A0A]">{category.productCount ?? 0}</TableCell>
                     <TableCell>
                       {category.available ? <Chip tone="green">Available</Chip> : <Chip>Hidden</Chip>}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-[#6B6B6B]">{category.orderNumber ?? 0}</TableCell>
+                    <TableCell className="text-right tabular-nums text-[#5B5852]">{category.orderNumber ?? 0}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <OutlineButton size="sm" onClick={() => openEdit(category)}>Edit</OutlineButton>
-                        <OutlineButton size="sm" className="text-[#8A3A34] hover:text-[#8A3A34]" onClick={() => setPendingDelete(category)}>
+                        <OutlineButton size="sm" className="text-[#A4302A] hover:text-[#A4302A]" onClick={() => setPendingDelete(category)}>
                           Delete
                         </OutlineButton>
                       </div>
@@ -232,20 +232,20 @@ const AdminCategories = () => {
 
       {/* Create / edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={(open) => !saving && setDialogOpen(open)}>
-        <DialogContent className="border-[#ECE7E0] sm:max-w-md">
+        <DialogContent className="border-[#E4E0D7] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-playfair">{editing ? 'Edit category' : 'New category'}</DialogTitle>
+            <DialogTitle className="font-display">{editing ? 'Edit category' : 'New category'}</DialogTitle>
             <DialogDescription>
               {editing ? 'Update the category details.' : 'Add a new category to the collection.'}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Name</Label>
+              <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Name</Label>
               <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="Totes" className={inputClass} />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Image</Label>
+              <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Image</Label>
               <div className="flex items-center gap-3">
                 <Thumb src={form.image || null} alt={form.name || 'Category'} size="h-14 w-14" />
                 <div className="flex-1 space-y-2">
@@ -259,18 +259,18 @@ const AdminCategories = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Order</Label>
+                <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Order</Label>
                 <Input type="number" min="0" step="1" value={form.orderNumber} onChange={(e) => setForm((f) => ({ ...f, orderNumber: e.target.value }))} className={inputClass} />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wide text-[#6B6B6B]">Available</Label>
+                <Label className="text-xs uppercase tracking-wide text-[#5B5852]">Available</Label>
                 <div className="flex items-center h-10">
-                  <Switch checked={form.available} onCheckedChange={(v) => setForm((f) => ({ ...f, available: v }))} className="data-[state=checked]:bg-[#B68D40]" />
-                  <span className="ml-3 text-sm text-[#6B6B6B]">{form.available ? 'Shown in store' : 'Hidden'}</span>
+                  <Switch checked={form.available} onCheckedChange={(v) => setForm((f) => ({ ...f, available: v }))} className="data-[state=checked]:bg-[#A27627]" />
+                  <span className="ml-3 text-sm text-[#5B5852]">{form.available ? 'Shown in store' : 'Hidden'}</span>
                 </div>
               </div>
             </div>
-            {formError && <p className="text-xs text-[#8A3A34]">{formError}</p>}
+            {formError && <p className="text-xs text-[#A4302A]">{formError}</p>}
           </div>
           <DialogFooter>
             <OutlineButton type="button" onClick={() => setDialogOpen(false)} disabled={saving}>Cancel</OutlineButton>
@@ -283,9 +283,9 @@ const AdminCategories = () => {
 
       {/* Delete confirmation */}
       <AlertDialog open={!!pendingDelete} onOpenChange={(open) => !open && !deleting && setPendingDelete(null)}>
-        <AlertDialogContent className="border-[#ECE7E0]">
+        <AlertDialogContent className="border-[#E4E0D7]">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-playfair">Delete category?</AlertDialogTitle>
+            <AlertDialogTitle className="font-display">Delete category?</AlertDialogTitle>
             <AlertDialogDescription>
               "{pendingDelete?.name}" will be removed. Products currently assigned to it keep the category name as text
               {pendingDelete?.productCount ? ` (${pendingDelete.productCount} product${pendingDelete.productCount === 1 ? '' : 's'})` : ''},
@@ -293,11 +293,11 @@ const AdminCategories = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting} className="border-[#ECE7E0]">Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting} className="border-[#E4E0D7]">Cancel</AlertDialogCancel>
             <AlertDialogAction
               disabled={deleting}
               onClick={(e) => { e.preventDefault(); confirmDelete(); }}
-              className="bg-[#1F1F1F] hover:bg-[#333333] text-white"
+              className="bg-[#0A0A0A] hover:bg-[#2A2926] text-white"
             >
               {deleting ? 'Deleting…' : 'Delete'}
             </AlertDialogAction>

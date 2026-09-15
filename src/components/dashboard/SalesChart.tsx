@@ -15,29 +15,29 @@ export const SalesChart = ({ data }: SalesChartProps) => {
   const hasSales = data.some((d) => d.total > 0);
 
   if (data.length === 0) {
-    return <p className="text-sm text-[#6B6B6B] py-8 text-center">No sales data available.</p>;
+    return <p className="text-sm text-[#5B5852] py-8 text-center">No sales data available.</p>;
   }
 
   return (
     <div>
       {!hasSales && (
-        <p className="text-xs text-[#999999] mb-3 !leading-normal md:!text-xs">
+        <p className="text-xs text-[#8C887F] mb-3 !leading-normal md:!text-xs">
           No sales recorded in the last 7 days.
         </p>
       )}
       <ResponsiveContainer width="100%" height={240}>
         <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-          <CartesianGrid stroke="#ECE7E0" strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="#E4E0D7" strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey="day"
             tickFormatter={formatDay}
-            tick={{ fontSize: 11, fill: '#999999' }}
-            axisLine={{ stroke: '#ECE7E0' }}
+            tick={{ fontSize: 11, fill: '#8C887F' }}
+            axisLine={{ stroke: '#E4E0D7' }}
             tickLine={false}
           />
           <YAxis
             width={64}
-            tick={{ fontSize: 11, fill: '#999999' }}
+            tick={{ fontSize: 11, fill: '#8C887F' }}
             axisLine={false}
             tickLine={false}
             tickFormatter={(value: number) => `£${Number(value).toLocaleString('en-GB')}`}
@@ -45,17 +45,17 @@ export const SalesChart = ({ data }: SalesChartProps) => {
           <Tooltip
             formatter={(value: number) => [formatMoney(Number(value)), 'Sales']}
             labelFormatter={(label) => formatDay(String(label))}
-            contentStyle={{ background: '#fff', border: '1px solid #ECE7E0', borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: '#6B6B6B' }}
-            cursor={{ stroke: '#ECE7E0' }}
+            contentStyle={{ background: '#fff', border: '1px solid #E4E0D7', borderRadius: 8, fontSize: 12 }}
+            labelStyle={{ color: '#5B5852' }}
+            cursor={{ stroke: '#E4E0D7' }}
           />
           <Line
             type="monotone"
             dataKey="total"
-            stroke="#B68D40"
+            stroke="#A27627"
             strokeWidth={2}
-            dot={{ r: 3, stroke: '#B68D40', fill: '#fff', strokeWidth: 1.5 }}
-            activeDot={{ r: 5, fill: '#B68D40' }}
+            dot={{ r: 3, stroke: '#A27627', fill: '#fff', strokeWidth: 1.5 }}
+            activeDot={{ r: 5, fill: '#A27627' }}
           />
         </LineChart>
       </ResponsiveContainer>
