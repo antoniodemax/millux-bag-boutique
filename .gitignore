@@ -24,3 +24,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local artifacts
+cookies.txt
+*.pid
+*.backup
+*.backup[0-9]
