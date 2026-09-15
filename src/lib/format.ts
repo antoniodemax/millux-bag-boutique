@@ -1,3 +1,4 @@
+import { formatAmount } from '@/lib/currency';
 const gbp = new Intl.NumberFormat('en-GB', {
   style: 'currency',
   currency: 'GBP',
@@ -5,11 +6,8 @@ const gbp = new Intl.NumberFormat('en-GB', {
   maximumFractionDigits: 2,
 });
 
-/** £1,234.00 */
-export const formatMoney = (value: number | string | null | undefined): string => {
-  const n = typeof value === 'string' ? parseFloat(value) : value ?? 0;
-  return gbp.format(Number.isFinite(n) ? n : 0);
-};
+/** Amount in the selected currency: KES 1,234.00, or ≈ $9.50 */
+export const formatMoney = (value: number | string | null | undefined): string => formatAmount(value, { cents: true });
 
 /** 15 Sep 2026 */
 export const formatDate = (iso: string | Date | null | undefined): string => {

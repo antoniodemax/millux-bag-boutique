@@ -5,6 +5,7 @@ import { Menu, X, ShoppingBag, User } from 'lucide-react';
 import { Logo } from '@/components/brand/Logo';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
+import { CurrencySwitch } from '@/components/store/CurrencySwitch';
 
 const NAV = [
   { label: 'Shop', to: '/shop' },
@@ -61,6 +62,7 @@ const SiteHeader = () => {
           <Logo on="light" className="h-14 xl:h-16" priority />
 
           <div className="flex items-center justify-end gap-6">
+            <CurrencySwitch className="-mr-2" />
             <Link to="/customer/profile" className="brand-label inline-flex items-center gap-2 text-soft hover:text-ink transition-colors focus-ring py-2">
               <User className="h-[18px] w-[18px]" strokeWidth={1.5} aria-hidden="true" />
               Account
@@ -147,6 +149,10 @@ const SiteHeader = () => {
               <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="py-3 brand-label text-gold-deep focus-ring">
                 WhatsApp us
               </a>
+              <div className="mt-2 flex items-center justify-between border-t border-line pt-4">
+                <span className="brand-label text-faint">Currency</span>
+                <CurrencySwitch className="-mr-2" />
+              </div>
             </div>
           </div>
         </div>

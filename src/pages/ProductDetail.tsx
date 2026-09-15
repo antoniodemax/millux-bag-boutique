@@ -17,7 +17,8 @@ import { toast } from '@/components/ui/sonner';
 import { useCart } from '@/context/CartContext';
 import { getProductBySlug, getProductsByCategory } from '@/services/productService';
 import type { Product } from '@/types/models';
-import { formatPrice, cn } from '@/lib/utils';
+import { formatPrice, formatKES, cn } from '@/lib/utils';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const FALLBACK_IMAGE = '/images/handbags-category.png';
 const WHATSAPP_NUMBER = '254723425778';
@@ -25,6 +26,7 @@ const WHATSAPP_NUMBER = '254723425778';
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { addItem } = useCart();
+  const { isConverted } = useCurrency();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +139,7 @@ const ProductDetail = () => {
         keywords={`Millux, ${product.name}, luxury bag, ${product.category}`}
         type="product"
         price={product.price}
-        currency="GBP"
+        currency="KES"
         availability={soldOut ? 'out_of_stock' : 'in_stock'}
         image={mainImage}
         category={product.category}
@@ -206,7 +208,12 @@ const ProductDetail = () => {
             <p className="brand-label text-faint">{product.category}</p>
             <h1 className="mt-3 text-display-md">{product.name}</h1>
             <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2">
-              <p className="font-sans text-xl text-ink">{formatPrice(product.price)}</p>
+              <div>
+                <p className="font-sans text-xl text-ink">{formatPrice(product.price)}</p>
+                {isConverted && (
+                  <p className="mt-1 text-xs text-faint">Charged in Kenyan shillings: {formatKES(product.price)}. Dollar price is approximate.</p>
+                )}
+              </div>
               <AvailabilityPill availability={product.availability} stock={stock} />
             </div>
 

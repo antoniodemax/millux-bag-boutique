@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CurrencySwitch } from '@/components/store/CurrencySwitch';
 import { logout } from '@/services/authService';
 import { toast } from '@/components/ui/sonner';
 
@@ -122,6 +123,10 @@ export const AdminSidebar = ({ email, mobileOpen, onClose }: AdminSidebarProps) 
 
         {/* Footer */}
         <div className="px-4 py-5 border-t border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-[#F5F2EC]/50">Show prices in</span>
+            <CurrencySwitch tone="dark" className="-mr-2" />
+          </div>
           <Link
             to="/"
             className="flex items-center gap-2 text-xs text-[#F5F2EC]/60 hover:text-[#A27627] transition-colors"

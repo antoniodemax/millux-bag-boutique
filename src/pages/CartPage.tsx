@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { isAxiosError } from 'axios';
 import { Minus, Plus } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, formatKES } from '@/lib/utils';
+import { useCurrency } from '@/context/CurrencyContext';
 import { getCustomerProfile } from '@/services/authService';
 import { createOrderFromCart } from '@/services/orderService';
 import { toast } from '@/components/ui/sonner';
@@ -19,6 +20,7 @@ const errorMessage = (err: unknown, fallback: string) =>
 
 const CartPage = () => {
   const { cart, updateQuantity, removeItem, clearCart, cartTotal, cartCount } = useCart();
+  const { isConverted } = useCurrency();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [customerName, setCustomerName] = useState<string | null>(null);
@@ -33,7 +35,7 @@ const CartPage = () => {
   }, []);
 
   const itemLines = () =>
-    cart.map((item, index) => `${index + 1}. ${item.name} (x${item.quantity}) - ${formatPrice(item.price * item.quantity)}`).join('\n');
+    cart.map((item, index) => `${index + 1}. ${item.name} (x${item.quantity}) - ${formatKES(item.price * item.quantity)}`).join('\n');
 
   const generateWhatsAppMessage = (order: Order): string => {
     let message = `*New Order from Millux Collections*\n\n`;
@@ -41,7 +43,7 @@ const CartPage = () => {
     message += `*Customer:* ${customerName || 'Valued Customer'}\n`;
     message += `*Date:* ${new Date(order.createdAt ?? Date.now()).toLocaleString()}\n\n`;
     message += `*Items:*\n${itemLines()}\n`;
-    message += `\n*Total:* ${formatPrice(order.totalAmount)}\n\n`;
+    message += `\n*Total:* ${formatKES(order.totalAmount)}\n\n`;
     message += `*Status:* ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n`;
     message += `Thank you for shopping with Millux Collections!`;
     return message;
@@ -81,7 +83,7 @@ const CartPage = () => {
     message += `*Customer:* ${customerName || 'Guest Customer'}\n`;
     message += `*Date:* ${new Date().toLocaleString()}\n\n`;
     message += `*Items:*\n${itemLines()}\n`;
-    message += `\n*Total:* ${formatPrice(cartTotal)}\n\n`;
+    message += `\n*Total:* ${formatKES(cartTotal)}\n\n`;
     message += `Please confirm availability and proceed with order.`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
     clearCart();
@@ -174,7 +176,7 @@ const CartPage = () => {
                 </div>
               </dl>
               <p className="mt-4 text-xs leading-relaxed text-soft">
-                Delivery and payment are arranged over WhatsApp after you place your order.
+                Delivery and payment are arranged over WhatsApp after you place your order.{isConverted && ` You will be charged in Kenyan shillings (${formatKES(cartTotal)}); US dollar amounts are approximate.`}
               </p>
 
               <div className="mt-8 space-y-3">

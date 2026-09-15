@@ -1,14 +1,11 @@
+import { formatAmount } from '@/lib/currency';
 import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export const formatMoney = (value: number): string =>
-  `£${(Number.isFinite(value) ? value : 0).toLocaleString('en-GB', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+export const formatMoney = (value: number): string => formatAmount(value, { cents: true });
 
 export const formatDate = (value?: string | null): string => {
   if (!value) return '—';

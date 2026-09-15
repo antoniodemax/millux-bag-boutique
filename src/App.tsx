@@ -31,6 +31,7 @@ import SiteFooter from "./components/SiteFooter";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import ScrollToTop from "./components/ScrollToTop";
 import AccountLayout from "./components/account/AccountLayout";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 import { me, User } from "@/services/authService";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 
@@ -144,7 +145,9 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Shell />
+          <CurrencyProvider>
+            <Shell />
+          </CurrencyProvider>
         </BrowserRouter>
       </TooltipProvider>
     </HelmetProvider>

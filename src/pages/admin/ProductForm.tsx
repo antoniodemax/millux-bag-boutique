@@ -307,7 +307,7 @@ const AdminProductForm = () => {
                     )}
                   />
                 </Field>
-                <Field label="Price (£)" error={errors.price?.message}>
+                <Field label="Price (KES)" error={errors.price?.message}>
                   <Input type="number" step="0.01" min="0" {...register('price')} className={inputClass} />
                 </Field>
                 <Field label="Stock" error={errors.stock?.message} hint="Units available to order">

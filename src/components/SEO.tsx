@@ -23,7 +23,7 @@ const SEO = ({
   url = window.location.href,
   type = "website",
   price,
-  currency = "GBP",
+  currency = "KES",
   availability,
   brand = "Millux Collections",
   category
